@@ -80,7 +80,7 @@ function similarity(base, p) {
   if (base.id===p.id) return -1;
   let score=0; if(base.type===p.type) score+=8; if(base.category===p.category) score+=5; if(base.room===p.room) score+=2;
   if(base.material && p.material && base.material.toLowerCase().includes(p.material.toLowerCase().split(',')[0])) score+=2;
-  if(base.store!==p.store) score+=2; const ratio=Math.min(base.price,p.price)/Math.max(base.price,p.price); score+=ratio*3;
+  if(base.store!==p.store) score+=10; const ratio=Math.min(base.price,p.price)/Math.max(base.price,p.price); score+=ratio*3;
   const words=new Set(base.name.toLowerCase().split(/\W+/)); p.name.toLowerCase().split(/\W+/).forEach(w=>{if(w.length>3&&words.has(w))score+=1}); return score;
 }
 function similarTo(p) { return PRODUCTS.map(x=>({p:x,s:similarity(p,x)})).filter(x=>x.s>=0).sort((a,b)=>b.s-a.s).slice(0,4).map(x=>x.p); }
