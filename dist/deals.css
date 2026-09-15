@@ -1,0 +1,67 @@
+:root { --ink:#1d1814; --cream:#f5efe6; --paper:#fffaf4; --orange:#fd5b27; --red:#a31918; --yellow:#f5cf41; --line:#dfd2c4; }
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { margin:0; background:var(--paper); color:var(--ink); font-family:"DM Sans",sans-serif; }
+.deal-header { min-height:76px; display:flex; justify-content:space-between; align-items:center; padding:0 max(5vw,24px); background:var(--ink); color:white; }
+.brand { display:flex; align-items:center; gap:12px; color:inherit; text-decoration:none; font-weight:700; letter-spacing:-.02em; }
+.brand-mark { width:36px; height:36px; display:grid; place-items:center; border-radius:50%; background:var(--yellow); color:var(--ink); font-size:13px; }
+.brand em { color:var(--yellow); font-style:normal; font-size:12px; margin-left:4px; }
+.catalogue-link { color:white; text-decoration:none; font-size:14px; font-weight:700; }
+.catalogue-link span { color:var(--yellow); margin-left:5px; }
+.deal-hero { min-height:480px; padding:72px max(8vw,28px) 68px; display:grid; grid-template-columns:minmax(0,1fr) 230px; align-items:end; gap:42px; position:relative; overflow:hidden; color:#fff9ee; background:var(--red); }
+.deal-hero::before { content:""; position:absolute; width:760px; height:760px; border:2px solid rgba(255,249,238,.25); border-radius:50%; right:-360px; top:-295px; box-shadow:0 0 0 45px rgba(255,249,238,.04),0 0 0 105px rgba(255,249,238,.04); }
+.deal-hero::after { content:""; position:absolute; width:100%; height:16px; background:repeating-linear-gradient(135deg,var(--yellow) 0 16px,#1d1814 16px 32px); bottom:0; left:0; }
+.hero-copy,.hero-stat { position:relative; z-index:1; }
+.eyebrow { margin:0 0 12px; text-transform:uppercase; letter-spacing:.14em; font-size:12px; font-weight:700; }
+.hero-copy .eyebrow { color:var(--yellow); }
+h1,h2 { font-family:"Playfair Display",serif; letter-spacing:-.05em; }
+h1 { max-width:700px; margin:0; font-size:clamp(54px,8vw,105px); line-height:.84; }
+h1 em { color:var(--yellow); font-style:normal; }
+.hero-note { max-width:430px; margin:26px 0; color:#f3d4c7; line-height:1.6; }
+.hero-cta { display:inline-flex; gap:10px; align-items:center; padding:13px 17px; background:var(--yellow); color:var(--ink); text-decoration:none; font-weight:700; border-radius:4px; }
+.hero-cta span { font-size:20px; }
+.hero-stat { padding:24px; background:#fff9ee; color:var(--ink); transform:rotate(-3deg); box-shadow:10px 12px 0 var(--ink); }
+.hero-stat strong { display:block; font:700 68px/.9 "Playfair Display",serif; color:var(--red); }
+.hero-stat span { display:block; margin-top:7px; font-size:15px; font-weight:700; }
+.hero-stat p { margin:14px 0 0; color:#665e58; font-size:12px; line-height:1.45; }
+.hero-stamp { position:absolute; z-index:1; top:44px; right:max(6vw,32px); display:flex; align-items:center; justify-content:center; width:120px; height:120px; border-radius:50%; background:var(--yellow); color:var(--ink); font:700 34px/.8 "Playfair Display",serif; transform:rotate(15deg); }
+.hero-stamp small { margin-left:7px; font:700 9px/1.05 "DM Sans",sans-serif; letter-spacing:.08em; }
+.deal-rules { display:grid; grid-template-columns:repeat(4,1fr); border-bottom:1px solid var(--line); background:var(--cream); }
+.deal-rules div { min-height:114px; padding:22px max(3vw,20px); border-right:1px solid var(--line); }
+.deal-rules div:last-child { border:0; }
+.deal-rules span { color:var(--red); font:700 30px/1 "Playfair Display",serif; }
+.deal-rules p { margin:9px 0 0; font-size:13px; font-weight:700; }
+.deal-section { max-width:1440px; margin:auto; padding:84px max(5vw,24px) 100px; }
+.section-intro { display:flex; justify-content:space-between; align-items:end; margin-bottom:38px; }
+.section-intro .eyebrow { color:var(--red); }
+.section-intro h2 { margin:0; font-size:clamp(38px,5vw,68px); line-height:.9; }
+.deal-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:19px; align-items:start; }
+.deal-card { overflow:hidden; background:white; border:1px solid var(--line); box-shadow:0 9px 0 rgba(29,24,20,.04); }
+.deal-card-0 { grid-column:span 2; grid-row:span 2; }
+.deal-card-0 .deal-image { aspect-ratio:1.18; }
+.deal-card-0 h3 { font-size:25px; }
+.deal-card-3 { margin-top:34px; }
+.deal-card-5 { margin-top:-26px; }
+.deal-card-6 { grid-column:span 2; }
+.deal-image { display:block; position:relative; aspect-ratio:1; background:#e6ddd2; overflow:hidden; }
+.deal-image img { width:100%; height:100%; object-fit:cover; display:block; transition:transform .35s ease; }
+.deal-card:hover .deal-image img { transform:scale(1.04); }
+.image-fallback { height:100%; display:grid; place-items:center; color:#8a7b6d; font:700 21px "Playfair Display",serif; }
+.discount { position:absolute; top:11px; left:11px; width:58px; height:58px; display:grid; place-content:center; border-radius:50%; background:var(--orange); color:white; text-align:center; font-size:19px; font-weight:700; line-height:.8; transform:rotate(-9deg); }
+.discount small { display:block; margin-top:5px; font-size:10px; text-transform:uppercase; letter-spacing:.07em; }
+.deal-body { padding:16px; }
+.deal-meta { display:flex; justify-content:space-between; gap:10px; color:#827568; font-size:11px; text-transform:uppercase; letter-spacing:.07em; font-weight:700; }
+.deal-body h3 { min-height:43px; margin:9px 0 12px; font-size:16px; line-height:1.28; }
+.prices { display:flex; align-items:baseline; gap:8px; margin:0; }
+.prices strong { font-size:19px; }
+.prices span { color:#9a8f86; font-size:13px; text-decoration:line-through; }
+.saving { display:flex; justify-content:space-between; margin-top:13px; padding:8px 0; border-top:1px solid var(--line); color:#75695f; font-size:12px; }
+.saving b { color:var(--red); }
+.view-deal { display:flex; justify-content:space-between; margin-top:12px; padding-top:11px; border-top:1px solid var(--line); color:var(--ink); text-decoration:none; font-size:13px; font-weight:700; }
+.view-deal span { color:var(--red); }
+.empty { padding:70px; text-align:center; border:1px dashed var(--line); }
+.empty h2 { margin:0 0 8px; }
+.empty a { color:var(--red); font-weight:700; }
+footer { padding:28px max(5vw,24px); background:var(--ink); color:#c8bcb0; font-size:12px; line-height:1.5; }
+@media (max-width:900px) { .deal-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .deal-card-0,.deal-card-6 { grid-column:span 1; grid-row:span 1; } .deal-card-0 .deal-image { aspect-ratio:1; } .deal-card-0 h3 { font-size:16px; } .deal-card-3,.deal-card-5 { margin-top:0; } }
+@media (max-width:660px) { .deal-header { min-height:64px; } .catalogue-link { font-size:12px; } .deal-hero { min-height:590px; display:block; padding-top:58px; } .hero-stat { width:210px; margin:48px 0 0 auto; } .hero-stamp { top:30px; right:22px; width:90px; height:90px; font-size:26px; } .hero-stamp small { font-size:7px; } .deal-rules { grid-template-columns:repeat(2,1fr); } .deal-rules div:nth-child(2) { border-right:0; } .deal-rules div { min-height:98px; border-bottom:1px solid var(--line); } .deal-rules div:nth-child(n+3) { border-bottom:0; } .deal-section { padding-top:58px; } .deal-grid { gap:12px; } .deal-body { padding:12px; } .deal-meta { display:block; } .deal-meta span:last-child { display:block; margin-top:4px; } .deal-body h3 { font-size:14px; min-height:54px; } .prices strong { font-size:16px; } }
