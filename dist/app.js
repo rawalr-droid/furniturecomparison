@@ -100,9 +100,11 @@ function groupedRows(rows) {
 
 function filteredProducts() {
   const terms = state.query.toLowerCase().split(/\s+/).filter(Boolean);
+  const intents = {bed:['Bed','Bunk & Loft Bed'],beds:['Bed','Bunk & Loft Bed'],towel:['Towel'],towels:['Towel'],sofa:['Sofa','Sofa Set','Corner & Modular Sofa','Sofa Bed'],sofas:['Sofa','Sofa Set','Corner & Modular Sofa','Sofa Bed'],'dining chair':['Dining Chair'],'dining chairs':['Dining Chair'],'dining table':['Dining Table'],'dining tables':['Dining Table'],rug:['Rug'],rugs:['Rug'],mirror:['Mirror'],mirrors:['Mirror']};
+  const intent=intents[state.query.toLowerCase().trim()];
   const matches = PRODUCTS.filter(p => {
     const haystack = `${p.name} ${p.variant} ${p.category} ${p.type} ${p.material} ${p.store}`.toLowerCase();
-    return terms.every(t => haystack.includes(t)) &&
+    return (intent ? intent.includes(p.type) : terms.every(t => haystack.includes(t))) &&
       (!state.category || p.category === state.category) && (!state.room || p.room === state.room) &&
       (!state.store || p.store === state.store) && (!state.min || p.price >= Number(state.min)) &&
       (!state.max || p.price <= Number(state.max)) && (!state.sale || p.discount > 0);
@@ -172,7 +174,7 @@ function similarTo(product) {
   return [...PRODUCT_GROUPS.entries()]
     .filter(([key]) => key !== productKey(product))
     .map(([,variants]) => { const p=bestVariant(variants); return {p:{...p,_displayName:groupName(variants)},s:similarity(product,p)}; })
-    .filter(x=>x.s>=0).sort((a,b)=>b.s-a.s).slice(0,4).map(x=>x.p);
+    .filter(x=>x.s>=0 && x.p.type===product.type && (product.room==='Outdoor')===(x.p.room==='Outdoor')).sort((a,b)=>b.s-a.s).slice(0,4).map(x=>x.p);
 }
 function fact(label,value){ return value ? `<div class="fact"><span>${label}</span>${escapeHTML(value)}</div>`:''; }
 
