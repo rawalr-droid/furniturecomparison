@@ -129,12 +129,12 @@ function card(p) {
   const count = p._variants.length;
   const price = p._minPrice < p._maxPrice ? `From ${money(p._minPrice)}` : money(p._minPrice);
   return `<article class="product-card">
-    <div class="product-media" data-view="${escapeHTML(p.id)}">${imageMarkup(p)}${count > 1 ? `<span class="variant-count">${count} options</span>` : ''}</div>
+    <a class="product-media" href="product.html?id=${encodeURIComponent(p.id)}" target="_blank" rel="noopener">${imageMarkup(p)}${count > 1 ? `<span class="variant-count">${count} options</span>` : ''}</a>
     <div class="product-body">
       <div class="product-kicker"><span>${escapeHTML(p.store)}</span>${p._maxDiscount ? `<span class="sale-badge">Up to ${Math.round(p._maxDiscount*100)}% off</span>` : ''}</div>
-      <h3>${escapeHTML(p._displayName)}</h3>
+      <h3><a href="product.html?id=${encodeURIComponent(p.id)}" target="_blank" rel="noopener">${escapeHTML(p._displayName)}</a></h3>
       <div class="price">${price}${p.original > p.price && p._minPrice === p._maxPrice ? `<span class="was-price">${money(p.original)}</span>` : ''}</div>
-      <div class="card-actions"><button class="view-button" data-view="${escapeHTML(p.id)}">View details</button><button class="${selected?'selected':''}" data-compare="${escapeHTML(p.id)}">${selected?'Added':'Compare'}</button></div>
+      <div class="card-actions"><a class="view-button" href="product.html?id=${encodeURIComponent(p.id)}" target="_blank" rel="noopener">View details ↗</a><button class="${selected?'selected':''}" data-compare="${escapeHTML(p.id)}">${selected?'Added':'Compare'}</button></div>
     </div>
   </article>`;
 }
@@ -178,33 +178,7 @@ function similarTo(product) {
 }
 function fact(label,value){ return value ? `<div class="fact"><span>${label}</span>${escapeHTML(value)}</div>`:''; }
 
-function openProduct(id) {
-  const p=PRODUCTS.find(x=>x.id===id); if(!p)return;
-  const variants=PRODUCT_GROUPS.get(productKey(p)) || [p];
-  const parentName=groupName(variants);
-  const currentIndex=Math.max(0,variants.findIndex(v=>v.id===p.id));
-  const previous=variants[(currentIndex-1+variants.length)%variants.length];
-  const next=variants[(currentIndex+1)%variants.length];
-  const similar=similarTo(p);
-  const thumbnails=variants.map(v=>`<button class="variant-thumb ${v.id===p.id?'active':''}" data-variant="${escapeHTML(v.id)}" type="button" aria-label="Select ${escapeHTML(variantLabel(v,parentName))}" title="${escapeHTML(variantLabel(v,parentName))}">
-    <img src="${escapeHTML(v.image)}" alt="" loading="lazy"><span>${escapeHTML(variantLabel(v,parentName))}</span>
-  </button>`).join('');
-  $('productDialogContent').innerHTML=`<div class="product-detail">
-    <div class="detail-gallery">
-      ${imageMarkup(p,'detail-image')}
-      ${variants.length>1?`<button class="gallery-arrow gallery-prev" data-variant="${escapeHTML(previous.id)}" aria-label="Previous option">‹</button><button class="gallery-arrow gallery-next" data-variant="${escapeHTML(next.id)}" aria-label="Next option">›</button><div class="detail-thumbnails">${thumbnails}</div>`:''}
-    </div>
-    <div class="detail-copy"><div class="store">${escapeHTML(p.store)}</div><h2>${escapeHTML(parentName)}</h2>
-      ${variants.length>1?`<p class="selected-variant"><span>Colour / option</span>${escapeHTML(variantLabel(p,parentName))} <small>${currentIndex+1} of ${variants.length}</small></p>`:`<p class="variant">${escapeHTML(variantLabel(p,parentName))}</p>`}
-      <p class="detail-price">${money(p.price)}${p.original>p.price?` <span class="was-price">${money(p.original)}</span>`:''}</p>
-      <div class="facts">${fact('Category',p.type)}${fact('Room',p.room)}${fact('Material',p.material)}${fact('Dimensions',p.dimensions)}</div>
-      <p class="description">${escapeHTML(p.description||'See the retailer website for full product information.')}</p>
-      <a class="retailer-link" href="${escapeHTML(retailerURL(p))}" target="_blank" rel="noopener sponsored">View this option at ${escapeHTML(p.store)}</a>
-    </div>
-    <div class="similar-wrap"><h3>Similar pieces across stores</h3><div class="similar-grid">${similar.map(s=>`<button class="similar-item" data-view="${escapeHTML(s.id)}">${imageMarkup(s)}<div><strong>${escapeHTML(s._displayName)}</strong><span>${money(s.price)} · ${escapeHTML(s.store)}</span></div></button>`).join('')}</div></div>
-  </div>`;
-  if (!els.productDialog.open) els.productDialog.showModal();
-}
+function openProduct(id) { window.open("product.html?id="+encodeURIComponent(id), "_blank", "noopener"); }
 
 function toggleCompare(id) {
   if(state.compare.includes(id)) state.compare=state.compare.filter(x=>x!==id);
@@ -220,7 +194,7 @@ function openCompare() {
     ${row('Selected option',p=>escapeHTML(variantLabel(p,groupName(PRODUCT_GROUPS.get(productKey(p))||[p]))))}
     ${row('Price',p=>`<strong>${money(p.price)}</strong>${p.original>p.price?`<br><small>${Math.round(p.discount*100)}% off</small>`:''}`)}
     ${row('Type',p=>escapeHTML(p.type))}${row('Material',p=>escapeHTML(p.material))}${row('Dimensions',p=>escapeHTML(p.dimensions))}
-    ${row('',p=>`<a href="${escapeHTML(retailerURL(p))}" target="_blank" rel="noopener sponsored">View at retailer</a>`)}</tbody></table>`;
+    ${row('',p=>`<a href="product.html?id=${encodeURIComponent(p.id)}" target="_blank" rel="noopener">View details</a>`)}</tbody></table>`;
   els.compareDialog.showModal();
 }
 function toast(message){ const t=$('toast');t.textContent=message;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800); }

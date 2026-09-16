@@ -3,119 +3,50 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Search and compare furniture from stores across the UAE." />
-  <title>Furnish Finder UAE</title>
+  <meta name="description" content="The strongest furniture discounts currently available across Furnish Finder UAE." />
+  <title>70%+ Deals | Furnish Finder UAE</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=taxonomy-20260916" />
-</head>
+  <link rel="stylesheet" href="deals.css?v=pages-v1" />
+<link rel="stylesheet" href="pages.css?v=pages-v1"></head>
 <body>
-  <header class="site-header">
-    <a class="brand" href="#" aria-label="Furnish Finder UAE home">
-      <span class="brand-mark">FF</span>
-      <span>Furnish Finder <em>UAE</em></span>
-    </a>
-    <div class="header-actions">
-      <a class="deal-link" href="deals.html">70%+ deals</a>
-      <button class="compare-trigger" id="compareTrigger" type="button" disabled>
-        Compare <span id="compareCount">0</span>
-      </button>
-    </div>
+  <header class="deal-header">
+    <a class="brand" href="index.html" aria-label="Furnish Finder UAE home"><span class="brand-mark">FF</span><span>Furnish Finder <em>UAE</em></span></a>
+    <a class="catalogue-link" href="browse.html">Browse all furniture <span>↗</span></a>
   </header>
 
   <main>
-    <section class="search-stage">
-      <div class="eyebrow">Furniture from stores across the UAE</div>
-      <h1>Find the right piece,<br><span>without opening ten tabs.</span></h1>
-      <form class="search-box" id="searchForm" role="search">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 21-4.35-4.35m2.35-5.65a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z"/></svg>
-        <input id="searchInput" type="search" placeholder="Search sofas, dining tables, mirrors…" autocomplete="off" aria-label="Search furniture" />
-        <button type="submit">Search</button>
-      </form>
-      <div class="quick-searches" aria-label="Popular searches">
-        <span>Popular:</span>
-        <button data-query="sofa">Sofas</button>
-        <button data-query="dining table">Dining tables</button>
-        <button data-query="bed">Beds</button>
-        <button data-query="mirror">Mirrors</button>
+    <section class="deal-hero">
+      <div class="hero-copy">
+        <p class="eyebrow">The deal edit</p>
+        <h1>Furniture that<br><em>really</em> moved.</h1>
+        <p class="hero-note">Only items reduced by at least 70%, originally priced from AED 1,000. Curated across rooms and categories.</p>
+        <a class="hero-cta" href="#dealGrid">See the drop <span>↓</span></a>
       </div>
+      <div class="hero-stat">
+        <strong id="dealCount">—</strong>
+        <span>seriously reduced pieces</span>
+        <p>Each category is capped at 20% of this edit.</p>
+      </div>
+      <div class="hero-stamp">70%<small>OFF<br>OR MORE</small></div>
     </section>
 
-    <section class="browse-shell" id="browse">
-      <div class="section-heading">
-        <div>
-          <p id="resultLabel">Browse the catalogue</p>
-          <h2 id="resultCount">Loading furniture…</h2>
-        </div>
-        <button class="filter-toggle" id="filterToggle" type="button">Filters</button>
-      </div>
+    <section class="deal-rules">
+      <div><span>01</span><p>70%+ off</p></div>
+      <div><span>02</span><p>AED 1,000+ original price</p></div>
+      <div><span>03</span><p>Balanced across categories</p></div>
+      <div><span id="updatedDate">—</span><p>Last catalogue refresh</p></div>
+    </section>
 
-      <div class="catalogue-layout">
-        <aside class="filters" id="filters" aria-label="Product filters">
-          <div class="filter-top">
-            <h3>Filter</h3>
-            <button id="clearFilters" type="button">Clear all</button>
-          </div>
-          <label class="filter-field">Category
-            <select id="categoryFilter"><option value="">All categories</option></select>
-          </label>
-          <label class="filter-field">Room
-            <select id="roomFilter"><option value="">All rooms</option></select>
-          </label>
-          <label class="filter-field">Store
-            <select id="storeFilter"><option value="">All stores</option></select>
-          </label>
-          <div class="filter-field">
-            <span>Price range</span>
-            <div class="price-row">
-              <label><span>AED</span><input id="minPrice" inputmode="numeric" type="number" min="0" placeholder="Min" /></label>
-              <label><span>AED</span><input id="maxPrice" inputmode="numeric" type="number" min="0" placeholder="Max" /></label>
-            </div>
-          </div>
-          <label class="checkbox-row"><input id="saleOnly" type="checkbox" /><span>On sale only</span></label>
-        </aside>
-
-        <div class="results-area">
-          <div class="sort-row">
-            <div class="active-filters" id="activeFilters"></div>
-            <label>Sort
-              <select id="sortSelect">
-                <option value="featured">Featured</option>
-                <option value="price-low">Price: low to high</option>
-                <option value="price-high">Price: high to low</option>
-                <option value="discount">Biggest discount</option>
-                <option value="name">Name</option>
-              </select>
-            </label>
-          </div>
-          <div class="product-grid" id="productGrid" aria-live="polite"></div>
-          <button class="load-more" id="loadMore" type="button">Show more</button>
-          <div class="empty-state" id="emptyState" hidden>
-            <h3>No matching furniture</h3>
-            <p>Try removing a filter or searching for a broader term.</p>
-            <button type="button" id="emptyReset">Reset search</button>
-          </div>
-        </div>
-      </div>
+    <section class="deal-section" id="dealGrid">
+      <div class="section-intro"><p class="eyebrow">The shortlist</p><h2>Big reductions.<br>Little digging.</h2></div>
+      <div class="deal-grid" id="deals"></div>
+      <div class="empty" id="empty" hidden><h2>Deals are being refreshed.</h2><p>Try the full catalogue while we update this edit.</p><a href="browse.html">Browse all furniture</a></div>
     </section>
   </main>
-
-  <dialog class="product-dialog" id="productDialog">
-    <button class="dialog-close" data-close="product" aria-label="Close product details">×</button>
-    <div id="productDialogContent"></div>
-  </dialog>
-
-  <dialog class="compare-dialog" id="compareDialog">
-    <div class="compare-head">
-      <div><p>Side-by-side</p><h2>Compare furniture</h2></div>
-      <button class="dialog-close" data-close="compare" aria-label="Close comparison">×</button>
-    </div>
-    <div id="compareContent"></div>
-  </dialog>
-
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="catalogue.js?v=taxonomy-20260916"></script>
-  <script src="app.js?v=taxonomy-20260916"></script>
+  <footer>Prices and availability are supplied by the retailer and can change. Always check the retailer page before buying.</footer>
+  <script src="catalogue.js?v=pages-v1"></script>
+  <script src="deals.js?v=pages-v1"></script>
 </body>
 </html>
