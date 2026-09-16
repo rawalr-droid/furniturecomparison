@@ -4,8 +4,41 @@ const escapeHTML = (value = '') => String(value).replace(/[&<>'"]/g, char => ({ 
 
 function savings(product) { return Math.max(0, product.original - product.price); }
 
+function productKey(product) {
+  const raw = String(product.url || '').trim();
+  try {
+    const url = new URL(raw, window.location.href);
+    const shopify = url.pathname.match(/\/products\/([^/]+)/i);
+    const path = shopify ? `/products/${shopify[1]}` : url.pathname.replace(/\/$/, '');
+    return `${product.store}|${url.hostname.toLowerCase()}${path.toLowerCase()}`;
+  } catch (_) {
+    return `${product.store}|${raw.split(/[?#]/)[0].replace(/\/$/, '').toLowerCase() || product.id}`;
+  }
+}
+
+function retailerURL(product) {
+  const raw = String(product.url || '');
+  const variantId = String(product.id || '').match(/(\d{8,})$/)?.[1];
+  if (!variantId || !/\/products\//i.test(raw)) return raw;
+  try {
+    const url = new URL(raw);
+    url.searchParams.set('variant', variantId);
+    return url.toString();
+  } catch (_) { return raw; }
+}
+
+function uniqueBestDeals(products) {
+  const groups = new Map();
+  for (const product of products) {
+    const key = productKey(product);
+    const current = groups.get(key);
+    if (!current || product.discount > current.discount || (product.discount === current.discount && savings(product) > savings(current))) groups.set(key, product);
+  }
+  return [...groups.values()];
+}
+
 function selectBalancedDeals() {
-  const candidates = DEALS
+  const candidates = uniqueBestDeals(DEALS)
     .filter(product => product.discount >= .7 && product.original >= 1000 && product.price > 0 && product.url)
     .sort((a, b) => b.discount - a.discount || savings(b) - savings(a) || b.original - a.original);
 
@@ -30,13 +63,13 @@ function card(product, index) {
     ? `<img src="${escapeHTML(product.image)}" alt="${escapeHTML(product.name)}" loading="lazy">`
     : `<div class="image-fallback">Furniture deal</div>`;
   return `<article class="deal-card deal-card-${index % 7}">
-    <a class="deal-image" href="${escapeHTML(product.url)}" target="_blank" rel="noopener sponsored">${image}<span class="discount">${percent}%<small>off</small></span></a>
+    <a class="deal-image" href="${escapeHTML(retailerURL(product))}" target="_blank" rel="noopener sponsored">${image}<span class="discount">${percent}%<small>off</small></span></a>
     <div class="deal-body">
       <div class="deal-meta"><span>${escapeHTML(product.category)}</span><span>${escapeHTML(product.store)}</span></div>
       <h3>${escapeHTML(product.name)}</h3>
       <p class="prices"><strong>${AED.format(product.price)}</strong><span>${AED.format(product.original)}</span></p>
       <div class="saving"><span>You save</span><b>${AED.format(savings(product))}</b></div>
-      <a class="view-deal" href="${escapeHTML(product.url)}" target="_blank" rel="noopener sponsored">View this deal <span>↗</span></a>
+      <a class="view-deal" href="${escapeHTML(retailerURL(product))}" target="_blank" rel="noopener sponsored">View this deal <span>↗</span></a>
     </div>
   </article>`;
 }

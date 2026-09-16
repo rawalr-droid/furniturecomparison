@@ -67,7 +67,9 @@ h1 span { color: #a8b7b1; }
 .product-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
 .product-card { background: white; border: 1px solid var(--line); border-radius: 15px; overflow: hidden; transition: transform .2s ease, box-shadow .2s ease; min-width: 0; }
 .product-card:hover { transform: translateY(-3px); box-shadow: 0 14px 35px rgba(20,46,37,.1); }
+.product-media { position: relative; }
 .product-image { aspect-ratio: 1.22; width: 100%; display: block; object-fit: cover; background: #e9eeeb; cursor: pointer; }
+.variant-count { position: absolute; right: 11px; bottom: 11px; padding: 6px 10px; border-radius: 999px; background: rgba(255,255,255,.94); color: var(--green-dark); box-shadow: 0 3px 12px rgba(15,45,35,.15); font-size: 11px; font-weight: 700; }
 .image-fallback { aspect-ratio: 1.22; display: grid; place-items: center; background: linear-gradient(135deg,#e8eeea,#dce5e0); color: #87948f; font: 600 19px "Playfair Display",serif; }
 .product-body { padding: 15px; }
 .product-kicker { display: flex; justify-content: space-between; gap: 8px; color: var(--muted); font-size: 12px; }
@@ -88,11 +90,23 @@ dialog { width: min(1100px, calc(100% - 32px)); max-height: calc(100vh - 40px); 
 dialog::backdrop { background: rgba(5,24,18,.68); backdrop-filter: blur(3px); }
 .dialog-close { position: absolute; top: 15px; right: 16px; width: 38px; height: 38px; border: 0; border-radius: 50%; background: rgba(255,255,255,.9); font-size: 25px; z-index: 3; }
 .product-detail { display: grid; grid-template-columns: 1fr 1fr; }
-.detail-image { width: 100%; height: 100%; min-height: 520px; object-fit: cover; background: #e7ece9; }
+.detail-gallery { position: relative; align-self: stretch; min-width: 0; background: #e7ece9; }
+.detail-image { width: 100%; height: 520px; display: block; object-fit: cover; background: #e7ece9; }
+.gallery-arrow { position: absolute; top: 235px; width: 42px; height: 42px; border: 1px solid var(--line); border-radius: 50%; background: rgba(255,255,255,.95); color: var(--ink); box-shadow: 0 4px 14px rgba(15,45,35,.15); font-size: 31px; line-height: 1; z-index: 2; }
+.gallery-prev { left: 14px; }
+.gallery-next { right: 14px; }
+.detail-thumbnails { display: flex; gap: 9px; padding: 14px; overflow-x: auto; background: white; scrollbar-width: thin; }
+.variant-thumb { flex: 0 0 78px; border: 2px solid transparent; border-radius: 8px; padding: 3px; background: white; color: var(--muted); text-align: left; }
+.variant-thumb.active { border-color: var(--green); }
+.variant-thumb img { width: 100%; aspect-ratio: 1; display: block; object-fit: cover; border-radius: 5px; background: #e7ece9; }
+.variant-thumb span { display: block; margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 9px; }
 .detail-copy { padding: 55px 46px 42px; }
 .detail-copy .store { color: var(--green); text-transform: uppercase; letter-spacing: .1em; font-size: 12px; font-weight: 700; }
 .detail-copy h2 { margin: 9px 0 5px; font: 700 38px/1.08 "Playfair Display",serif; }
 .variant { color: var(--muted); margin: 0 0 18px; }
+.selected-variant { margin: 14px 0 18px; font-weight: 600; }
+.selected-variant span { display: block; margin-bottom: 4px; color: var(--muted); font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: .06em; }
+.selected-variant small { margin-left: 7px; color: var(--muted); font-weight: 400; }
 .detail-price { font-size: 25px; font-weight: 700; margin: 0 0 22px; }
 .facts { display: grid; grid-template-columns: 1fr 1fr; margin: 20px 0; border-top: 1px solid var(--line); }
 .fact { padding: 13px 10px 13px 0; border-bottom: 1px solid var(--line); }
@@ -123,6 +137,8 @@ dialog::backdrop { background: rgba(5,24,18,.68); backdrop-filter: blur(3px); }
   .product-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
   .catalogue-layout { grid-template-columns: 205px 1fr; gap: 22px; }
   .product-detail { grid-template-columns: 43% 57%; }
+  .detail-image { height: 460px; }
+  .gallery-arrow { top: 205px; }
   .detail-copy { padding: 50px 30px 30px; }
   .similar-grid { grid-template-columns: repeat(2,1fr); }
 }
@@ -146,7 +162,9 @@ dialog::backdrop { background: rgba(5,24,18,.68); backdrop-filter: blur(3px); }
   .sort-row > label { display: grid; gap: 4px; }
   .sort-row select { min-width: 135px; }
   .product-detail { display: block; }
-  .detail-image { min-height: 0; height: 330px; }
+  .detail-image { min-height: 0; height: 390px; }
+  .gallery-arrow { top: 174px; }
+  .variant-thumb { flex-basis: 70px; }
   .detail-copy { padding: 30px 22px; }
   .detail-copy h2 { font-size: 30px; }
   .similar-wrap { padding: 24px 18px; }
