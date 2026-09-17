@@ -3,50 +3,86 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="The strongest furniture discounts currently available across Furnish Finder UAE." />
-  <title>70%+ Deals | Furnish Finder UAE</title>
+  <meta name="description" content="Search furniture across UAE stores, compare prices and discover the best deals." />
+  <title>Furnish Finder UAE | Search every furniture store at once</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="deals.css?v=gapless-v2" />
-<link rel="stylesheet" href="pages.css?v=pages-v1"></head>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230d3b2e'/%3E%3Cpath d='M15 18h34v9H25v8h20v9H25v12H15z' fill='%23fff'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="deals.css?v=retail-v1" />
+  <link rel="stylesheet" href="pages.css?v=pages-v1" />
+</head>
 <body>
-  <header class="deal-header">
-    <a class="brand" href="index.html" aria-label="Furnish Finder UAE home"><span class="brand-mark">FF</span><span>Furnish Finder <em>UAE</em></span></a>
-    <a class="catalogue-link" href="browse.html">Browse all furniture <span>↗</span></a>
+  <div class="announcement">One search. Thousands of products across UAE furniture stores.</div>
+  <header class="site-header">
+    <a class="brand" href="index.html" aria-label="Furnish Finder UAE home">
+      <span class="brand-word">FURNISH<span>FINDER</span></span><small>UAE</small>
+    </a>
+    <form class="header-search" action="browse.html" role="search">
+      <input name="q" type="search" placeholder="What are you looking for?" aria-label="Search furniture" />
+      <button type="submit" aria-label="Search">⌕</button>
+    </form>
+    <nav class="header-actions" aria-label="Quick links">
+      <a href="browse.html">Browse all</a>
+      <a href="#deals">Deals</a>
+    </nav>
   </header>
 
+  <nav class="category-nav" aria-label="Furniture categories">
+    <a class="nav-feature" href="#deals">Top deals</a>
+    <a href="browse.html?q=sofa">Sofas</a>
+    <a href="browse.html?q=dining%20table">Dining</a>
+    <a href="browse.html?q=bed">Bedroom</a>
+    <a href="browse.html?q=coffee%20table">Tables</a>
+    <a href="browse.html?q=chair">Chairs</a>
+    <a href="browse.html?q=storage">Storage</a>
+    <a href="browse.html?q=outdoor">Outdoor</a>
+    <a href="browse.html?q=lighting">Lighting</a>
+  </nav>
+
   <main>
-    <section class="deal-hero">
-      <div class="hero-copy">
-        <p class="eyebrow">The deal edit</p>
-        <h1>Furniture that<br><em>really</em> moved.</h1>
-        <p class="hero-note">Only items reduced by at least 70%, originally priced from AED 1,000. Curated across rooms and categories.</p>
-        <a class="hero-cta" href="#dealGrid">See the drop <span>↓</span></a>
-      </div>
-      <div class="hero-stat">
-        <strong id="dealCount">—</strong>
-        <span>seriously reduced pieces</span>
-        <p>Each category is capped at 20% of this edit.</p>
-      </div>
-      <div class="hero-stamp">70%<small>OFF<br>OR MORE</small></div>
+    <section class="hero-grid" aria-label="Featured furniture discovery">
+      <a class="hero-card hero-main" href="#deals">
+        <div class="hero-copy">
+          <p>THE UAE DEAL EDIT</p>
+          <h1>Great furniture.<br><span>Better prices.</span></h1>
+          <div class="hero-button">Shop today’s best deals</div>
+        </div>
+        <div class="hero-product" id="heroProduct"></div>
+      </a>
+      <a class="hero-card hero-secondary" href="browse.html">
+        <p>SEARCH THEM ALL</p>
+        <h2>Every store.<br>One search.</h2>
+        <span>Explore the full catalogue →</span>
+      </a>
+      <a class="hero-card hero-tertiary" id="similarHero" href="browse.html?q=sofa">
+        <p>FIND SIMILAR FOR LESS</p>
+        <h2>Love the look,<br>not the price?</h2>
+        <span>Discover alternatives →</span>
+      </a>
     </section>
 
-    <section class="deal-rules">
-      <div><span>01</span><p>70%+ off</p></div>
-      <div><span>02</span><p>AED 1,000+ original price</p></div>
-      <div><span>03</span><p>Balanced across categories</p></div>
-      <div><span id="updatedDate">—</span><p>Last catalogue refresh</p></div>
+    <section class="category-section">
+      <div class="section-head"><div><p>START WITH A ROOM</p><h2>Shop by category</h2></div><a href="browse.html">View all furniture →</a></div>
+      <div class="category-strip" id="categoryStrip"></div>
     </section>
 
-    <section class="deal-section" id="dealGrid">
-      <div class="section-intro"><p class="eyebrow">The shortlist</p><h2>Big reductions.<br>Little digging.</h2></div>
-      <div class="deal-grid" id="deals"></div>
+    <section class="deals-section" id="deals">
+      <div class="section-head"><div><p>PRICE DROPS WORTH SEEING</p><h2>Today’s standout deals</h2></div><div class="deal-summary"><strong id="dealCount">—</strong> hand-picked reductions</div></div>
+      <div class="deal-grid" id="dealGrid"></div>
       <div class="empty" id="empty" hidden><h2>Deals are being refreshed.</h2><p>Try the full catalogue while we update this edit.</p><a href="browse.html">Browse all furniture</a></div>
+      <a class="view-all" href="browse.html?deals=1">Explore all furniture on sale</a>
+    </section>
+
+    <section class="why-section">
+      <div><span>01</span><h3>Search across stores</h3><p>Skip the tab-hopping and see UAE furniture in one place.</p></div>
+      <div><span>02</span><h3>Compare the details</h3><p>Check prices, dimensions, materials and current offers.</p></div>
+      <div><span>03</span><h3>Buy from the retailer</h3><p>We send you directly to the original store to complete the purchase.</p></div>
     </section>
   </main>
-  <footer>Prices and availability are supplied by the retailer and can change. Always check the retailer page before buying.</footer>
+
+  <footer><a class="brand footer-brand" href="index.html"><span class="brand-word">FURNISH<span>FINDER</span></span><small>UAE</small></a><p>Prices and availability can change. Always confirm details with the retailer before buying.</p></footer>
   <script src="catalogue.js?v=pages-v1"></script>
-  <script src="deals.js?v=pages-v1"></script>
+  <script src="deals.js?v=retail-v1"></script>
 </body>
 </html>

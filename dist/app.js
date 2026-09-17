@@ -1,6 +1,7 @@
 const PRODUCTS = window.CATALOGUE || [];
 const PAGE_SIZE = 24;
-const state = { query: '', category: '', room: '', store: '', min: '', max: '', sale: false, sort: 'featured', shown: PAGE_SIZE, compare: [] };
+const initialParams = new URLSearchParams(window.location.search);
+const state = { query: initialParams.get('q') || '', category: '', room: '', store: '', min: '', max: '', sale: initialParams.get('deals') === '1', sort: 'featured', shown: PAGE_SIZE, compare: [] };
 
 const $ = (id) => document.getElementById(id);
 const els = {
@@ -9,6 +10,8 @@ const els = {
   sale: $('saleOnly'), sort: $('sortSelect'), load: $('loadMore'), empty: $('emptyState'), active: $('activeFilters'),
   compareCount: $('compareCount'), compareTrigger: $('compareTrigger'), productDialog: $('productDialog'), compareDialog: $('compareDialog')
 };
+els.search.value = state.query;
+els.sale.checked = state.sale;
 
 function money(value) { return new Intl.NumberFormat('en-AE', {style:'currency', currency:'AED', maximumFractionDigits:0}).format(value || 0); }
 function escapeHTML(value='') { return String(value).replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#039;','"':'&quot;'}[c])); }
