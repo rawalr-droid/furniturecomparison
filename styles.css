@@ -100,6 +100,9 @@ dialog::backdrop { background: rgba(5,24,18,.68); backdrop-filter: blur(3px); }
 .variant-thumb.active { border-color: var(--green); }
 .variant-thumb img { width: 100%; aspect-ratio: 1; display: block; object-fit: cover; border-radius: 5px; background: #e7ece9; }
 .variant-thumb span { display: block; margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 9px; }
+.image-thumb { flex-basis: 68px; text-align: center; }
+.option-thumbnails { display: flex; gap: 8px; max-width: 100%; margin: -6px 0 18px; overflow-x: auto; }
+.option-thumbnails .variant-thumb { flex-basis: 72px; }
 .detail-copy { padding: 55px 46px 42px; }
 .detail-copy .store { color: var(--green); text-transform: uppercase; letter-spacing: .1em; font-size: 12px; font-weight: 700; }
 .detail-copy h2 { margin: 9px 0 5px; font: 700 38px/1.08 "Playfair Display",serif; }
@@ -112,6 +115,14 @@ dialog::backdrop { background: rgba(5,24,18,.68); backdrop-filter: blur(3px); }
 .fact { padding: 13px 10px 13px 0; border-bottom: 1px solid var(--line); }
 .fact span { display: block; color: var(--muted); font-size: 12px; margin-bottom: 3px; }
 .description { color: #4d5b56; line-height: 1.65; max-height: 130px; overflow: auto; }
+.product-features, .product-care, .product-specs { margin-top: 22px; }
+.product-features h3, .product-care h3, .product-specs h3 { margin: 0 0 10px; font-size: 16px; }
+.product-features ul { margin: 0; padding-left: 19px; color: #4d5b56; line-height: 1.7; }
+.product-care p { margin: 0; color: #4d5b56; line-height: 1.65; }
+.product-specs dl { margin: 0; border-top: 1px solid var(--line); }
+.product-specs dl div { display: grid; grid-template-columns: minmax(110px,.8fr) 1.2fr; gap: 16px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.product-specs dt { color: var(--muted); }
+.product-specs dd { margin: 0; }
 .retailer-link { display: inline-flex; justify-content: center; width: 100%; margin-top: 18px; padding: 13px; color: white; background: var(--green); border-radius: 10px; text-decoration: none; font-weight: 700; }
 .similar-wrap { grid-column: 1/-1; padding: 30px 36px 38px; background: #f1f5f2; }
 .similar-wrap h3 { margin: 0 0 16px; font: 700 25px "Playfair Display",serif; }

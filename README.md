@@ -28,3 +28,18 @@ $CODEX_PRIMARY_RUNTIME_NODE scripts/export-catalogue.mjs /path/to/UAE_Furniture_
 ```
 
 The current similarity engine is a transparent MVP based on product type, category, room, material, price and name overlap. It can later be upgraded to image/text embeddings without changing the page design.
+
+To replace Pan Home with a fresh scraper JSON while retaining every other
+retailer, run:
+
+```bash
+node scripts/merge-retailer-json.mjs /path/to/pan_home_products.json catalogue.js "Pan Home"
+node scripts/split-retailer-catalogue.mjs catalogue.js "Pan Home" .
+```
+
+The importer keeps one website record per product, stores every product image
+inside the `images` array, and deliberately omits videos, exact inventory
+quantities, low-stock labels, preorder/on-demand status, fabric swatches and
+fabric durability ratings. The splitter writes browser-friendly files to both
+`catalogue-data/` and `dist/catalogue-data/`. The loader replaces the older Pan
+Home rows at runtime, so the catalogue does not contain duplicates.
