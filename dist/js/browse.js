@@ -5,7 +5,7 @@
   const params = new URLSearchParams(location.search);
   const state = {
     q: params.get('q') || '', cat: params.get('c') || '', room: params.get('room') || '', store: params.get('store') || '',
-    min: '', max: '', sale: params.get('deals') === '1', sort: 'featured', shown: PAGE, compare: []
+    min: '', max: '', sale: params.get('deals') === '1', sort: ['price-low', 'price-high', 'discount', 'saving', 'name'].includes(params.get('sort')) ? params.get('sort') : 'featured', shown: PAGE, compare: []
   };
   const els = {
     grid: $('productGrid'), count: $('resultCount'), label: $('resultLabel'), status: $('loadStatus'), search: $('searchInput'),
@@ -85,7 +85,8 @@
     const by = {
       'price-low': (a, b) => a.price - b.price,
       'price-high': (a, b) => b.price - a.price,
-      discount: (a, b) => b.disc - a.disc || a.price - b.price,
+      discount: (a, b) => b.disc - a.disc || b.save - a.save,
+      saving: (a, b) => b.save - a.save || b.disc - a.disc,
       name: (a, b) => a.nameL.localeCompare(b.nameL),
       featured: ts.length ? (a, b) => b._s - a._s || a.pri - b.pri || b.f - a.f : (a, b) => a.pri - b.pri || b.f - a.f
     };
@@ -125,6 +126,7 @@
     if (state.room) p.set('room', state.room);
     if (state.store) p.set('store', state.store);
     if (state.sale) p.set('deals', '1');
+    if (state.sort !== 'featured') p.set('sort', state.sort);
     history.replaceState(null, '', location.pathname + (p.toString() ? '?' + p : ''));
   }
 

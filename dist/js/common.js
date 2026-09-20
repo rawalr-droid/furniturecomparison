@@ -75,7 +75,7 @@
     const cat = FF.catL[c];
     return {
       id, name, s, c, price, orig, img, opts, store: FF.stores[s], room: room >= 0 ? FF.meta.rooms[room] : '',
-      disc: orig > price ? (orig - price) / orig : 0, f: (orig > price ? (orig - price) / orig : 0) * 2 + (img ? 1 : 0), l1: cat.l1, l2: cat.l2, l3: cat.l3,
+      save: orig > price ? orig - price : 0, disc: orig > price ? (orig - price) / orig : 0, f: (orig > price ? (orig - price) / orig : 0) * 2 + (img ? 1 : 0), l1: cat.l1, l2: cat.l2, l3: cat.l3,
       nameL: name.toLowerCase(), catL: cat.text, storeL: FF.stores[s].toLowerCase(), pri: FF.l1Order.get(cat.l1)
     };
   };
