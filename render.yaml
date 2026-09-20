@@ -1,6 +1,0 @@
-services:
-  - type: web
-    name: furnish-finder-uae
-    runtime: static
-    staticPublishPath: ./dist
-    pullRequestPreviewsEnabled: true
