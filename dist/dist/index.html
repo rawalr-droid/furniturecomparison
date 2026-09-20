@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Search furniture across UAE stores, compare prices and discover the best deals." />
+  <title>Furnish Finder UAE | Search every furniture store at once</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230d3b2e'/%3E%3Cpath d='M15 18h34v9H25v8h20v9H25v12H15z' fill='%23fff'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="deals.css?v=20260920" />
+  <link rel="stylesheet" href="pages.css?v=20260920" />
+</head>
+<body>
+  <div class="announcement" id="announce">One search. Thousands of products across UAE furniture stores.</div>
+  <header class="site-header">
+    <a class="brand" href="index.html" aria-label="Furnish Finder UAE home">
+      <span class="brand-word">FURNISH<span>FINDER</span></span><small>UAE</small>
+    </a>
+    <form class="header-search" action="browse.html" role="search">
+      <input name="q" type="search" placeholder="What are you looking for?" aria-label="Search furniture" />
+      <button type="submit" aria-label="Search">⌕</button>
+    </form>
+    <nav class="header-actions" aria-label="Quick links">
+      <a href="browse.html">Browse all</a>
+      <a href="#deals">Deals</a>
+    </nav>
+  </header>
+
+  <nav class="category-nav" aria-label="Furniture categories">
+    <a class="nav-feature" href="#deals">Top deals</a>
+    <a href="browse.html?c=furniture/sofas-sectionals">Sofas</a>
+    <a href="browse.html?c=furniture/dining-furniture">Dining</a>
+    <a href="browse.html?c=furniture/beds-mattresses">Beds</a>
+    <a href="browse.html?c=furniture/tables">Tables</a>
+    <a href="browse.html?c=furniture/armchairs-recliners">Chairs</a>
+    <a href="browse.html?c=furniture/storage-display">Storage</a>
+    <a href="browse.html?c=furniture/outdoor-furniture">Outdoor</a>
+    <a href="browse.html?c=home-decor">Decor</a>
+    <a href="browse.html?c=lighting">Lighting</a>
+    <a href="browse.html?c=rugs-mats">Rugs</a>
+    <a href="browse.html?c=bedding">Bedding</a>
+  </nav>
+
+  <main>
+    <section class="hero-grid" aria-label="Featured furniture discovery">
+      <a class="hero-card hero-main" href="#deals">
+        <div class="hero-copy">
+          <p>THE UAE DEAL EDIT</p>
+          <h1>Great furniture.<br><span>Better prices.</span></h1>
+          <div class="hero-button">Shop today’s best deals</div>
+        </div>
+        <div class="hero-product" id="heroProduct"></div>
+      </a>
+      <a class="hero-card hero-secondary" href="browse.html">
+        <p>SEARCH THEM ALL</p>
+        <h2>Every store.<br>One search.</h2>
+        <span>Explore the full catalogue →</span>
+      </a>
+      <a class="hero-card hero-tertiary" id="similarHero" href="browse.html?c=furniture/sofas-sectionals">
+        <p>FIND SIMILAR FOR LESS</p>
+        <h2>Love the look,<br>not the price?</h2>
+        <span>Discover alternatives →</span>
+      </a>
+    </section>
+
+    <section class="category-section">
+      <div class="section-head"><div><p>START WITH A ROOM</p><h2>Shop by category</h2></div><a href="browse.html">View all products →</a></div>
+      <div class="category-strip" id="categoryStrip"></div>
+    </section>
+
+    <section class="deals-section" id="deals">
+      <div class="section-head"><div><p>PRICE DROPS WORTH SEEING</p><h2>Today’s standout deals</h2></div><div class="deal-summary"><strong id="dealCount">—</strong> hand-picked reductions</div></div>
+      <div class="deal-grid" id="dealGrid"></div>
+      <div class="empty" id="empty" hidden><h2>Deals are being refreshed.</h2><p>Try the full catalogue while we update this edit.</p><a href="browse.html">Browse all products</a></div>
+      <a class="view-all" href="browse.html?deals=1">Explore everything on sale</a>
+    </section>
+
+    <section class="why-section">
+      <div><span>01</span><h3>Search across stores</h3><p>Skip the tab-hopping and see UAE furniture in one place.</p></div>
+      <div><span>02</span><h3>Compare the details</h3><p>Check prices, dimensions, materials and current offers.</p></div>
+      <div><span>03</span><h3>Buy from the retailer</h3><p>We send you directly to the original store to complete the purchase.</p></div>
+    </section>
+  </main>
+
+  <footer><a class="brand footer-brand" href="index.html"><span class="brand-word">FURNISH<span>FINDER</span></span><small>UAE</small></a><p>Prices and availability can change. Always confirm details with the retailer before buying.</p></footer>
+  <script src="js/common.js?v=20260920" data-v="20260920"></script>
+  <script src="js/home.js?v=20260920"></script>
+</body>
+</html>

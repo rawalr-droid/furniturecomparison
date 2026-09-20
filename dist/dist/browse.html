@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Search and compare furniture and home products from stores across the UAE." />
+  <title>Browse | Furnish Finder UAE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css?v=20260920" />
+  <link rel="stylesheet" href="pages.css?v=20260920" />
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html" aria-label="Furnish Finder UAE home">
+      <span class="brand-word">FURNISH<span>FINDER</span></span><small>UAE</small>
+    </a>
+    <div class="header-actions">
+      <a class="deal-link" href="index.html">Home</a>
+      <button class="compare-trigger" id="compareTrigger" type="button" disabled>
+        Compare <span id="compareCount">0</span>
+      </button>
+    </div>
+  </header>
+  <nav class="retail-nav" aria-label="Furniture categories">
+    <a href="browse.html?deals=1">Top deals</a>
+    <a href="browse.html?c=furniture/sofas-sectionals">Sofas</a>
+    <a href="browse.html?c=furniture/dining-furniture">Dining</a>
+    <a href="browse.html?c=furniture/beds-mattresses">Beds</a>
+    <a href="browse.html?c=furniture/tables">Tables</a>
+    <a href="browse.html?c=furniture/armchairs-recliners">Chairs</a>
+    <a href="browse.html?c=furniture/storage-display">Storage</a>
+    <a href="browse.html?c=furniture/outdoor-furniture">Outdoor</a>
+    <a href="browse.html?c=home-decor">Decor</a>
+    <a href="browse.html?c=lighting">Lighting</a>
+    <a href="browse.html?c=rugs-mats">Rugs</a>
+    <a href="browse.html?c=bedding">Bedding</a>
+  </nav>
+
+  <main>
+    <section class="search-stage">
+      <div class="eyebrow">Furniture from stores across the UAE</div>
+      <h1>Find the right piece,<br><span>without opening ten tabs.</span></h1>
+      <form class="search-box" id="searchForm" role="search">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 21-4.35-4.35m2.35-5.65a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z"/></svg>
+        <input id="searchInput" type="search" placeholder="Search sofas, dining tables, mirrors…" autocomplete="off" aria-label="Search products" />
+        <button type="submit">Search</button>
+      </form>
+      <div class="quick-searches" aria-label="Popular searches">
+        <span>Popular:</span>
+        <button data-c="furniture/sofas-sectionals">Sofas</button>
+        <button data-c="furniture/dining-furniture/dining-tables">Dining tables</button>
+        <button data-c="furniture/beds-mattresses">Beds</button>
+        <button data-c="home-decor/mirrors">Mirrors</button>
+      </div>
+    </section>
+
+    <section class="browse-shell" id="browse">
+      <div class="section-heading">
+        <div>
+          <p id="resultLabel">Browse the catalogue</p>
+          <h2 id="resultCount">Loading furniture…</h2>
+          <div class="load-status" id="loadStatus" aria-live="polite"></div>
+        </div>
+        <button class="filter-toggle" id="filterToggle" type="button">Filters</button>
+      </div>
+
+      <div class="catalogue-layout">
+        <aside class="filters" id="filters" aria-label="Product filters">
+          <div class="filter-top">
+            <h3>Filter</h3>
+            <button id="clearFilters" type="button">Clear all</button>
+          </div>
+          <label class="filter-field">Category
+            <select id="categoryFilter"><option value="">All categories</option></select>
+          </label>
+          <label class="filter-field">Sub-category
+            <select id="subcategoryFilter" disabled><option value="">All sub-categories</option></select>
+          </label>
+          <label class="filter-field">Type
+            <select id="typeFilter" disabled><option value="">All types</option></select>
+          </label>
+          <label class="filter-field">Room
+            <select id="roomFilter"><option value="">All rooms</option></select>
+          </label>
+          <label class="filter-field">Store
+            <select id="storeFilter"><option value="">All stores</option></select>
+          </label>
+          <div class="filter-field">
+            <span>Price range</span>
+            <div class="price-row">
+              <label><span>AED</span><input id="minPrice" inputmode="numeric" type="number" min="0" placeholder="Min" /></label>
+              <label><span>AED</span><input id="maxPrice" inputmode="numeric" type="number" min="0" placeholder="Max" /></label>
+            </div>
+          </div>
+          <label class="checkbox-row"><input id="saleOnly" type="checkbox" /><span>On sale only</span></label>
+        </aside>
+
+        <div class="results-area">
+          <div class="sort-row">
+            <div class="active-filters" id="activeFilters"></div>
+            <label>Sort
+              <select id="sortSelect">
+                <option value="featured">Featured</option>
+                <option value="price-low">Price: low to high</option>
+                <option value="price-high">Price: high to low</option>
+                <option value="discount">Biggest discount (%)</option>
+                <option value="saving">Biggest saving (AED)</option>
+                <option value="name">Name</option>
+              </select>
+            </label>
+          </div>
+          <div class="product-grid" id="productGrid" aria-live="polite"></div>
+          <button class="load-more" id="loadMore" type="button" hidden>Show more</button>
+          <div class="empty-state" id="emptyState" hidden>
+            <h3>No matching products</h3>
+            <p>Try removing a filter or searching for a broader term.</p>
+            <button type="button" id="emptyReset">Reset search</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <dialog class="compare-dialog" id="compareDialog">
+    <div class="compare-head">
+      <div><p>Side-by-side</p><h2>Compare products</h2></div>
+      <button class="dialog-close" data-close="compare" aria-label="Close comparison">×</button>
+    </div>
+    <div id="compareContent"></div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="js/common.js?v=20260920c" data-v="20260920"></script>
+  <script src="js/browse.js?v=20260920c"></script>
+</body>
+</html>
