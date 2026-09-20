@@ -61,6 +61,8 @@
     return s;
   }
 
+  const saved = r => (r.orig > r.price ? r.orig - r.price : 0);   // AED off, worked out here so this file never depends on common.js being current
+
   function currentRows() {
     const n = FF.node(state.cat);
     const shardKeys = n.l2 ? [n.l2.f] : n.l1 ? n.l1.ch.map(x => x.f) : FF.shards.map(s => s.key);
@@ -85,8 +87,8 @@
     const by = {
       'price-low': (a, b) => a.price - b.price,
       'price-high': (a, b) => b.price - a.price,
-      discount: (a, b) => b.disc - a.disc || b.save - a.save,
-      saving: (a, b) => b.save - a.save || b.disc - a.disc,
+      discount: (a, b) => b.disc - a.disc || saved(b) - saved(a),
+      saving: (a, b) => saved(b) - saved(a) || b.disc - a.disc,
       name: (a, b) => a.nameL.localeCompare(b.nameL),
       featured: ts.length ? (a, b) => b._s - a._s || a.pri - b.pri || b.f - a.f : (a, b) => a.pri - b.pri || b.f - a.f
     };
