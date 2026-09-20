@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: furniturecomparison
+    runtime: static
+    buildCommand: ""
+    staticPublishPath: ./dist
+    headers:
+      - path: /data/*
+        name: Cache-Control
+        value: public, max-age=3600
