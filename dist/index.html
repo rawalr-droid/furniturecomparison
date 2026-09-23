@@ -7,10 +7,11 @@
   <title>Furnish Finder UAE | Search every furniture store at once</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230d3b2e'/%3E%3Cpath d='M15 18h34v9H25v8h20v9H25v12H15z' fill='%23fff'/%3E%3C/svg%3E" />
   <link rel="stylesheet" href="deals.css?v=20260920" />
   <link rel="stylesheet" href="pages.css?v=20260920" />
+  <link rel="stylesheet" href="theme.css?v=20260923" />
 </head>
 <body>
   <div class="announcement" id="announce">One search. Thousands of products across UAE furniture stores.</div>
@@ -28,41 +29,17 @@
     </nav>
   </header>
 
-  <nav class="category-nav" aria-label="Furniture categories">
-    <a class="nav-feature" href="#deals">Top deals</a>
-    <a href="browse.html?c=furniture/sofas-sectionals">Sofas</a>
-    <a href="browse.html?c=furniture/dining-furniture">Dining</a>
-    <a href="browse.html?c=furniture/beds-mattresses">Beds</a>
-    <a href="browse.html?c=furniture/tables">Tables</a>
-    <a href="browse.html?c=furniture/armchairs-recliners">Chairs</a>
-    <a href="browse.html?c=furniture/storage-display">Storage</a>
-    <a href="browse.html?c=furniture/outdoor-furniture">Outdoor</a>
-    <a href="browse.html?c=home-decor">Decor</a>
-    <a href="browse.html?c=lighting">Lighting</a>
-    <a href="browse.html?c=rugs-mats">Rugs</a>
-    <a href="browse.html?c=bedding">Bedding</a>
-  </nav>
+  <nav class="category-nav" id="categoryNav" aria-label="Furniture categories"></nav>
 
   <main>
-    <section class="hero-grid" aria-label="Featured furniture discovery">
-      <a class="hero-card hero-main" href="#deals">
-        <div class="hero-copy">
-          <p>THE UAE DEAL EDIT</p>
-          <h1>Great furniture.<br><span>Better prices.</span></h1>
-          <div class="hero-button">Shop today’s best deals</div>
-        </div>
-        <div class="hero-product" id="heroProduct"></div>
-      </a>
-      <a class="hero-card hero-secondary" href="browse.html">
-        <p>SEARCH THEM ALL</p>
-        <h2>Every store.<br>One search.</h2>
-        <span>Explore the full catalogue →</span>
-      </a>
-      <a class="hero-card hero-tertiary" id="similarHero" href="browse.html?c=furniture/sofas-sectionals">
-        <p>FIND SIMILAR FOR LESS</p>
-        <h2>Love the look,<br>not the price?</h2>
-        <span>Discover alternatives →</span>
-      </a>
+    <section class="hero-banner">
+      <div class="hero-copy">
+        <p class="eyebrow-serif">Modern furniture for modern living</p>
+        <h1>Furniture made<br>for living.</h1>
+        <p class="hero-sub">Search, compare and buy from stores across the UAE — thoughtfully organised, all in one place.</p>
+        <a class="btn-dark" href="#deals">Shop today's deals →</a>
+      </div>
+      <a class="hero-photo" href="#deals" id="heroProduct" aria-label="Today's top deal"></a>
     </section>
 
     <section class="category-section">
@@ -71,10 +48,18 @@
     </section>
 
     <section class="deals-section" id="deals">
-      <div class="section-head"><div><p>PRICE DROPS WORTH SEEING</p><h2>Today’s standout deals</h2></div><div class="deal-summary"><strong id="dealCount">—</strong> hand-picked reductions</div></div>
+      <div class="section-head"><div><p>FEATURED COLLECTION</p><h2>Handpicked deals for every space</h2></div><div class="deal-summary"><strong id="dealCount">—</strong> hand-picked reductions</div></div>
       <div class="deal-grid" id="dealGrid"></div>
       <div class="empty" id="empty" hidden><h2>Deals are being refreshed.</h2><p>Try the full catalogue while we update this edit.</p><a href="browse.html">Browse all products</a></div>
       <a class="view-all" href="browse.html?deals=1">Explore everything on sale</a>
+    </section>
+
+    <section class="banner-strip">
+      <div class="banner-copy">
+        <p class="kicker">New arrivals</p>
+        <h2>Timeless designs,<br>for every room.</h2>
+        <a class="btn-dark" href="browse.html">Explore new arrivals →</a>
+      </div>
     </section>
 
     <section class="why-section">

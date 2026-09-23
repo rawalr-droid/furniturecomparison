@@ -6,9 +6,10 @@
   <title>Product | Furnish Finder UAE</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css?v=20260920">
   <link rel="stylesheet" href="pages.css?v=20260920">
+  <link rel="stylesheet" href="theme.css?v=20260923">
 </head>
 <body>
   <header class="site-header">
@@ -16,18 +17,7 @@
     <form class="product-search" action="browse.html" role="search"><input name="q" type="search" placeholder="Search furniture across UAE stores" aria-label="Search products"><button type="submit">Search</button></form>
     <nav class="header-actions" aria-label="Main navigation"><a class="deal-link" href="index.html">Home</a><a class="deal-link" href="browse.html">Browse</a></nav>
   </header>
-  <nav class="retail-nav" aria-label="Furniture categories">
-    <a href="browse.html?deals=1">Top deals</a>
-    <a href="browse.html?c=furniture/sofas-sectionals">Sofas</a>
-    <a href="browse.html?c=furniture/dining-furniture">Dining</a>
-    <a href="browse.html?c=furniture/beds-mattresses">Beds</a>
-    <a href="browse.html?c=furniture/tables">Tables</a>
-    <a href="browse.html?c=furniture/armchairs-recliners">Chairs</a>
-    <a href="browse.html?c=furniture/storage-display">Storage</a>
-    <a href="browse.html?c=furniture/outdoor-furniture">Outdoor</a>
-    <a href="browse.html?c=home-decor">Decor</a>
-    <a href="browse.html?c=lighting">Lighting</a>
-  </nav>
+  <nav class="retail-nav" id="categoryNav" aria-label="Furniture categories"></nav>
   <main class="product-page" id="productDialogContent"><p style="padding:40px">Loading product…</p></main>
   <footer class="product-footer">Prices and availability can change. Confirm details with the retailer before buying.</footer>
   <script src="js/common.js?v=20260920" data-v="20260923d"></script>

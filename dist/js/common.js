@@ -124,4 +124,21 @@
     if (!variantId || !/\/products\//i.test(raw)) return raw;
     try { const u = new URL(raw); u.searchParams.set('variant', variantId); return u.toString(); } catch (_) { return raw; }
   };
+
+  // Header category nav: one item per Level-1 category, each with a Level-2 dropdown. Built from the live
+  // taxonomy (meta.json), so it always matches whatever categories actually exist - nothing hardcoded here.
+  FF.renderNav = el => {
+    el.innerHTML = FF.meta.tree.map(l1 => `
+      <div class="nav-item">
+        <a class="nav-l1" href="browse.html?c=${FF.enc(l1.s)}">${FF.esc(l1.n)}</a>
+        <div class="nav-dropdown">
+          ${l1.ch.map(l2 => `<a href="browse.html?c=${FF.enc(l2.s)}">${FF.esc(l2.n)}</a>`).join('')}
+        </div>
+      </div>`).join('');
+  };
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const nav = FF.$('categoryNav');
+    if (nav) FF.loadMeta().then(() => FF.renderNav(nav));
+  });
 })();
