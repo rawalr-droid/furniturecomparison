@@ -60,10 +60,14 @@ a { color: inherit; }
 }
 .nav-item { position: relative; display: flex; align-items: center; height: 50px; }
 .nav-l1 {
-  text-decoration: none; color: var(--ink); font-size: 13px; font-weight: 600;
-  letter-spacing: .01em; padding: 6px 2px; white-space: nowrap;
+  /* overrides a legacy rule (".retail-nav a:first-child") from the old hardcoded nav that was meant to
+     highlight just its one "Top deals" pill - but ":first-child" matches ANY link that's the first child
+     of its own parent, which every .nav-l1 now is (its parent is its own .nav-item wrapper) */
+  background: none !important; border-radius: 0 !important; padding: 6px 2px !important;
+  text-decoration: none; color: var(--ink) !important; font-size: 13px; font-weight: 600;
+  letter-spacing: .01em; white-space: nowrap;
 }
-.nav-item:hover .nav-l1, .nav-item:focus-within .nav-l1 { color: var(--muted); }
+.nav-item:hover .nav-l1, .nav-item:focus-within .nav-l1 { color: var(--muted) !important; }
 .nav-dropdown {
   position: absolute; top: 100%; left: 50%; transform: translateX(-50%) translateY(4px);
   min-width: 230px; max-width: 280px; background: var(--surface); border: 1px solid var(--line);
@@ -168,3 +172,70 @@ footer { background: var(--accent) !important; }
      item goes straight to that category's browse page instead, same as before this dropdown existed */
   .nav-dropdown { display: none !important; }
 }
+
+/* ===================================================================================
+   Browse page (search hero, filters, results grid)
+   =================================================================================== */
+.search-stage {
+  background: var(--bg) !important; color: var(--ink) !important; overflow: visible !important;
+}
+.search-stage::after { display: none !important; }
+.search-stage .eyebrow {
+  color: var(--muted) !important; text-transform: uppercase; letter-spacing: .14em; font-size: 11px !important; font-weight: 700 !important;
+}
+.search-stage h1 { font: 500 clamp(34px, 4.4vw, 54px)/1.08 var(--serif) !important; color: var(--ink) !important; }
+.search-stage h1 span { color: var(--muted) !important; }
+.search-box {
+  border: 1px solid var(--line) !important; border-radius: 999px !important; box-shadow: none !important; background: var(--surface) !important;
+}
+.search-box svg { stroke: var(--muted) !important; }
+.search-box button { background: var(--accent) !important; color: var(--bg) !important; border-radius: 999px !important; }
+.quick-searches { color: var(--muted) !important; }
+.quick-searches button { border-color: var(--line) !important; color: var(--ink) !important; background: var(--surface) !important; }
+
+.browse-shell { background: var(--bg); }
+.section-heading p, .section-heading h2 { font-family: var(--sans) !important; }
+.section-heading p { color: var(--muted) !important; text-transform: uppercase; letter-spacing: .1em; font-size: 11px !important; font-weight: 700 !important; }
+.section-heading h2 { font: 500 clamp(22px, 2.6vw, 30px)/1.15 var(--serif) !important; color: var(--ink) !important; }
+.filter-toggle, .filters {
+  background: var(--surface) !important; border-color: var(--line) !important; border-radius: 10px !important;
+}
+.filter-top button { color: var(--ink) !important; }
+.filter-field select, .price-row label, .sort-row select {
+  border-color: var(--line) !important; border-radius: 8px !important; outline-color: var(--accent) !important;
+}
+.checkbox-row input { accent-color: var(--accent) !important; }
+.filter-pill { background: var(--accent-soft) !important; color: var(--ink) !important; border-radius: 999px !important; }
+
+.product-card {
+  border-color: var(--line) !important; border-radius: 4px !important; box-shadow: none !important;
+}
+.product-image { background: var(--accent-soft) !important; }
+.variant-count { color: var(--ink) !important; }
+.product-card h3 { font: 500 15px/1.4 var(--sans) !important; }
+.price { font: 500 16px var(--sans) !important; }
+.card-actions .view-button { background: var(--accent) !important; border-color: var(--accent) !important; }
+.card-actions .selected { background: var(--accent-soft) !important; border-color: var(--ink) !important; color: var(--ink) !important; }
+.load-more { border-color: var(--ink) !important; color: var(--ink) !important; border-radius: 999px !important; }
+.empty-state { background: var(--surface) !important; border-color: var(--line) !important; }
+
+/* ===================================================================================
+   Product detail page
+   =================================================================================== */
+.product-page { border-color: var(--line) !important; background: var(--surface) !important; }
+.detail-gallery, .detail-image { background: var(--accent-soft) !important; }
+.gallery-arrow { border-color: var(--line) !important; background: rgba(255,255,255,.95) !important; color: var(--ink) !important; }
+.variant-thumb.active { border-color: var(--ink) !important; }
+.detail-copy .store { color: var(--muted) !important; text-transform: uppercase; letter-spacing: .1em; font-size: 11px !important; font-weight: 700 !important; }
+.detail-copy h2 { font: 500 clamp(26px, 3vw, 36px)/1.12 var(--serif) !important; color: var(--ink) !important; }
+.detail-price { font-family: var(--sans) !important; }
+.retailer-link { background: var(--accent) !important; border-radius: 8px !important; }
+.similar-wrap { background: var(--bg) !important; }
+.similar-wrap h3 { font: 500 22px var(--serif) !important; color: var(--ink) !important; }
+.similar-item { border-color: var(--line) !important; }
+.similar-item span { color: var(--muted) !important; }
+.variant-chip.active { border-color: var(--ink) !important; box-shadow: 0 0 0 1px var(--ink) !important; background: var(--accent-soft) !important; }
+.crumbs a { color: var(--ink) !important; }
+
+.compare-dialog .compare-head h2 { font: 500 26px var(--serif) !important; }
+.compare-table a { color: var(--ink) !important; }
