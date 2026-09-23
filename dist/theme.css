@@ -53,6 +53,10 @@ a { color: inherit; }
   gap: 30px !important;
   padding: 0 24px !important;
   min-height: 50px !important;
+  /* the base stylesheet sets overflow-x:auto for mobile scrolling, but that has a CSS side effect of also
+     clipping overflow-y - which silently hid the dropdown below it. Desktop doesn't need the scroll (all
+     10 items fit on one line), so only re-enable it inside the mobile breakpoint further down. */
+  overflow: visible !important;
 }
 .nav-item { position: relative; display: flex; align-items: center; height: 50px; }
 .nav-l1 {
@@ -70,6 +74,12 @@ a { color: inherit; }
 .nav-item:hover .nav-dropdown, .nav-item:focus-within .nav-dropdown {
   opacity: 1; visibility: visible; pointer-events: auto; transform: translateX(-50%) translateY(0);
 }
+/* the first/last items sit too close to the viewport edge for a centered dropdown to fit - anchor those two
+   to their own left/right edge instead so they never get clipped off-screen */
+.nav-item:first-child .nav-dropdown { left: 0; transform: translateY(4px); }
+.nav-item:first-child:hover .nav-dropdown, .nav-item:first-child:focus-within .nav-dropdown { transform: translateY(0); }
+.nav-item:last-child .nav-dropdown { left: auto; right: 0; transform: translateY(4px); }
+.nav-item:last-child:hover .nav-dropdown, .nav-item:last-child:focus-within .nav-dropdown { transform: translateY(0); }
 .nav-dropdown a {
   display: block; padding: 9px 12px; border-radius: 6px; color: var(--muted);
   text-decoration: none; font-size: 13px; white-space: nowrap;
@@ -153,5 +163,8 @@ footer { background: var(--accent) !important; }
 @media (max-width: 900px) {
   .hero-banner { grid-template-columns: 1fr; }
   .deal-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
-  .category-nav, .retail-nav { justify-content: flex-start !important; }
+  .category-nav, .retail-nav { justify-content: flex-start !important; overflow-x: auto !important; }
+  /* touch devices have no real hover, so the dropdown would otherwise be unreachable - tapping an L1
+     item goes straight to that category's browse page instead, same as before this dropdown existed */
+  .nav-dropdown { display: none !important; }
 }
