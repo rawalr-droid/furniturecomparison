@@ -4,17 +4,34 @@
   const PAGE = 24;
   const params = new URLSearchParams(location.search);
   const state = {
-    q: params.get('q') || '', cat: params.get('c') || '', room: params.get('room') || '', store: params.get('store') || '',
+    q: params.get('q') || '', cat: params.get('c') || '', room: params.get('room') || '', store: params.get('store') || '', size: params.get('size') || '',
     min: '', max: '', sale: params.get('deals') === '1', sort: ['price-low', 'price-high', 'discount', 'saving', 'name'].includes(params.get('sort')) ? params.get('sort') : 'featured', shown: PAGE, compare: []
   };
   const els = {
     grid: $('productGrid'), count: $('resultCount'), label: $('resultLabel'), status: $('loadStatus'), search: $('searchInput'),
-    cat: $('categoryFilter'), sub: $('subcategoryFilter'), type: $('typeFilter'), room: $('roomFilter'), store: $('storeFilter'),
+    cat: $('categoryFilter'), sub: $('subcategoryFilter'), type: $('typeFilter'), room: $('roomFilter'), store: $('storeFilter'), size: $('sizeFilter'), sizeField: $('sizeField'),
     min: $('minPrice'), max: $('maxPrice'), sale: $('saleOnly'), sort: $('sortSelect'), load: $('loadMore'), empty: $('emptyState'),
     active: $('activeFilters'), compareCount: $('compareCount'), compareTrigger: $('compareTrigger'), compareDialog: $('compareDialog')
   };
   let token = 0;
-  let cache = { key: '', rows: [] };
+  let cache = { key: '', rows: [], sizes: new Map() };
+
+  // sizes in a sensible order: beds small to large, seats by number (sets last), rugs by area
+  const BED = ['Single', 'Double', 'Queen', 'King', 'Super King'];
+  function sizeRank(z) {
+    const b = BED.indexOf(z); if (b >= 0) return b;
+    const set = /\+/.test(z), n = (z.match(/\d+(\.\d+)?/g) || []).map(Number);
+    if (/seater|set/i.test(z)) return 100 + (set ? 1000 + n.reduce((a, x) => a + x, 0) : n[0] || 0);
+    return 10000 + (n.length > 1 ? n[0] * n[1] : (n[0] || 0) * (n[0] || 0));
+  }
+  function sizeOptions() {
+    const list = [...cache.sizes.entries()].sort((a, b) => sizeRank(a[0]) - sizeRank(b[0]) || a[0].localeCompare(b[0]));
+    const show = (FF.node(state.cat).l2 && list.length > 1) || !!state.size;      // only inside a sub-category, so beds and rugs never mix
+    els.sizeField.hidden = !show;
+    if (!show) return;
+    els.size.innerHTML = opt('', 'All sizes') + list.map(([z, n]) => opt(z, `${z} (${n.toLocaleString()})`)).join('');
+    els.size.value = state.size;
+  }
 
   // ------------------------------------------------------------------ filters UI
   function opt(value, label) { return `<option value="${esc(value)}">${esc(label)}</option>`; }
@@ -67,11 +84,11 @@
     const n = FF.node(state.cat);
     const shardKeys = n.l2 ? [n.l2.f] : n.l1 ? n.l1.ch.map(x => x.f) : FF.shards.map(s => s.key);
     const loaded = shardKeys.filter(k => FF.shardRows[k]);
-    const key = JSON.stringify([state.cat, state.q, state.room, state.store, state.min, state.max, state.sale, state.sort, loaded.length]);
+    const key = JSON.stringify([state.cat, state.q, state.room, state.store, state.size, state.min, state.max, state.sale, state.sort, loaded.length]);
     if (cache.key === key) return cache.rows;
     const ts = FF.terms(state.q), phrase = ts.join(' ');
     const min = state.min === '' ? null : Number(state.min), max = state.max === '' ? null : Number(state.max);
-    const rows = [];
+    const rows = [], sizes = new Map();
     for (const k of loaded) {
       for (const r of FF.shardRows[k]) {
         if (n.l3 && r.c !== n.l3.i) continue;
@@ -81,6 +98,8 @@
         if (max !== null && r.price > max) continue;
         if (state.sale && !(r.disc > 0)) continue;
         if (ts.length) { const sc = score(r, ts, phrase); if (sc < 0) continue; r._s = sc; } else r._s = 0;
+        if (r.size) sizes.set(r.size, (sizes.get(r.size) || 0) + 1);
+        if (state.size && r.size !== state.size) continue;
         rows.push(r);
       }
     }
@@ -93,7 +112,7 @@
       featured: ts.length ? (a, b) => b._s - a._s || a.pri - b.pri || b.f - a.f : (a, b) => a.pri - b.pri || b.f - a.f
     };
     rows.sort(by[state.sort] || by.featured);
-    cache = { key, rows };
+    cache = { key, rows, sizes };
     return rows;
   }
 
@@ -101,13 +120,17 @@
   function card(r) {
     const selected = state.compare.includes(r.id);
     const href = 'product.html?id=' + enc(r.id);
-    const price = r.opts > 1 ? 'From ' + money(r.price) : money(r.price);
+    const price = r.from ? 'From ' + money(r.price) : money(r.price);
+    const tags = [r.size, r.colour].filter(Boolean);
+    if (r.moreColours) tags.push(`+${r.moreColours} more colour${r.moreColours > 1 ? 's' : ''}`);
+    else if (!r.colour && r.colours > 1) tags.push(`${r.colours} colours`);
+    const badge = !tags.length && r.opts > 1 ? `<span class="variant-count">${r.opts} options</span>` : '';
     return `<article class="product-card">
-      <a class="product-media" href="${href}" target="_blank" rel="noopener">${FF.img(r.img, r.name, 'product-image')}${r.opts > 1 ? `<span class="variant-count">${r.opts} options</span>` : ''}</a>
+      <a class="product-media" href="${href}" target="_blank" rel="noopener">${FF.img(r.img, r.name, 'product-image')}${badge}</a>
       <div class="product-body">
         <div class="product-kicker"><span>${esc(r.store)}</span>${r.disc ? `<span class="sale-badge">${Math.round(r.disc * 100)}% off</span>` : ''}</div>
         <h3><a href="${href}" target="_blank" rel="noopener">${esc(r.name)}</a></h3>
-        <div class="card-type">${esc(r.l3)}</div>
+        <div class="card-type">${esc(r.l3)}</div>${tags.length ? `<div class="card-variant">${tags.map(esc).join(' · ')}</div>` : ''}
         <div class="price">${price}${r.orig > r.price ? `<span class="was-price">${money(r.orig)}</span>` : ''}</div>
         <div class="card-actions"><a class="view-button" href="${href}" target="_blank" rel="noopener">View details ↗</a><button class="${selected ? 'selected' : ''}" data-compare="${esc(r.id)}">${selected ? 'Added' : 'Compare'}</button></div>
       </div>
@@ -116,7 +139,7 @@
 
   function pills() {
     const n = FF.node(state.cat), deepest = n.l3 || n.l2 || n.l1;
-    const list = [['q', state.q && `“${state.q}”`], ['cat', deepest && deepest.n], ['room', state.room], ['store', state.store],
+    const list = [['q', state.q && `“${state.q}”`], ['cat', deepest && deepest.n], ['size', state.size], ['room', state.room], ['store', state.store],
       ['price', (state.min || state.max) && `AED ${state.min || 0}–${state.max || '∞'}`], ['sale', state.sale && 'On sale']].filter(([, v]) => v);
     els.active.innerHTML = list.map(([k, v]) => `<button class="filter-pill" data-clear="${k}">${esc(v)} ×</button>`).join('');
   }
@@ -127,6 +150,7 @@
     if (state.cat) p.set('c', state.cat);
     if (state.room) p.set('room', state.room);
     if (state.store) p.set('store', state.store);
+    if (state.size) p.set('size', state.size);
     if (state.sale) p.set('deals', '1');
     if (state.sort !== 'featured') p.set('sort', state.sort);
     history.replaceState(null, '', location.pathname + (p.toString() ? '?' + p : ''));
@@ -139,6 +163,7 @@
     const n = FF.node(state.cat), deepest = n.l3 || n.l2 || n.l1;
     els.count.textContent = `${rows.length.toLocaleString()} products`;
     els.label.textContent = state.q ? `Results for “${state.q}”` : deepest ? [n.l1, n.l2, n.l3].filter(Boolean).map(x => x.n).join(' › ') : state.sale ? 'Everything on sale' : 'Browse the catalogue';
+    sizeOptions();
     els.load.hidden = visible.length >= rows.length || !rows.length;
     els.empty.hidden = !!rows.length; els.grid.hidden = !rows.length;
     pills();
@@ -182,14 +207,14 @@
 
   // ------------------------------------------------------------------ events
   function readControls() {
-    state.room = els.room.value; state.store = els.store.value; state.min = els.min.value; state.max = els.max.value;
+    state.room = els.room.value; state.store = els.store.value; state.size = els.size.value; state.min = els.min.value; state.max = els.max.value;
     state.sale = els.sale.checked; state.sort = els.sort.value; state.shown = PAGE;
     refresh();
   }
-  els.cat.addEventListener('change', () => { state.cat = els.cat.value; state.shown = PAGE; syncControls(); refresh(); });
-  els.sub.addEventListener('change', () => { state.cat = els.sub.value || els.cat.value; state.shown = PAGE; syncControls(); refresh(); });
-  els.type.addEventListener('change', () => { state.cat = els.type.value || els.sub.value; state.shown = PAGE; syncControls(); refresh(); });
-  [els.room, els.store, els.sale, els.sort].forEach(x => x.addEventListener('change', readControls));
+  els.cat.addEventListener('change', () => { state.cat = els.cat.value; state.size = ''; state.shown = PAGE; syncControls(); refresh(); });
+  els.sub.addEventListener('change', () => { state.cat = els.sub.value || els.cat.value; state.size = ''; state.shown = PAGE; syncControls(); refresh(); });
+  els.type.addEventListener('change', () => { state.cat = els.type.value || els.sub.value; state.size = ''; state.shown = PAGE; syncControls(); refresh(); });
+  [els.room, els.store, els.size, els.sale, els.sort].forEach(x => x.addEventListener('change', readControls));
   [els.min, els.max].forEach(x => x.addEventListener('input', () => { clearTimeout(x.timer); x.timer = setTimeout(readControls, 300); }));
 
   function goSearch(q) { state.q = q.trim(); state.shown = PAGE; els.search.value = state.q; refresh().then(() => $('browse').scrollIntoView({ behavior: 'smooth' })); }
@@ -199,7 +224,7 @@
     state.q = ''; state.cat = b.dataset.c; state.shown = PAGE; syncControls(); refresh().then(() => $('browse').scrollIntoView({ behavior: 'smooth' }));
   }));
   function reset() {
-    Object.assign(state, { q: '', cat: '', room: '', store: '', min: '', max: '', sale: false, sort: 'featured', shown: PAGE });
+    Object.assign(state, { q: '', cat: '', room: '', store: '', size: '', min: '', max: '', sale: false, sort: 'featured', shown: PAGE });
     syncControls(); refresh();
   }
   $('clearFilters').addEventListener('click', reset); $('emptyReset').addEventListener('click', reset);
@@ -220,8 +245,8 @@
     const row = (label, fn) => `<tr><td>${label}</td>${items.map((p, i) => `<td>${fn(p, details[i] || {}) || '—'}</td>`).join('')}</tr>`;
     $('compareContent').innerHTML = `<table class="compare-table"><tbody>
       ${row('', p => FF.img(p.img, p.name, 'product-image'))}
-      ${row('Product', p => `<strong>${esc(p.name)}</strong><br><small>${esc(p.store)}</small>`)}
-      ${row('Price', p => `<strong>${p.opts > 1 ? 'From ' : ''}${money(p.price)}</strong>${p.disc ? `<br><small>${Math.round(p.disc * 100)}% off</small>` : ''}`)}
+      ${row('Product', p => `<strong>${esc(p.name)}</strong><br><small>${esc([p.store, p.size, p.colour].filter(Boolean).join(' · '))}</small>`)}
+      ${row('Price', p => `<strong>${p.from ? 'From ' : ''}${money(p.price)}</strong>${p.disc ? `<br><small>${Math.round(p.disc * 100)}% off</small>` : ''}`)}
       ${row('Type', p => esc(p.l3))}${row('Room', p => esc(p.room))}
       ${row('Material', (p, d) => esc(d.m))}${row('Colour', (p, d) => esc(d.k))}${row('Dimensions', (p, d) => esc(d.z))}
       ${row('', p => `<a href="product.html?id=${enc(p.id)}" target="_blank" rel="noopener">View details</a>`)}</tbody></table>`;
@@ -234,7 +259,7 @@
     const clear = e.target.closest('[data-clear]');
     if (clear) {
       const k = clear.dataset.clear;
-      if (k === 'q') state.q = ''; else if (k === 'cat') state.cat = ''; else if (k === 'sale') state.sale = false;
+      if (k === 'q') state.q = ''; else if (k === 'cat') { state.cat = ''; state.size = ''; } else if (k === 'sale') state.sale = false;
       else if (k === 'price') { state.min = ''; state.max = ''; } else state[k] = '';
       state.shown = PAGE; syncControls(); refresh();
     }

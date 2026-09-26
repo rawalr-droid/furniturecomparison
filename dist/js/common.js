@@ -69,12 +69,20 @@
     return out;
   };
 
+  // Size/colour cards: a product sold in several sizes/colours has extra rows "<product id>~<size>~<colour>" that share its detail
+  // record; the optional 10th field says which size (z) and colour (k) the card shows, how many colours exist (c), how many more
+  // colours than the cards shown (m), whether other options change the price ("from", f) and which option to open (q).
+  FF.baseId = id => String(id).split('~')[0];
+  FF.slug = v => String(v || '').toLowerCase().replace(/[^a-z0-9+]+/g, '-').replace(/^-+|-+$/g, '') || 'x';
+
   FF.rowFrom = a => {
-    const [id, name, s, c, price, orig, img0, room, opts] = a;
+    const [id, name, s, c, price, orig, img0, room, opts, at] = a;
     const img = FF.fixImg(img0);
     const cat = FF.catL[c];
+    const x = at || {};
     return {
       id, name, s, c, price, orig, img, opts, store: FF.stores[s], room: room >= 0 ? FF.meta.rooms[room] : '',
+      size: x.z || '', colour: x.k || '', colours: x.c || 0, moreColours: x.m || 0, from: at ? !!x.f : opts > 1, q: x.q,
       save: orig > price ? orig - price : 0, disc: orig > price ? (orig - price) / orig : 0, f: (orig > price ? (orig - price) / orig : 0) * 2 + (img ? 1 : 0), l1: cat.l1, l2: cat.l2, l3: cat.l3,
       nameL: name.toLowerCase(), catL: cat.text, storeL: FF.stores[s].toLowerCase(), pri: FF.l1Order.get(cat.l1)
     };
@@ -90,6 +98,7 @@
 
   const chunkPromises = {};
   FF.loadDetail = id => {
+    id = FF.baseId(id);
     const n = FF.fnv(id) % FF.meta.chunks;
     const file = String(n).padStart(3, '0');
     const p = chunkPromises[file] || (chunkPromises[file] = FF.fetchJSON('data/d/' + file + '.json.gz'));
