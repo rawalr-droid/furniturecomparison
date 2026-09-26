@@ -65,14 +65,17 @@
       const { v, price, orig } = view();
       const main = v && v.i && imgIndex === -1 ? v.i : images[imgIndex] || '';
       const thumbs = images.map((src, i) => `<button class="variant-thumb image-thumb ${i === imgIndex ? 'active' : ''}" data-image-index="${i}" type="button" aria-label="View image ${i + 1} of ${images.length}"><img src="${esc(src)}" alt="" loading="lazy" onerror="FF.imgErr(this)"><span>${i + 1}</span></button>`).join('');
-      const group = (label, values, cur, attr, priceOf) => values.length > 1 ? `<div class="option-group"><span>${label}</span><div class="chip-row">${values.map(x => {
-        const p = priceOf(x);
-        return `<button class="variant-chip ${x === cur ? 'active' : ''}" data-${attr}="${esc(x)}" type="button">${esc(x)}${p ? `<small>${money(p)}</small>` : ''}</button>`;
+      // an option the store marks as sold out (n === 0) stays clickable but is greyed and labelled
+      const soldOut = f => { const vs = priced.filter(f); return vs.length > 0 && vs.every(x => x.n === 0); };
+      const group = (label, values, cur, attr, priceOf, outOf) => values.length > 1 ? `<div class="option-group"><span>${label}</span><div class="chip-row">${values.map(x => {
+        const p = priceOf(x), out = outOf(x);
+        return `<button class="variant-chip ${x === cur ? 'active' : ''} ${out ? 'sold-out' : ''}" data-${attr}="${esc(x)}" type="button">${esc(x)}<small>${out ? 'Sold out' : p ? money(p) : ''}</small></button>`;
       }).join('')}</div></div>` : '';
       const minP = f => { const ps = priced.filter(f).map(x => x.p); return ps.length ? Math.min(...ps) : 0; };
-      const pickers = group('Size', sizes, v && v.z, 'size', z => minP(x => x.z === z && (!v || !v.k || x.k === v.k)))
-        + group('Colour', colours, v && v.k, 'colour', k => minP(x => x.k === k && (!v || !v.z || x.z === v.z)));
-      const chips = variants.map((x, i) => `<button class="variant-chip ${i === current ? 'active' : ''}" data-variant-index="${i}" type="button">${esc(x.t)}${x.p ? `<small>${money(x.p)}</small>` : ''}</button>`).join('');
+      const inSize = z => x => x.z === z && (!v || !v.k || x.k === v.k), inColour = k => x => x.k === k && (!v || !v.z || x.z === v.z);
+      const pickers = group('Size', sizes, v && v.z, 'size', z => minP(inSize(z)), z => soldOut(inSize(z)))
+        + group('Colour', colours, v && v.k, 'colour', k => minP(inColour(k)), k => soldOut(inColour(k)));
+      const chips = variants.map((x, i) => `<button class="variant-chip ${i === current ? 'active' : ''} ${x.n === 0 ? 'sold-out' : ''}" data-variant-index="${i}" type="button">${esc(x.t)}${x.n === 0 ? '<small>Sold out</small>' : x.p ? `<small>${money(x.p)}</small>` : ''}</button>`).join('');
       root.innerHTML = `<div class="product-detail">
         <div class="detail-gallery">
           ${main ? `<img id="detailMainImage" class="detail-image" src="${esc(main)}" alt="${esc(d.n)}" onerror="FF.imgErr(this)">` : '<div class="image-fallback">Image unavailable</div>'}
@@ -84,7 +87,7 @@
           <h2>${esc(d.n)}</h2>
           ${pickers}${variants.some(x => x.t) && (!pickers || otherOptions) ? `<p class="selected-variant"><span>Option</span>${esc(v.t)} <small>${current + 1} of ${variants.length}</small></p><div class="chip-row">${chips}</div>` : ''}
           <p class="detail-price">${money(price)}${orig > price ? ` <span class="was-price">${money(orig)}</span>` : ''}</p>
-          <div class="facts">${fact('Category', cat.l3)}${fact('Room', room)}${fact('Material', d.m)}${fact('Size', v && v.z)}${fact('Colour', (v && v.k) || d.k)}${fact('Dimensions', d.z)}${fact('Brand', d.b)}${fact('Style', d.y)}${d.t === 0 ? fact('Availability', 'Out of stock at last check') : ''}</div>
+          <div class="facts">${fact('Category', cat.l3)}${fact('Room', room)}${fact('Material', d.m)}${fact('Size', v && v.z)}${fact('Colour', (v && v.k) || d.k)}${fact('Dimensions', d.z)}${fact('Brand', d.b)}${fact('Style', d.y)}${d.t === 0 ? fact('Availability', 'Out of stock at last check') : v && v.n === 0 ? fact('Availability', 'This option was sold out at last check') : ''}</div>
           <p class="description">${esc(d.d || 'See the retailer website for full product information.')}</p>
           <a class="retailer-link" href="${esc(FF.retailerURL(d.u, v && v.x))}" target="_blank" rel="noopener sponsored">View ${variants.length ? 'this option' : 'product'} at ${esc(store)}</a>
         </div>

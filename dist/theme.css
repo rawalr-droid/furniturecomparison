@@ -244,3 +244,5 @@ footer { background: var(--accent) !important; }
 .card-variant { margin: -4px 0 10px; font-size: 13px; font-weight: 500; color: var(--ink); }
 .option-group { margin: 0 0 14px; }
 .option-group > span { display: block; margin-bottom: 6px; color: var(--muted); font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: .06em; }
+.variant-chip.sold-out { opacity: .55; }
+.variant-chip.sold-out small { color: var(--ink) !important; font-weight: 500; }
