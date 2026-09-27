@@ -9,10 +9,12 @@
   }
   const fact = (label, value) => value ? `<div class="fact"><span>${label}</span>${esc(value)}</div>` : '';
 
+  const SIM_SHARDS = 256;   // must match SHARDS in agents/similar/build_similar.py
+
+  // fallback only, for products that have no precomputed list yet (e.g. added today); stores are treated neutrally
   function similarity(base, p) {
     let s = 0;
     if (p.c === base.c) s += 8;
-    if (p.s !== base.s) s += 10;
     s += (Math.min(base.price, p.price) / Math.max(base.price, p.price)) * 3;
     const words = new Set(base.nameL.split(/\W+/));
     p.nameL.split(/\W+/).forEach(w => { if (w.length > 3 && words.has(w)) s += 1; });
@@ -100,13 +102,20 @@
     document.title = d.n + ' | Furnish Finder UAE';
     paint();
 
-    // similar items come from the listing file of the same sub-category
+    // similar items: precomputed nightly from photo + description + price + category + size + colour (data/s/, built by
+    // agents/similar/build_similar.py). A size/colour card can have its own list; otherwise the product's list is used.
+    // Results are always in the same group (L2), so the listing file below already holds their name, price and photo.
     try {
       const rows = await FF.loadShard(l2.f);
       const base = { c: d.c, s: d.s, price: d.p, nameL: d.n.toLowerCase() };
       const own = FF.baseId(id), seenBase = new Set([own]);
-      const sim = rows.filter(r => r.c === d.c && r.img && !seenBase.has(FF.baseId(r.id)) && seenBase.add(FF.baseId(r.id))).map(r => ({ r, s: similarity(base, r) })).sort((a, b) => b.s - a.s).slice(0, 12).map(x => x.r);
-      similarHTML = `<h3>Similar pieces across stores</h3><p>${sim.length} matching products. Alternatives from other retailers are prioritised.</p>
+      let sim = [];
+      try {
+        const lists = await FF.fetchJSON('data/s/' + String(FF.fnv(own) % SIM_SHARDS).padStart(3, '0') + '.json.gz');
+        sim = (lists[id] || lists[own] || []).map(x => FF.byId.get(x)).filter(r => r && r.img);
+      } catch (e) { console.warn(e); }
+      if (sim.length < 4) sim = rows.filter(r => r.c === d.c && r.img && !seenBase.has(FF.baseId(r.id)) && seenBase.add(FF.baseId(r.id))).map(r => ({ r, s: similarity(base, r) })).sort((a, b) => b.s - a.s).slice(0, 12).map(x => x.r);
+      similarHTML = `<h3>Similar pieces across stores</h3><p>${sim.length} products with a similar look, size and price.</p>
         <div class="similar-grid">${sim.map(s => `<a class="similar-item" href="product.html?id=${enc(s.id)}" target="_blank" rel="noopener">${FF.img(s.img, s.name, 'similar-img')}<div><strong>${esc(s.name)}</strong><span>${money(s.price)} · ${esc(s.store)}</span></div></a>`).join('')}</div>`;
       if (!sim.length) similarHTML = '<h3>Similar pieces across stores</h3><p>No close matches found yet.</p>';
       $('similarWrap').innerHTML = similarHTML;
