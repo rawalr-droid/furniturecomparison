@@ -11,8 +11,9 @@
       <strong>${esc(t.label)}</strong>
     </a>`).join('');
 
-    const hero = deals[0];
+    const hero = home.hero || deals[0];            // hero rule: design/tools/pick_hero.py, refreshed nightly (falls back to the top deal)
     if (hero) {
+      $('heroProduct').href = href(hero.id);
       $('heroProduct').innerHTML = `<img src="${esc(FF.fixImg(hero.i))}" alt="${esc(hero.name)}" onerror="FF.imgErr(this)"><span class="hero-badge">${Math.round((hero.o - hero.p) / hero.o * 100)}%<small>OFF</small></span>`;
     }
 
