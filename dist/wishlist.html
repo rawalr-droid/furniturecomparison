@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Product | Furnish Finder UAE</title>
+  <title>Your wishlist | Furnish Finder UAE</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
@@ -18,10 +18,17 @@
     <form class="product-search" action="browse.html" role="search"><input name="q" type="search" placeholder="Search furniture across UAE stores" aria-label="Search products"><button type="submit">Search</button></form>
     <nav class="header-actions" aria-label="Main navigation"><a class="deal-link" href="index.html">Home</a><a class="deal-link" href="browse.html">Browse</a><a class="wish-link" href="wishlist.html" aria-label="Wishlist">♡ Wishlist <span class="wish-count" data-wish-count></span></a></nav>
   </header>
-  <nav class="retail-nav" id="categoryNav" aria-label="Furniture categories"></nav>
-  <main class="product-page" id="productDialogContent"><p style="padding:40px">Loading product…</p></main>
-  <footer class="product-footer">Prices and availability can change. Confirm details with the retailer before buying.</footer>
+  
+  <main class="wish-page">
+    <div class="wish-head">
+      <p class="wish-eyebrow">Saved in this browser</p>
+      <h1>Your wishlist</h1>
+      <p class="wish-sub" id="wishSummary">Loading…</p>
+    </div>
+    <div class="wish-tabs" id="wishTabs" role="tablist"></div>
+    <div id="wishRooms"></div>
+  </main>
   <script src="js/common.js?v=20260928w" data-v="20260927d"></script>
-  <script src="js/product.js?v=20260928w"></script>
+  <script src="js/wishlist.js?v=20260928w"></script>
 </body>
 </html>

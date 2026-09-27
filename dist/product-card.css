@@ -178,3 +178,43 @@
 .pc-price-from { font-size: 12px; font-weight: 400; color: var(--pc-text-secondary); margin-right: -4px; }
 .pc-media .image-fallback { font: 12px var(--pc-font); color: var(--pc-text-secondary); }
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- Wishlist: "save to a room" pop-up, header link, product-page button ---------- */
+.wish-pop { position: absolute; z-index: 50; background: #fff; border: 1px solid var(--pc-border); border-radius: 10px; padding: 12px;
+  box-shadow: 0 12px 32px rgba(36,36,36,.16); font-family: var(--pc-font); color: var(--pc-text); }
+.wish-pop-title { margin: 0 0 8px; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--pc-text-secondary); }
+.wish-pop-rooms { display: grid; gap: 4px; }
+.wish-room { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; background: #fff; border: 1px solid var(--pc-border);
+  border-radius: 8px; padding: 8px 10px; font: 500 14px var(--pc-font); color: var(--pc-text); cursor: pointer; }
+.wish-room small { margin-left: auto; font-size: 11px; color: var(--pc-text-secondary); }
+.wish-room:hover { border-color: var(--pc-accent); }
+.wish-room.on { background: #EEF1EC; border-color: var(--pc-accent); color: var(--pc-accent); }
+.wish-check { width: 20px; height: 20px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;
+  background: var(--pc-image-frame); font-size: 12px; font-weight: 700; }
+.wish-room.on .wish-check { background: var(--pc-accent); color: #fff; }
+.wish-room:focus-visible, .wish-pop-link:focus-visible { outline: 2px solid var(--pc-accent); outline-offset: 2px; }
+.wish-pop-link { display: block; margin-top: 10px; font-size: 13px; font-weight: 700; color: var(--pc-accent); }
+.wish-link { white-space: nowrap; }
+.wish-count:not(:empty) { display: inline-block; min-width: 18px; padding: 1px 6px; margin-left: 2px; border-radius: 99px; background: var(--pc-badge-bg);
+  color: #fff; font-size: 11px; font-weight: 700; text-align: center; }
+.detail-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.wish-save { border: 1px solid var(--pc-border); background: #fff; border-radius: 999px; padding: 12px 18px; font: 600 14px var(--pc-font); cursor: pointer; color: var(--pc-text); }
+.wish-save[aria-pressed="true"] { border-color: var(--pc-badge-bg); color: var(--pc-badge-bg); }
+/* ---------- Wishlist page ---------- */
+.wish-page { max-width: 1016px; margin: 0 auto; padding: 32px 20px 64px; font-family: var(--pc-font); color: var(--pc-text); }
+.wish-eyebrow { margin: 0; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--pc-text-secondary); }
+.wish-page h1 { font-family: "Playfair Display", Georgia, serif; font-size: 2.2rem; margin: 6px 0 4px; }
+.wish-sub { margin: 4px 0 0; color: var(--pc-text-secondary); font-size: 14px; }
+.wish-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 22px 0 8px; }
+.wish-tab { border: 1px solid var(--pc-border); background: #fff; border-radius: 999px; padding: 7px 14px; font: 600 13px var(--pc-font); color: var(--pc-text); cursor: pointer; }
+.wish-tab span { color: var(--pc-text-secondary); font-weight: 400; }
+.wish-tab.on { background: var(--pc-text); border-color: var(--pc-text); color: #fff; }
+.wish-tab.on span { color: #fff; }
+.wish-room-sec { margin-top: 28px; }
+.wish-room-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; margin-bottom: 14px; }
+.wish-room-sec h2 { font-family: "Playfair Display", Georgia, serif; font-size: 1.5rem; margin: 0; }
+.wish-drop { margin: 2px 0 0; font-size: 12px; font-weight: 700; color: var(--pc-accent); }
+.wish-out { color: var(--pc-badge-bg); }
+.wish-empty { margin-top: 32px; padding: 32px; background: #fff; border: 1px solid var(--pc-border); border-radius: 10px; text-align: center; }
+.wish-gone { opacity: .7; }
+.wish-remove { align-self: flex-start; border: 1px solid var(--pc-border); background: #fff; border-radius: 6px; padding: 6px 10px; font: 600 12px var(--pc-font); cursor: pointer; }

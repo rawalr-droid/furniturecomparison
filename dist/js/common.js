@@ -125,8 +125,38 @@
   // o: {id, name, store, img, price, orig, disc, from, size, colours}. Store sits in the "brand" slot.
   const HEART = '<svg viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
   const DOTS = '<svg width="22" height="12" viewBox="0 0 22 12" aria-hidden="true"><circle cx="6" cy="6" r="5" fill="#E8E5DE" stroke="#fff"/><circle cx="11" cy="6" r="5" fill="#B5B0A8" stroke="#fff"/><circle cx="16" cy="6" r="5" fill="#77736D" stroke="#fff"/></svg>';
-  FF.wishlist = () => { try { return new Set(JSON.parse(localStorage.getItem('ff-wishlist') || '[]')); } catch (_) { return new Set(); } };
+  // Wishlist by room (saved in this browser; accounts later). {v:1, rooms: {"Bedroom": [{id, name, store, img, price, orig, size, colours, from, t}]}}
+  FF.ROOMS = ['Living Room', 'Bedroom', 'Dining Room', 'Kitchen', 'Bathroom'];
+  const WKEY = 'ff-wishlist-rooms';
+  FF.wish = {
+    load() {
+      let w = null;
+      try { w = JSON.parse(localStorage.getItem(WKEY) || 'null'); } catch (_) {}
+      if (!w || !w.rooms) {
+        w = { v: 1, rooms: {} };
+        try {                                          // hearts saved before rooms existed go to Living Room
+          const old = JSON.parse(localStorage.getItem('ff-wishlist') || '[]');
+          if (old.length) w.rooms['Living Room'] = old.map(id => ({ id, t: Date.now() }));
+        } catch (_) {}
+      }
+      for (const r of FF.ROOMS) w.rooms[r] = w.rooms[r] || [];
+      return w;
+    },
+    save(w) { try { localStorage.setItem(WKEY, JSON.stringify(w)); } catch (_) {} document.dispatchEvent(new CustomEvent('ff-wish')); },
+    roomsOf(id) { const w = FF.wish.load(); return FF.ROOMS.filter(r => w.rooms[r].some(x => x.id === id)); },
+    toggle(id, room, snap) {
+      const w = FF.wish.load(), list = w.rooms[room], i = list.findIndex(x => x.id === id);
+      if (i >= 0) list.splice(i, 1); else list.unshift({ ...(snap || {}), id, t: Date.now() });
+      FF.wish.save(w);
+      return i < 0;
+    },
+    count() { const w = FF.wish.load(); return new Set(FF.ROOMS.flatMap(r => w.rooms[r].map(x => x.id))).size; }
+  };
+  FF.wishlist = () => { const w = FF.wish.load(); return new Set(FF.ROOMS.flatMap(r => w.rooms[r].map(x => x.id))); };
+  FF._snap = new Map();                               // card data by id, for the "save to room" pop-up
   FF.pcCard = o => {
+    FF._snap.set(o.id, { name: o.name, store: o.store, img: o.img, price: o.price, orig: o.orig, size: o.size || '', colours: o.colours || 0,
+                         from: !!o.from, room: o.room || '' });
     const fav = FF.wishlist().has(o.id), href = 'product.html?id=' + FF.enc(o.id);
     const right = [o.size ? FF.esc(o.size) : '', o.colours > 1 ? `${o.size ? '' : DOTS}${o.colours} colours` : ''   /* no dots next to a size: keeps room for the store name */].filter(Boolean).join(' · ');
     const img = o.img ? `<img src="${FF.esc(o.img)}" alt="${FF.esc(o.name)}" loading="lazy" onerror="FF.imgErr(this)">` : '<div class="image-fallback">Image unavailable</div>';
@@ -144,14 +174,48 @@
       </div>
     </li>`;
   };
+  // "Save to a room" pop-up, opened by any heart ([data-wish]); one shared element
+  let pop = null, popFor = null;
+  function closePop() { if (pop) { pop.hidden = true; popFor = null; } }
+  function paintPop() {
+    const id = popFor.dataset.wish, saved = FF.wish.roomsOf(id), sug = (FF._snap.get(id) || {}).room;
+    pop.innerHTML = `<p class="wish-pop-title">Save to a room</p>
+      <div class="wish-pop-rooms">${FF.ROOMS.map(r => `<button type="button" class="wish-room${saved.includes(r) ? ' on' : ''}" data-room="${FF.esc(r)}" aria-pressed="${saved.includes(r)}">
+        <span class="wish-check" aria-hidden="true">${saved.includes(r) ? '✓' : '+'}</span>${FF.esc(r)}${r === sug && !saved.includes(r) ? '<small>suggested</small>' : ''}</button>`).join('')}</div>
+      <a class="wish-pop-link" href="wishlist.html">View wishlist →</a>`;
+  }
+  function placePop(btn) {
+    const r = btn.getBoundingClientRect(), w = Math.min(240, window.innerWidth - 24);
+    pop.style.width = w + 'px';
+    pop.style.left = Math.max(12, Math.min(window.scrollX + r.right - w, window.scrollX + window.innerWidth - w - 12)) + 'px';
+    pop.style.top = (window.scrollY + r.bottom + 8) + 'px';
+  }
+  function syncHearts(id) {
+    const on = FF.wish.roomsOf(id).length > 0;
+    document.querySelectorAll(`[data-wish="${CSS.escape(id)}"]`).forEach(h => { h.setAttribute('aria-pressed', String(on)); h.setAttribute('aria-label', on ? 'Saved to your wishlist' : 'Save to wishlist'); });
+    document.querySelectorAll('[data-wish-count]').forEach(el => { const n = FF.wish.count(); el.textContent = n ? n : ''; });
+  }
   document.addEventListener('click', e => {
-    const w = e.target.closest('[data-wish]'); if (!w) return;
-    e.preventDefault(); e.stopPropagation();
-    const set = FF.wishlist(), id = w.dataset.wish;
-    set.has(id) ? set.delete(id) : set.add(id);
-    try { localStorage.setItem('ff-wishlist', JSON.stringify([...set])); } catch (_) {}
-    w.setAttribute('aria-pressed', String(set.has(id))); w.setAttribute('aria-label', set.has(id) ? 'Remove from wishlist' : 'Add to wishlist');
+    const room = e.target.closest('.wish-room');
+    if (room && popFor) {
+      const id = popFor.dataset.wish;
+      FF.wish.toggle(id, room.dataset.room, FF._snap.get(id));
+      paintPop(); syncHearts(id); return;
+    }
+    const heart = e.target.closest('[data-wish]');
+    if (heart) {
+      e.preventDefault(); e.stopPropagation();
+      if (popFor === heart) return closePop();
+      if (!pop) { pop = document.createElement('div'); pop.className = 'wish-pop'; pop.setAttribute('role', 'dialog'); pop.setAttribute('aria-label', 'Save to a room'); document.body.appendChild(pop); }
+      popFor = heart; pop.hidden = false; paintPop(); placePop(heart);
+      const first = pop.querySelector('.wish-room'); if (first) first.focus();
+      return;
+    }
+    if (pop && !pop.hidden && !e.target.closest('.wish-pop')) closePop();
   });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && pop && !pop.hidden) { const h = popFor; closePop(); if (h) h.focus(); } });
+  window.addEventListener('resize', closePop);
+  document.addEventListener('DOMContentLoaded', () => document.querySelectorAll('[data-wish-count]').forEach(el => { const n = FF.wish.count(); el.textContent = n ? n : ''; }));
 
   FF.toast = message => {
     const t = FF.$('toast');

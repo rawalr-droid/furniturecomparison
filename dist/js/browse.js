@@ -117,7 +117,7 @@
   }
 
   // ------------------------------------------------------------------ rendering
-  const card = r => FF.pcCard(r);          // shared product card (common.js)
+  const card = r => FF.pcCard(r);                 // rows carry r.room (suggested wishlist room)          // shared product card (common.js)
 
 
 
