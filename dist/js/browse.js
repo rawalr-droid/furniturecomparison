@@ -117,25 +117,9 @@
   }
 
   // ------------------------------------------------------------------ rendering
-  function card(r) {
-    const selected = state.compare.includes(r.id);
-    const href = 'product.html?id=' + enc(r.id);
-    const price = r.from ? 'From ' + money(r.price) : money(r.price);
-    const tags = [r.size, r.colour].filter(Boolean);
-    if (r.moreColours) tags.push(`+${r.moreColours} more colour${r.moreColours > 1 ? 's' : ''}`);
-    else if (!r.colour && r.colours > 1) tags.push(`${r.colours} colours`);
-    const badge = !tags.length && r.opts > 1 ? `<span class="variant-count">${r.opts} options</span>` : '';
-    return `<article class="product-card">
-      <a class="product-media" href="${href}" target="_blank" rel="noopener">${FF.img(r.img, r.name, 'product-image')}${badge}</a>
-      <div class="product-body">
-        <div class="product-kicker"><span>${esc(r.store)}</span>${r.disc ? `<span class="sale-badge">${Math.round(r.disc * 100)}% off</span>` : ''}</div>
-        <h3><a href="${href}" target="_blank" rel="noopener">${esc(r.name)}</a></h3>
-        <div class="card-type">${esc(r.l3)}</div>${tags.length ? `<div class="card-variant">${tags.map(esc).join(' · ')}</div>` : ''}
-        <div class="price">${price}${r.orig > r.price ? `<span class="was-price">${money(r.orig)}</span>` : ''}</div>
-        <div class="card-actions"><a class="view-button" href="${href}" target="_blank" rel="noopener">View details ↗</a><button class="${selected ? 'selected' : ''}" data-compare="${esc(r.id)}">${selected ? 'Added' : 'Compare'}</button></div>
-      </div>
-    </article>`;
-  }
+  const card = r => FF.pcCard(r);          // shared product card (common.js)
+
+
 
   function pills() {
     const n = FF.node(state.cat), deepest = n.l3 || n.l2 || n.l1;

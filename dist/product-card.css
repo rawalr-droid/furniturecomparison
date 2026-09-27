@@ -1,0 +1,180 @@
+/* ==========================================================================
+   Product card — Product Listing Page (PLP)
+   Drop-in styles. All colours and sizes are tokens at the top.
+   ========================================================================== */
+
+:root {
+  /* Colour */
+  --pc-page-bg:        #F6F4EF;  /* website background */
+  --pc-card-bg:        #FFFFFF;  /* product card */
+  --pc-text:           #242424;  /* main text */
+  --pc-text-secondary: #77736D;  /* brand, colour count, old price */
+  --pc-border:         #E8E5DE;  /* card border */
+  --pc-image-frame:    #F1EEE8;  /* fill behind images that don't fill the square */
+  --pc-accent:         #354238;  /* hover state of product name */
+  --pc-badge-bg:       #B85C4A;  /* discount badge */
+  --pc-badge-text:     #FFFFFF;
+  --pc-wishlist-on:    #B85C4A;  /* filled heart */
+
+  /* Type */
+  --pc-font: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+
+  /* Layout */
+  --pc-columns: 3;
+  --pc-gap: 24px;
+  --pc-radius: 8px;
+  --pc-image-padding: 16px;
+}
+
+/* ---------- Grid ---------- */
+.pc-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--pc-columns), minmax(0, 1fr));
+  gap: var(--pc-gap);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+@media (max-width: 1024px) { .pc-grid { --pc-columns: 2; } }
+@media (max-width: 560px)  { .pc-grid { --pc-gap: 12px; --pc-image-padding: 10px; } }
+
+/* ---------- Card ---------- */
+.pc-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: var(--pc-card-bg);
+  border: 1px solid var(--pc-border);
+  border-radius: var(--pc-radius);
+  overflow: hidden;
+  font-family: var(--pc-font);
+  color: var(--pc-text);
+}
+
+/* ---------- Image ---------- */
+.pc-media {
+  position: relative;
+  aspect-ratio: 1 / 1;              /* every card has the same square frame */
+  background: var(--pc-image-frame);
+  padding: var(--pc-image-padding);
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.pc-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;              /* never crop the product */
+  mix-blend-mode: multiply;         /* white backgrounds melt into the frame */
+  display: block;
+}
+
+/* ---------- Discount badge ---------- */
+.pc-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  background: var(--pc-badge-bg);
+  color: var(--pc-badge-text);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 6px 8px;
+  border-radius: 4px;
+}
+
+/* ---------- Wishlist ---------- */
+.pc-wishlist {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;                       /* sits above the card-wide link */
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: #FFFFFF;
+  box-shadow: 0 1px 4px rgba(36, 36, 36, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--pc-text);
+}
+.pc-wishlist svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; }
+.pc-wishlist[aria-pressed="true"] { color: var(--pc-wishlist-on); }
+.pc-wishlist[aria-pressed="true"] svg { fill: currentColor; }
+
+/* ---------- Body ---------- */
+.pc-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+}
+.pc-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  height: 18px;                     /* fixed: colour count never changes card height */
+}
+.pc-brand {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--pc-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pc-colours {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  font-size: 12px;
+  color: var(--pc-text-secondary);
+}
+
+/* Product name: always 2 lines tall, cut with "…" beyond that */
+.pc-name {
+  font-size: 15px;
+  line-height: 22px;
+  height: 44px;
+  color: var(--pc-text);
+  text-decoration: none;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  transition: color 0.2s;
+}
+/* The whole card is clickable (see .pc-name::after) */
+.pc-name::after { content: ""; position: absolute; inset: 0; z-index: 1; }
+.pc-card:hover .pc-name,
+.pc-name:focus-visible {
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  color: var(--pc-accent);
+}
+.pc-name:focus-visible { outline: none; }
+.pc-card:has(.pc-name:focus-visible) { outline: 2px solid var(--pc-accent); outline-offset: 2px; }
+
+/* ---------- Price ---------- */
+.pc-price { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px; margin: 0; }
+.pc-price-now { font-size: 16px; font-weight: 700; color: var(--pc-text); }
+.pc-price-was { font-size: 13px; color: var(--pc-text-secondary); text-decoration: line-through; }
+
+@media (prefers-reduced-motion: reduce) { .pc-name { transition: none; } }
+
+/* ---------- FurnishFinder additions ---------- */
+.pc-grid { width: 100%; }
+.pc-price-from { font-size: 12px; font-weight: 400; color: var(--pc-text-secondary); margin-right: -4px; }
+.pc-media .image-fallback { font: 12px var(--pc-font); color: var(--pc-text-secondary); }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }

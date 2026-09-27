@@ -116,7 +116,7 @@
       } catch (e) { console.warn(e); }
       if (sim.length < 4) sim = rows.filter(r => r.c === d.c && r.img && !seenBase.has(FF.baseId(r.id)) && seenBase.add(FF.baseId(r.id))).map(r => ({ r, s: similarity(base, r) })).sort((a, b) => b.s - a.s).slice(0, 12).map(x => x.r);
       similarHTML = `<h3>Similar pieces across stores</h3><p>${sim.length} products with a similar look, size and price.</p>
-        <div class="similar-grid">${sim.map(s => `<a class="similar-item" href="product.html?id=${enc(s.id)}" target="_blank" rel="noopener">${FF.img(s.img, s.name, 'similar-img')}<div><strong>${esc(s.name)}</strong><span>${money(s.price)} · ${esc(s.store)}</span></div></a>`).join('')}</div>`;
+        <ul class="pc-grid similar-cards">${sim.map(FF.pcCard).join('')}</ul>`;
       if (!sim.length) similarHTML = '<h3>Similar pieces across stores</h3><p>No close matches found yet.</p>';
       $('similarWrap').innerHTML = similarHTML;
     } catch (e) { console.error(e); $('similarWrap').innerHTML = ''; }

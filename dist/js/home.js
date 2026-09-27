@@ -18,22 +18,7 @@
     }
 
     $('dealCount').textContent = deals.length;
-    $('dealGrid').innerHTML = deals.map(d => {
-      const pct = Math.round((d.o - d.p) / d.o * 100);
-      return `<article class="deal-card">
-        <a class="deal-image" href="${href(d.id)}" target="_blank" rel="noopener">
-          <img src="${esc(FF.fixImg(d.i))}" alt="${esc(d.name)}" loading="lazy" onerror="FF.imgErr(this)">
-          <span class="discount">${pct}% <small>off</small></span>
-        </a>
-        <div class="deal-body">
-          <div class="deal-meta"><span>${esc(d.cat)}</span><span>${esc(d.store)}</span></div>
-          <h3><a href="${href(d.id)}" target="_blank" rel="noopener">${esc(d.name)}</a></h3>
-          <p class="prices"><strong>${money(d.p)}</strong><span>${money(d.o)}</span></p>
-          <div class="saving"><span>You save</span><b>${money(d.o - d.p)}</b></div>
-          <a class="view-deal" href="${href(d.id)}" target="_blank" rel="noopener">View product <span>→</span></a>
-        </div>
-      </article>`;
-    }).join('');
+    $('dealGrid').innerHTML = deals.map(d => FF.pcCard({ id: d.id, name: d.name, store: d.store, img: FF.fixImg(d.i), price: d.p, orig: d.o })).join('');
     $('empty').hidden = deals.length > 0;
 
     const rounded = Math.floor(home.total / 1000) * 1000;

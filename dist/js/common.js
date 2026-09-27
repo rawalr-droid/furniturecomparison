@@ -121,6 +121,38 @@
     img.replaceWith(d);
   };
 
+  // Product card (design handoff 2026-09-28), shared by browse/search, homepage deals and similar items.
+  // o: {id, name, store, img, price, orig, disc, from, size, colours}. Store sits in the "brand" slot.
+  const HEART = '<svg viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
+  const DOTS = '<svg width="22" height="12" viewBox="0 0 22 12" aria-hidden="true"><circle cx="6" cy="6" r="5" fill="#E8E5DE" stroke="#fff"/><circle cx="11" cy="6" r="5" fill="#B5B0A8" stroke="#fff"/><circle cx="16" cy="6" r="5" fill="#77736D" stroke="#fff"/></svg>';
+  FF.wishlist = () => { try { return new Set(JSON.parse(localStorage.getItem('ff-wishlist') || '[]')); } catch (_) { return new Set(); } };
+  FF.pcCard = o => {
+    const fav = FF.wishlist().has(o.id), href = 'product.html?id=' + FF.enc(o.id);
+    const right = [o.size ? FF.esc(o.size) : '', o.colours > 1 ? `${o.size ? '' : DOTS}${o.colours} colours` : ''   /* no dots next to a size: keeps room for the store name */].filter(Boolean).join(' · ');
+    const img = o.img ? `<img src="${FF.esc(o.img)}" alt="${FF.esc(o.name)}" loading="lazy" onerror="FF.imgErr(this)">` : '<div class="image-fallback">Image unavailable</div>';
+    const disc = o.disc || (o.orig > o.price ? (o.orig - o.price) / o.orig : 0);
+    return `<li class="pc-card" data-product-id="${FF.esc(o.id)}">
+      <div class="pc-media">
+        ${disc ? `<span class="pc-badge">-${Math.round(disc * 100)}%</span>` : ''}
+        <button class="pc-wishlist" type="button" data-wish="${FF.esc(o.id)}" aria-pressed="${fav}" aria-label="${fav ? 'Remove from wishlist' : 'Add to wishlist'}">${HEART}</button>
+        ${img}
+      </div>
+      <div class="pc-body">
+        <div class="pc-meta"><span class="pc-brand">${FF.esc(o.store || '')}</span>${right ? `<span class="pc-colours">${right}</span>` : ''}</div>
+        <a class="pc-name" href="${href}" target="_blank" rel="noopener" title="${FF.esc(o.name)}">${FF.esc(o.name)}</a>
+        <p class="pc-price">${o.from ? '<span class="pc-price-from">From</span>' : ''}<span class="pc-price-now">${FF.money(o.price)}</span>${o.orig > o.price ? `<span class="pc-price-was"><span class="visually-hidden">Was </span>${FF.money(o.orig)}</span>` : ''}</p>
+      </div>
+    </li>`;
+  };
+  document.addEventListener('click', e => {
+    const w = e.target.closest('[data-wish]'); if (!w) return;
+    e.preventDefault(); e.stopPropagation();
+    const set = FF.wishlist(), id = w.dataset.wish;
+    set.has(id) ? set.delete(id) : set.add(id);
+    try { localStorage.setItem('ff-wishlist', JSON.stringify([...set])); } catch (_) {}
+    w.setAttribute('aria-pressed', String(set.has(id))); w.setAttribute('aria-label', set.has(id) ? 'Remove from wishlist' : 'Add to wishlist');
+  });
+
   FF.toast = message => {
     const t = FF.$('toast');
     if (!t) return;
