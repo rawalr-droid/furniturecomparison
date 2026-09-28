@@ -19,7 +19,7 @@
   <header class="nn-header">
     <div class="nn-main">
       <a class="nn-logo" href="index.html" aria-label="Furnish Finder UAE home"><span>Furnish</span><span>Finder</span></a>
-      <form class="nn-search" action="browse.html" role="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5" stroke-linecap="round"/></svg><input name="q" type="search" placeholder="Search sofas, dining tables, mirrors…" aria-label="Search furniture"></form>
+      <form class="nn-search" id="searchForm" action="browse.html" role="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5" stroke-linecap="round"/></svg><input id="searchInput" name="q" type="search" placeholder="Search sofas, dining tables, mirrors…" aria-label="Search furniture"></form>
       <div class="nn-actions"><a class="nn-heart" href="wishlist.html" aria-label="Wishlist"><svg viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg><span class="nn-bubble" data-wish-count></span></a><button class="compare-trigger" id="compareTrigger" type="button" disabled hidden>Compare <span id="compareCount">0</span></button></div>
     </div>
     <nav class="nn-nav" aria-label="Main">
@@ -30,22 +30,6 @@
   <a class="nn-promo" id="promoBar" href="browse.html?deals=1&amp;sort=discount">Tonight's biggest drops ›</a>
 
   <main>
-    <section class="search-stage">
-      <div class="eyebrow">Furniture from stores across the UAE</div>
-      <h1>Find the right piece,<br><span>without opening ten tabs.</span></h1>
-      <form class="search-box" id="searchForm" role="search">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 21-4.35-4.35m2.35-5.65a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z"/></svg>
-        <input id="searchInput" type="search" placeholder="Search sofas, dining tables, mirrors…" autocomplete="off" aria-label="Search products" />
-        <button type="submit">Search</button>
-      </form>
-      <div class="quick-searches" aria-label="Popular searches">
-        <span>Popular:</span>
-        <button data-c="furniture/sofas-sectionals">Sofas</button>
-        <button data-c="furniture/dining-furniture/dining-tables">Dining tables</button>
-        <button data-c="furniture/beds-mattresses">Beds</button>
-        <button data-c="home-decor/mirrors">Mirrors</button>
-      </div>
-    </section>
 
     <section class="browse-shell" id="browse">
       <div class="section-heading">
@@ -136,6 +120,6 @@
     <p class="nn-footer-note">Prices and availability can change. Always confirm details with the retailer before buying. © Furnish Finder UAE.</p>
   </footer>
   <script src="js/common.js?v=20260928s1" data-v="20260928e"></script>
-  <script src="js/browse.js?v=20260928n1"></script>
+  <script src="js/browse.js?v=20260928h2"></script>
 </body>
 </html>

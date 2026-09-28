@@ -146,7 +146,7 @@
     els.grid.innerHTML = visible.map(card).join('');
     const n = FF.node(state.cat), deepest = n.l3 || n.l2 || n.l1;
     els.count.textContent = `${rows.length.toLocaleString()} products`;
-    els.label.textContent = state.q ? `Results for “${state.q}”` : deepest ? [n.l1, n.l2, n.l3].filter(Boolean).map(x => x.n).join(' › ') : state.sale ? 'Everything on sale' : 'Browse the catalogue';
+    els.label.textContent = state.q ? `Results for “${state.q}”` : deepest ? [n.l1, n.l2, n.l3].filter(Boolean).map(x => x.n).join(' › ') : state.sale ? 'Everything on sale' : 'All products';
     sizeOptions();
     els.load.hidden = visible.length >= rows.length || !rows.length;
     els.empty.hidden = !!rows.length; els.grid.hidden = !rows.length;
@@ -201,7 +201,7 @@
   [els.room, els.store, els.size, els.sale, els.sort].forEach(x => x.addEventListener('change', readControls));
   [els.min, els.max].forEach(x => x.addEventListener('input', () => { clearTimeout(x.timer); x.timer = setTimeout(readControls, 300); }));
 
-  function goSearch(q) { state.q = q.trim(); state.shown = PAGE; els.search.value = state.q; refresh().then(() => $('browse').scrollIntoView({ behavior: 'smooth' })); }
+  function goSearch(q) { state.q = q.trim(); state.shown = PAGE; if (state.q) { state.cat = ''; state.size = ''; syncControls(); } /* the header search looks across everything */ els.search.value = state.q; refresh().then(() => $('browse').scrollIntoView({ behavior: 'smooth', block: 'start' })); }
   $('searchForm').addEventListener('submit', e => { e.preventDefault(); goSearch(els.search.value); });
   document.querySelectorAll('[data-query]').forEach(b => b.addEventListener('click', () => goSearch(b.dataset.query)));
   document.querySelectorAll('[data-c]').forEach(b => b.addEventListener('click', () => {
