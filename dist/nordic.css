@@ -66,10 +66,16 @@ html body #categoryNav .nav-dropdown a:hover { background: var(--monochrome-brig
 .nn-links { display: flex; gap: 24px; font-size: 14px; font-weight: 500; }
 .nn-links a { text-decoration: none; white-space: nowrap; }
 .nn-links a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.nn-links { flex-shrink: 0; }
+@media (max-width: 1439px) {                        /* laptops: tighten the menu so it fits on one line */
+  html body #categoryNav { gap: 16px !important; }
+  html body #categoryNav .nav-l1, .nn-links { font-size: 13px !important; }
+  .nn-links { gap: 16px; }
+}
 .nn-promo { display: flex; align-items: center; justify-content: center; gap: 8px; height: 32px; padding: 4px 8px; background: var(--black);
   color: var(--white) !important; font-size: 14px; text-decoration: none; }
 .nn-promo:hover { text-decoration: underline; text-underline-offset: 3px; }
-@media (max-width: 1023px) {
+@media (max-width: 1279px) {                        /* tablets / small laptops: the menu scrolls sideways instead of widening the page */
   .nn-links { display: none; }
   html body #categoryNav { overflow-x: auto !important; scrollbar-width: none; }      /* scroll only on small screens (dropdowns off there) */
   html body #categoryNav .nav-dropdown { display: none !important; }
