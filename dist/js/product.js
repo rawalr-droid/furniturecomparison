@@ -50,7 +50,7 @@
       return list.length ? list.sort((a, b) => a.v.p - b.v.p)[0].i : current;
     };
     let imgIndex = 0;
-    if (want.length && variants[current] && variants[current].i) {           // a colour card opens on that colour's photo
+    if (variants[current] && variants[current].i) {           // open on the chosen option's own photo (a colour card: that colour's photo)
       const vi = FF.fixImg(variants[current].i);
       if (!images.includes(vi)) images.push(vi);
       imgIndex = images.indexOf(vi);
@@ -90,7 +90,7 @@
           <h2>${esc(d.n)}</h2>
           ${pickers}${variants.some(x => x.t) && (!pickers || otherOptions) ? `<p class="selected-variant"><span>Option</span>${esc(v.t)} <small>${current + 1} of ${variants.length}</small></p><div class="chip-row">${chips}</div>` : ''}
           <p class="detail-price">${money(price)}${orig > price ? ` <span class="was-price">${money(orig)}</span>` : ''}</p>
-          <div class="facts">${fact('Category', cat.l3)}${fact('Room', room)}${fact('Material', d.m)}${fact('Size', v && v.z)}${fact('Colour', (v && v.k) || d.k)}${fact('Dimensions', d.z)}${fact('Brand', d.b)}${fact('Style', d.y)}${d.t === 0 ? fact('Availability', 'Out of stock at last check') : v && v.n === 0 ? fact('Availability', 'This option was sold out at last check') : ''}</div>
+          <div class="facts">${fact('Category', cat.l3)}${fact('Room', room)}${fact('Material', d.m)}${fact('Size', v && v.z)}${fact('Colour', (v && v.k) || d.k)}${fact('Dimensions', /\d{2}|\d\s*(cm|mm|in\b|inch|"|ft)|\d\s*[x×*]\s*\d/i.test(d.z || '') ? d.z : '')}${fact('Brand', d.b)}${fact('Style', d.y)}${d.t === 0 ? fact('Availability', 'Out of stock at last check') : v && v.n === 0 ? fact('Availability', 'This option was sold out at last check') : ''}</div>
           <p class="description">${esc(d.d || 'See the retailer website for full product information.')}</p>
           <div class="detail-actions"><a class="retailer-link" href="${esc(FF.retailerURL(d.u, v && v.x))}" target="_blank" rel="noopener sponsored">View ${variants.length ? 'this option' : 'product'} at ${esc(store)}</a>
           <button class="wish-save" type="button" data-wish="${esc(id)}" aria-pressed="${FF.wishlist().has(id)}">♡ Save to a room</button></div>
