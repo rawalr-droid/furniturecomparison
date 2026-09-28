@@ -60,6 +60,11 @@ html body #categoryNav .nav-l1 { font-size: 14px !important; font-weight: 500 !i
 html body #categoryNav .nav-l1:hover { text-decoration: underline; text-underline-offset: 4px; }
 html body #categoryNav .nav-dropdown { top: 100% !important; left: -16px !important; min-width: 240px; background: var(--white) !important;
   border: 1px solid var(--monochrome-light) !important; box-shadow: 0 4px 16px rgba(0, 0, 0, .08) !important; padding: 12px 0 !important; }
+/* dropdown hover (owner, 2026-09-28): no dead gap between the menu word and its list, else the list closes on the way down */
+html body #categoryNav .nav-item { align-self: stretch; height: auto; }
+html body #categoryNav .nav-dropdown, html body #categoryNav .nav-item:hover .nav-dropdown,
+html body #categoryNav .nav-item:focus-within .nav-dropdown { margin-top: 0 !important; transform: none !important; }
+html body #categoryNav .nav-dropdown::before { content: ""; position: absolute; left: 0; right: 0; top: -16px; height: 16px; }
 html body #categoryNav .nav-dropdown a { display: block; padding: 8px 16px !important; font-size: 14px !important; font-weight: 400 !important;
   color: var(--ink) !important; background: transparent !important; }
 html body #categoryNav .nav-dropdown a:hover { background: var(--monochrome-brighter) !important; }
