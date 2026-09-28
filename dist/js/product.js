@@ -38,6 +38,8 @@
       const hits = variants.map((v, i) => ({ v, i })).filter(({ v }) => v.p && want.every(w => w === FF.slug(v.z) || w === FF.slug(v.k)));
       if (hits.length) current = hits.sort((a, b) => a.v.p - b.v.p)[0].i;
     }
+    const oq = Number(new URLSearchParams(location.search).get('o'));      // the card's own option (e.g. the 3 Seater, not a cushion)
+    if (new URLSearchParams(location.search).has('o') && variants[oq] && variants[oq].p) current = oq;
     const priced = variants.filter(v => v.p);
     const sizes = [...new Set(priced.map(v => v.z).filter(Boolean))];
     const colours = [...new Set(priced.map(v => v.k).filter(Boolean))];

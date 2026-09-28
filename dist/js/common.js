@@ -159,7 +159,7 @@
   FF.pcCard = o => {
     FF._snap.set(o.id, { name: o.name, store: o.store, img: o.img, price: o.price, orig: o.orig, size: o.size || '', colours: o.colours || 0,
                          from: !!o.from, room: o.room || '' });
-    const fav = FF.wishlist().has(o.id), href = 'product.html?id=' + FF.enc(o.id);
+    const fav = FF.wishlist().has(o.id), href = 'product.html?id=' + FF.enc(o.id) + (o.q != null ? '&o=' + o.q : '');     // o = the card's own option
     const parts = [o.size, o.colour, !o.colour && o.colours > 1 ? `${o.colours} colours` : ''].filter(Boolean).map(FF.esc);
     const more = o.moreColours ? `+${o.moreColours}${parts.length ? '' : ' more colours'}` : '';
     const tags = parts.length || more ? `<span class="pc-tags"><span class="pc-tags-text">${parts.join(' · ')}</span>${more ? `<span class="pc-more">${more}</span>` : ''}</span>` : '';
