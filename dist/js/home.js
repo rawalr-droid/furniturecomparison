@@ -22,7 +22,10 @@
     $('empty').hidden = deals.length > 0;
 
     const rounded = Math.floor(home.total / 1000) * 1000;
-    $('announce').textContent = `One search. ${rounded.toLocaleString()}+ products across ${home.stores} UAE home and furniture stores.`;
+    const announce = n => { $('announce').textContent = `One search. ${rounded.toLocaleString()}+ products across ${n} UAE home and furniture stores.`; };
+    announce(home.stores);
+    // home.stores counts every store in meta, including retired ones left at 0 products; count only stores with products
+    FF.loadMeta().then(m => { const n = m.stores.filter(s => s.c > 0).length; if (n) announce(n); }).catch(() => {});
   }).catch(err => {
     console.error(err);
     $('empty').hidden = false;
