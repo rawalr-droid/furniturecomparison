@@ -67,7 +67,7 @@
       const { v, price, orig } = view();
       FF._snap.set(id, { name: d.n, store, img: FF.fixImg((v && v.i) || d.i), price, orig, size: (v && v.z) || '', colours: 0, from: false, room });
       const main = v && v.i && imgIndex === -1 ? v.i : images[imgIndex] || '';
-      const thumbs = images.map((src, i) => `<button class="variant-thumb image-thumb ${i === imgIndex ? 'active' : ''}" data-image-index="${i}" type="button" aria-label="View image ${i + 1} of ${images.length}"><img src="${esc(src)}" alt="" loading="lazy" onerror="FF.imgErr(this)"><span>${i + 1}</span></button>`).join('');
+      const thumbs = images.map((src, i) => `<button class="variant-thumb image-thumb ${i === imgIndex ? 'active' : ''}" data-image-index="${i}" type="button" aria-label="View image ${i + 1} of ${images.length}"><img referrerpolicy="no-referrer" src="${esc(src)}" alt="" loading="lazy" onerror="FF.imgErr(this)"><span>${i + 1}</span></button>`).join('');
       // an option the store marks as sold out (n === 0) stays clickable but is greyed and labelled
       const soldOut = f => { const vs = priced.filter(f); return vs.length > 0 && vs.every(x => x.n === 0); };
       const group = (label, values, cur, attr, priceOf, outOf) => values.length > 1 ? `<div class="option-group"><span>${label}</span><div class="chip-row">${values.map(x => {
@@ -81,7 +81,7 @@
       const chips = variants.map((x, i) => `<button class="variant-chip ${i === current ? 'active' : ''} ${x.n === 0 ? 'sold-out' : ''}" data-variant-index="${i}" type="button">${esc(x.t)}${x.n === 0 ? '<small>Sold out</small>' : x.p ? `<small>${money(x.p)}</small>` : ''}</button>`).join('');
       root.innerHTML = `<div class="product-detail">
         <div class="detail-gallery">
-          ${main ? `<img id="detailMainImage" class="detail-image" src="${esc(main)}" alt="${esc(d.n)}" onerror="FF.imgErr(this)">` : '<div class="image-fallback">Image unavailable</div>'}
+          ${main ? `<img referrerpolicy="no-referrer" id="detailMainImage" class="detail-image" src="${esc(main)}" alt="${esc(d.n)}" onerror="FF.imgErr(this)">` : '<div class="image-fallback">Image unavailable</div>'}
           ${images.length > 1 ? `<button class="gallery-arrow gallery-prev" data-image-step="-1" aria-label="Previous image">‹</button><button class="gallery-arrow gallery-next" data-image-step="1" aria-label="Next image">›</button><div class="detail-thumbnails">${thumbs}</div>` : ''}
         </div>
         <div class="detail-copy">

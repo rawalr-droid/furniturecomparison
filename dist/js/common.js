@@ -106,7 +106,7 @@
   };
 
   FF.img = (src, alt, cls) => src
-    ? `<img class="${cls}" src="${FF.esc(src)}" alt="${FF.esc(alt)}" loading="lazy" onerror="FF.imgErr(this)">`
+    ? `<img referrerpolicy="no-referrer" class="${cls}" src="${FF.esc(src)}" alt="${FF.esc(alt)}" loading="lazy" onerror="FF.imgErr(this)">`
     : '<div class="image-fallback">Image unavailable</div>';
   FF.imgErr = img => {
     // Pan Home image links carry an empty resize option; try the plain media path once before giving up
@@ -163,7 +163,7 @@
     const parts = [o.size, o.colour, !o.colour && o.colours > 1 ? `${o.colours} colours` : ''].filter(Boolean).map(FF.esc);
     const more = o.moreColours ? `+${o.moreColours}${parts.length ? '' : ' more colours'}` : '';
     const tags = parts.length || more ? `<span class="pc-tags"><span class="pc-tags-text">${parts.join(' · ')}</span>${more ? `<span class="pc-more">${more}</span>` : ''}</span>` : '';
-    const img = o.img ? `<img src="${FF.esc(o.img)}" alt="${FF.esc(o.name)}" loading="lazy" onerror="FF.imgErr(this)">` : '<div class="image-fallback">Image unavailable</div>';
+    const img = o.img ? `<img referrerpolicy="no-referrer" src="${FF.esc(o.img)}" alt="${FF.esc(o.name)}" loading="lazy" onerror="FF.imgErr(this)">` : '<div class="image-fallback">Image unavailable</div>';
     const disc = o.disc || (o.orig > o.price ? (o.orig - o.price) / o.orig : 0);
     return `<li class="pc-card${disc ? ' on-sale' : ''}" data-product-id="${FF.esc(o.id)}">
       <div class="pc-media">

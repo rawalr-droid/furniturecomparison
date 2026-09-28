@@ -20,7 +20,7 @@
     const href = id => 'product.html?id=' + enc(id);
 
     $('categoryStrip').innerHTML = home.tiles.map(t => `<a class="category-card" href="browse.html?c=${enc(t.slug)}">
-      <span class="category-image">${t.i ? `<img src="${esc(FF.fixImg(t.i))}" alt="" loading="lazy" onerror="FF.imgErr(this)">` : ''}</span>
+      <span class="category-image">${t.i ? `<img referrerpolicy="no-referrer" src="${esc(FF.fixImg(t.i))}" alt="" loading="lazy" onerror="FF.imgErr(this)">` : ''}</span>
       <strong>${esc(t.label)}</strong>
     </a>`).join('');
 
@@ -28,7 +28,7 @@
     if (hero) {
       const off = pct(hero);
       $('heroProduct').href = href(hero.id);
-      $('heroProduct').innerHTML = `<img src="${esc(FF.fixImg(hero.i))}" alt="${esc(hero.name)}" onerror="FF.imgErr(this)">
+      $('heroProduct').innerHTML = `<img referrerpolicy="no-referrer" src="${esc(FF.fixImg(hero.i))}" alt="${esc(hero.name)}" onerror="FF.imgErr(this)">
         ${off ? `<span class="nn-hero-badge">-${off}%</span>` : ''}
         <span class="nn-hero-card"><small>${esc(hero.store)}</small><strong>${esc(hero.name)}</strong>
           <span><b class="${off ? 'sale' : ''}">${money(hero.p)}</b>${hero.o > hero.p ? ` <s>${money(hero.o)}</s>` : ''}</span></span>`;
