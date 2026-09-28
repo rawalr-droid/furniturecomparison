@@ -154,26 +154,33 @@
   };
   FF.wishlist = () => { const w = FF.wish.load(); return new Set(FF.ROOMS.flatMap(r => w.rooms[r].map(x => x.id))); };
   FF._snap = new Map();                               // card data by id, for the "save to room" pop-up
+  // Product card, Nordic Nest layout (PRD v1.2 §5.1): badge on the image; store + meta; one-line name; price row with the heart.
+  // Meta order: size · colour (colour cards) · "N colours" · "+N" (more colours than cards shown); the +N is never cut off.
   FF.pcCard = o => {
     FF._snap.set(o.id, { name: o.name, store: o.store, img: o.img, price: o.price, orig: o.orig, size: o.size || '', colours: o.colours || 0,
                          from: !!o.from, room: o.room || '' });
     const fav = FF.wishlist().has(o.id), href = 'product.html?id=' + FF.enc(o.id);
-    const right = [o.size ? FF.esc(o.size) : '', o.colours > 1 ? `${o.size ? '' : DOTS}${o.colours} colours` : ''   /* no dots next to a size: keeps room for the store name */].filter(Boolean).join(' · ');
+    const parts = [o.size, o.colour, !o.colour && o.colours > 1 ? `${o.colours} colours` : ''].filter(Boolean).map(FF.esc);
+    const more = o.moreColours ? `+${o.moreColours}${parts.length ? '' : ' more colours'}` : '';
+    const tags = parts.length || more ? `<span class="pc-tags"><span class="pc-tags-text">${parts.join(' · ')}</span>${more ? `<span class="pc-more">${more}</span>` : ''}</span>` : '';
     const img = o.img ? `<img src="${FF.esc(o.img)}" alt="${FF.esc(o.name)}" loading="lazy" onerror="FF.imgErr(this)">` : '<div class="image-fallback">Image unavailable</div>';
     const disc = o.disc || (o.orig > o.price ? (o.orig - o.price) / o.orig : 0);
-    return `<li class="pc-card" data-product-id="${FF.esc(o.id)}">
+    return `<li class="pc-card${disc ? ' on-sale' : ''}" data-product-id="${FF.esc(o.id)}">
       <div class="pc-media">
         ${disc ? `<span class="pc-badge">-${Math.round(disc * 100)}%</span>` : ''}
-        <button class="pc-wishlist" type="button" data-wish="${FF.esc(o.id)}" aria-pressed="${fav}" aria-label="${fav ? 'Remove from wishlist' : 'Add to wishlist'}">${HEART}</button>
         ${img}
       </div>
       <div class="pc-body">
-        <div class="pc-meta"><span class="pc-brand">${FF.esc(o.store || '')}</span>${right ? `<span class="pc-colours">${right}</span>` : ''}</div>
+        <div class="pc-meta"><span class="pc-brand">${FF.esc(o.store || '')}</span>${tags}</div>
         <a class="pc-name" href="${href}" target="_blank" rel="noopener" title="${FF.esc(o.name)}">${FF.esc(o.name)}</a>
-        <p class="pc-price">${o.from ? '<span class="pc-price-from">From</span>' : ''}<span class="pc-price-now">${FF.money(o.price)}</span>${o.orig > o.price ? `<span class="pc-price-was"><span class="visually-hidden">Was </span>${FF.money(o.orig)}</span>` : ''}</p>
+        <div class="pc-row3">
+          <p class="pc-price">${o.from ? '<span class="pc-price-from">From</span>' : ''}<span class="pc-price-now">${FF.money(o.price)}</span>${o.orig > o.price ? `<span class="pc-price-was"><span class="visually-hidden">Was </span>${FF.money(o.orig)}</span>` : ''}</p>
+          <button class="pc-wishlist" type="button" data-wish="${FF.esc(o.id)}" aria-pressed="${fav}" aria-label="${fav ? 'Saved to your wishlist' : 'Save to a room'}">${HEART}</button>
+        </div>
       </div>
     </li>`;
   };
+
   // "Save to a room" pop-up, opened by any heart ([data-wish]); one shared element
   let pop = null, popFor = null;
   function closePop() { if (pop) { pop.hidden = true; popFor = null; } }
@@ -242,8 +249,26 @@
       </div>`).join('');
   };
 
+  // Header + footer (PRD v1.2 §5.3, §5.13): rotating honest messages, promo bar from tonight's capped deals, footer category links
+  FF.headerInit = () => {
+    const util = FF.$('announce'), promo = FF.$('promoBar'), shop = FF.$('footerShop');
+    FF.loadMeta().then(m => {
+      const stores = m.stores.filter(s => s.c > 0).length, total = Math.floor(m.total / 1000) * 1000;
+      if (shop) shop.innerHTML = m.tree.map(l1 => `<a href="browse.html?c=${FF.enc(l1.s)}">${FF.esc(l1.n)}</a>`).join('');
+      if (!util || util.dataset.static) return;
+      const msgs = [`One search across ${stores} UAE home stores`, `${total.toLocaleString()}+ products, prices refreshed nightly`, 'Buy direct from the retailer'];
+      let i = 0; util.textContent = msgs[0];
+      if (!matchMedia('(prefers-reduced-motion: reduce)').matches) setInterval(() => { i = (i + 1) % msgs.length; util.textContent = msgs[i]; }, 6000);
+    }).catch(() => {});
+    if (promo) FF.fetchJSON('data/home.json').then(h => {       // deals already skip discounts above 80% (inflated was-prices)
+      const max = Math.max(0, ...(h.deals || []).map(d => d.o > d.p ? Math.round((d.o - d.p) / d.o * 100) : 0));
+      promo.textContent = max ? `Tonight's biggest drops, up to ${max}% off ›` : "Tonight's deals ›";
+    }).catch(() => {});
+  };
+
   document.addEventListener('DOMContentLoaded', () => {
     const nav = FF.$('categoryNav');
     if (nav) FF.loadMeta().then(() => FF.renderNav(nav));
+    FF.headerInit();
   });
 })();

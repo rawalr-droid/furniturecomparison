@@ -1,0 +1,268 @@
+/* ==========================================================================
+   Furnish Finder: Nordic Nest-style UI, phase 1 (PRD v1.1 + master review fixes, 2026-09-28)
+   Loaded LAST on every page. Tokens, Inter-only type, header/footer, card + grid, homepage, banner restyle, save-to-room popover.
+   Phase 2 (category landing, filter bar, product page, wishlist layout) and phase 3 (mega-menu, drawer, stores page) come later.
+   ========================================================================== */
+:root {
+  --white: #ffffff; --black: #000000; --ink: #212529; --dark-grey: #1e2022; --grey-text: #767676; --grey-count: #767676;
+  --soft-white: #fafafa; --monochrome-brighter: #f5f5f5; --monochrome-light: #ebebeb; --monochrome: #bbbcbc; --solid-grey: #c9c0bb;
+  --accordion-border: #e3dfdc; --price-sale: #d90005; --badge-sale: #bc0d0d; --positive: #4ec791; --positive-text: #1e7a50;
+  --orange: #ff9800; --negative: #f06161; --negative-text: #c62828; --cream-white: #fff1d9; --secondary-light: #ffc166;
+  --img-tint: rgba(128, 122, 106, .06); --pale-black: rgba(0, 0, 0, .1);
+  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif; --font-display: "Inter", system-ui, -apple-system, sans-serif;
+  --gutter: 40px; --sp-xxl: 70px;
+  /* old tokens used by the untouched page bodies, re-pointed so everything reads as one system */
+  --bg: #ffffff; --surface: #ffffff; --line: #ebebeb; --muted: #767676; --accent: #000000; --accent-soft: #f5f5f5;
+  --serif: var(--font-body); --sans: var(--font-body);
+  --pc-font: var(--font-body); --pc-page-bg: #ffffff; --pc-text: #000000; --pc-text-secondary: #767676; --pc-border: #ebebeb;
+  --pc-image-frame: #ffffff; --pc-accent: #000000; --pc-badge-bg: #bc0d0d; --pc-radius: 0px;
+}
+@media (max-width: 1023px) { :root { --gutter: 24px; } }
+@media (max-width: 767px) { :root { --gutter: 16px; --sp-xxl: 40px; } }
+
+/* ---------- Inter only, white pages, square corners (PRD §4.3-4.5) ---------- */
+html body, html body *:not(svg):not(path):not(circle) { font-family: var(--font-body) !important; }
+html body { background: var(--white) !important; color: var(--ink); font-size: 16px; line-height: 1.5; margin: 0; }
+html body * { border-radius: 0 !important; }
+html body .nn-search, html body .nn-search input, html body .ffb-dot, html body .ffb-dot i, html body .nn-bubble,
+html body .wish-count:not(:empty), html body .nn-carousel-btn { border-radius: 999px !important; }
+html body .ffb-card { border-radius: 6px !important; }
+.t-display, .nn-h { font-family: var(--font-display) !important; font-weight: 500; text-transform: uppercase; letter-spacing: .04em; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--secondary-light); outline-offset: 2px; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- Header (PRD §5.3) ---------- */
+.nn-utility { height: 30px; display: flex; align-items: center; justify-content: center; gap: 8px; background: var(--monochrome-light);
+  font-size: 12.5px; color: var(--ink); padding: 0 var(--gutter); text-align: center; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.nn-utility::before { content: "✓"; color: var(--orange); font-weight: 700; }
+.nn-header { background: var(--white); position: relative; z-index: 40; }
+.nn-main { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 16px; height: 64px; padding: 0 var(--gutter); }
+.nn-logo { display: inline-flex; flex-direction: column; text-decoration: none; color: var(--black); font-weight: 600; font-size: 18px;
+  line-height: .95; letter-spacing: .06em; text-transform: uppercase; justify-self: start; }
+.nn-search { justify-self: center; display: flex; align-items: center; gap: 8px; width: min(400px, 40vw); height: 34px; padding: 0 14px;
+  background: var(--monochrome-light); }
+.nn-search svg { width: 16px; height: 16px; flex: none; stroke: var(--ink); fill: none; stroke-width: 2; }
+.nn-search input { flex: 1; min-width: 0; border: 0; background: transparent; font-size: 14px; color: var(--ink); outline: none; }
+.nn-actions { justify-self: end; display: flex; align-items: center; gap: 8px; }
+.nn-heart { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; color: var(--black); }
+.nn-heart svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.7; }
+.nn-bubble:empty { display: none; }
+.nn-bubble { position: absolute; top: 2px; right: 0; min-width: 18px; height: 18px; padding: 0 5px; display: inline-flex; align-items: center;
+  justify-content: center; background: var(--orange); color: var(--black); font-size: 11px; font-weight: 600; }
+.nn-nav { display: flex; align-items: center; justify-content: space-between; gap: 24px; min-height: 40px; padding: 0 var(--gutter);
+  border-bottom: 1px solid var(--monochrome-light); }
+html body #categoryNav { display: flex !important; justify-content: flex-start !important; gap: 24px !important; background: transparent !important;
+  border: 0 !important; padding: 0 !important; min-height: 40px !important; flex: 1; overflow: visible !important; box-shadow: none !important; }
+html body #categoryNav .nav-item { position: relative; display: flex; align-items: center; }
+html body #categoryNav .nav-l1 { font-size: 14px !important; font-weight: 500 !important; color: var(--ink) !important; text-decoration: none;
+  padding: 10px 0 !important; letter-spacing: 0 !important; text-transform: none !important; white-space: nowrap; }
+html body #categoryNav .nav-l1:hover { text-decoration: underline; text-underline-offset: 4px; }
+html body #categoryNav .nav-dropdown { top: 100% !important; left: -16px !important; min-width: 240px; background: var(--white) !important;
+  border: 1px solid var(--monochrome-light) !important; box-shadow: 0 4px 16px rgba(0, 0, 0, .08) !important; padding: 12px 0 !important; }
+html body #categoryNav .nav-dropdown a { display: block; padding: 8px 16px !important; font-size: 14px !important; font-weight: 400 !important;
+  color: var(--ink) !important; background: transparent !important; }
+html body #categoryNav .nav-dropdown a:hover { background: var(--monochrome-brighter) !important; }
+.nn-links { display: flex; gap: 24px; font-size: 14px; font-weight: 500; }
+.nn-links a { text-decoration: none; white-space: nowrap; }
+.nn-links a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.nn-promo { display: flex; align-items: center; justify-content: center; gap: 8px; height: 32px; padding: 4px 8px; background: var(--black);
+  color: var(--white) !important; font-size: 14px; text-decoration: none; }
+.nn-promo:hover { text-decoration: underline; text-underline-offset: 3px; }
+@media (max-width: 1023px) {
+  .nn-links { display: none; }
+  html body #categoryNav { overflow-x: auto !important; scrollbar-width: none; }      /* scroll only on small screens (dropdowns off there) */
+  html body #categoryNav .nav-dropdown { display: none !important; }
+}
+@media (max-width: 767px) {
+  .nn-main { grid-template-columns: 1fr auto; height: 56px; }
+  .nn-logo { font-size: 15px; }
+  .nn-search { grid-column: 1 / -1; grid-row: 2; width: 100%; margin-bottom: 10px; }
+  .nn-main { height: auto; padding-top: 10px; row-gap: 10px; }
+  .nn-utility { font-size: 12px; }
+}
+
+/* ---------- Section rhythm + headings (PRD §4.5, §5.7) ---------- */
+.nn-section { padding: var(--sp-xxl) var(--gutter) 0; }
+.nn-h { font-size: 20px; line-height: 30px; color: var(--ink); text-align: center; margin: 0 0 8px; }
+.nn-sub { text-align: center; color: var(--grey-text); font-size: 12px; margin: 0 0 32px; }
+.nn-link { display: block; text-align: center; margin-top: 24px; font-size: 14px; font-weight: 300; text-decoration: underline; }
+@media (max-width: 767px) { .nn-h { font-size: 16px; line-height: 24px; } }
+
+/* ---------- Buttons + pills (PRD §4.7) ---------- */
+.nn-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 40px; padding: 7px 23px; background: var(--black);
+  color: var(--white) !important; border: 1px solid var(--black); font-size: 14px; font-weight: 500; text-decoration: none; cursor: pointer; }
+.nn-btn:hover { background: #333; }
+.nn-btn-up { font-family: var(--font-display) !important; text-transform: uppercase; letter-spacing: .04em; min-height: 35px; padding: 3px 23px; }
+.nn-btn-2 { background: var(--white); color: var(--black) !important; border: 1px solid var(--monochrome); }
+.nn-btn-2:hover { background: var(--monochrome-brighter); }
+.nn-pills { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.nn-pill { display: inline-flex; align-items: center; min-height: 48px; padding: 0 16px; background: var(--white); border: 1px solid var(--monochrome);
+  font-size: 14px; font-weight: 500; color: var(--black); text-decoration: none; white-space: nowrap; }
+.nn-pill:hover { border-color: var(--black); }
+.nn-pill.dark { border-color: var(--black); }
+.nn-pills-scroll { flex-wrap: nowrap; justify-content: flex-start; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+.nn-pills-scroll::-webkit-scrollbar { display: none; }
+
+/* ---------- Product card (PRD §5.1) ---------- */
+html body .pc-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; list-style: none; margin: 0; padding: 0; }
+@media (max-width: 1279px) { html body .pc-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 1023px) { html body .pc-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+html body .pc-card { background: var(--white); border: 0 !important; box-shadow: none !important; overflow: visible; position: relative; }
+html body .pc-media { aspect-ratio: 9 / 10; background: var(--white); padding: 8% !important; position: relative; overflow: hidden; }
+html body .pc-media::after { content: ""; position: absolute; inset: 0; background: var(--img-tint); pointer-events: none; }
+html body .pc-media img { mix-blend-mode: normal !important; object-fit: contain; transition: transform .3s ease-out; width: 100%; height: 100%; }
+html body .pc-card:hover .pc-media img { transform: scale(1.03); }
+html body .pc-badge { top: 12px !important; left: 12px !important; height: 24px; padding: 0 8px !important; display: inline-flex; align-items: center;
+  font-size: 12px !important; font-weight: 400 !important; line-height: 18px; background: var(--badge-sale) !important; color: var(--white) !important; }
+html body .pc-body { padding: 16px 0 0 !important; gap: 0 !important; }
+html body .pc-meta { height: auto !important; min-height: 21px; display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+html body .pc-brand { font-size: 14px !important; line-height: 21px; font-weight: 600 !important; color: var(--black) !important; letter-spacing: 0 !important;
+  text-transform: none !important; flex: none; max-width: 55%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pc-tags { display: flex; align-items: baseline; gap: 4px; min-width: 0; font-size: 12px; line-height: 18px; color: var(--grey-text); }
+.pc-tags-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.pc-more { flex: none; font-weight: 500; color: var(--black); }
+html body .pc-name { display: block !important; height: auto !important; -webkit-line-clamp: unset !important; font-size: 14px !important;
+  line-height: 19.6px !important; font-weight: 400 !important; color: var(--black) !important; white-space: nowrap; overflow: hidden;
+  text-overflow: ellipsis; text-decoration: none !important; margin-top: 2px; }
+html body .pc-card:hover .pc-name, html body .pc-name:focus-visible { font-weight: 400 !important; text-decoration: underline !important;
+  text-underline-offset: 3px; color: var(--black) !important; }
+.pc-row3 { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; }
+html body .pc-price { margin: 0 !important; gap: 0 6px !important; align-items: baseline; }
+html body .pc-price-now { font-size: 14px !important; line-height: 21px; font-weight: 400 !important; color: var(--black) !important; }
+html body .pc-card.on-sale .pc-price-now { color: var(--price-sale) !important; }
+html body .pc-price-was { font-size: 12px !important; line-height: 18px; font-weight: 300 !important; color: var(--grey-text) !important; }
+html body .pc-price-from { font-size: 12px !important; color: var(--grey-text) !important; margin: 0 !important; }
+html body .pc-row3 .pc-wishlist { position: relative !important; top: auto !important; right: auto !important; z-index: 2; width: 40px !important;
+  height: 40px !important; margin: -8px -8px -8px 0; background: transparent !important; box-shadow: none !important; color: var(--black) !important; flex: none; }
+html body .pc-row3 .pc-wishlist svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.7; }
+html body .pc-row3 .pc-wishlist[aria-pressed="true"] svg { fill: var(--black); }
+html body .pc-card:has(.pc-name:focus-visible) { outline: 2px solid var(--secondary-light); outline-offset: 2px; }
+@media (max-width: 767px) {
+  html body .pc-body { padding-top: 12px !important; }
+  html body .pc-brand, html body .pc-name, html body .pc-price-now { font-size: 13px !important; }
+}
+
+/* ---------- Save to a room popover (PRD §5.2) ---------- */
+html body .wish-pop { width: 280px !important; padding: 16px !important; border: 1px solid var(--monochrome-light) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, .08) !important; background: var(--white) !important; }
+html body .wish-pop-title { font-family: var(--font-display) !important; font-size: 14px !important; font-weight: 500 !important;
+  letter-spacing: .04em !important; color: var(--ink) !important; margin: 0 0 8px !important; }
+html body .wish-room { min-height: 48px; border: 0 !important; border-bottom: 1px solid var(--monochrome-light) !important; padding: 0 4px !important;
+  font-size: 14px !important; font-weight: 400 !important; color: var(--ink) !important; background: var(--white) !important; }
+html body .wish-room.on { background: var(--white) !important; color: var(--ink) !important; }
+html body .wish-check { width: 16px !important; height: 16px !important; border: 1px solid var(--black); background: var(--white) !important;
+  color: transparent !important; font-size: 11px !important; }
+html body .wish-room.on .wish-check { background: rgba(0, 0, 0, .8) !important; color: var(--white) !important; border-color: transparent; }
+html body .wish-pop-link { color: var(--black) !important; font-weight: 400 !important; text-decoration: underline; font-size: 14px !important; }
+
+/* ---------- Homepage (PRD §6.1) ---------- */
+.nn-hero { display: grid; grid-template-columns: 1fr 1fr; min-height: 520px; background: var(--monochrome-brighter); }
+.nn-hero-copy { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 16px; padding: 40px var(--gutter); }
+.nn-eyebrow { font-family: var(--font-display) !important; font-weight: 500; text-transform: uppercase; letter-spacing: .04em; font-size: 14px;
+  color: var(--grey-text); margin: 0; }
+.nn-hero h1 { font-size: 42px; line-height: 50px; font-weight: 400; margin: 0; color: var(--black); max-width: 14ch; text-wrap: balance; }
+.nn-hero-sub { font-size: 16px; line-height: 24px; margin: 0; max-width: 46ch; color: var(--ink); }
+html body #heroProduct { position: relative; display: flex; align-items: center; justify-content: center; background: var(--white); padding: 40px;
+  text-decoration: none; color: var(--black); overflow: hidden; min-height: 360px; }
+html body #heroProduct::after { content: ""; position: absolute; inset: 0; background: var(--img-tint); pointer-events: none; }
+html body #heroProduct img { max-width: 80%; max-height: 380px; object-fit: contain; }
+.nn-hero-badge { position: absolute; top: 24px; left: 24px; height: 28px; padding: 0 10px; display: inline-flex; align-items: center;
+  background: var(--badge-sale); color: var(--white); font-size: 14px; z-index: 2; }
+.nn-hero-card { position: absolute; left: 24px; bottom: 24px; max-width: calc(100% - 48px); background: var(--white); padding: 12px 14px; z-index: 2;
+  display: grid; gap: 2px; font-size: 14px; line-height: 21px; box-shadow: 0 4px 16px rgba(0, 0, 0, .08); }
+.nn-hero-card strong { font-weight: 600; }
+.nn-hero-card span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nn-hero-card .sale { color: var(--price-sale); }
+.nn-hero-card s { color: var(--grey-text); font-size: 12px; font-weight: 300; margin-left: 6px; }
+@media (max-width: 1023px) { .nn-hero { grid-template-columns: 1fr; } .nn-hero h1 { font-size: 32px; line-height: 40px; } }
+@media (max-width: 767px) { .nn-hero-copy { padding: 32px var(--gutter); } .nn-hero h1 { font-size: 28px; line-height: 36px; }
+  html body #heroProduct { min-height: 300px; padding: 24px; } }
+.nn-l1 { padding: 24px var(--gutter) 0; }
+/* deals carousel (PRD §5.8): a single row, arrow buttons on desktop, swipe on touch */
+.nn-carousel { position: relative; }
+html body .nn-carousel .pc-grid { display: grid; grid-auto-flow: column; grid-template-columns: none !important;
+  grid-auto-columns: calc((100% - 24px) / 4); overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
+html body .nn-carousel .pc-grid::-webkit-scrollbar { display: none; }
+html body .nn-carousel .pc-card { scroll-snap-align: start; }
+@media (max-width: 1279px) { html body .nn-carousel .pc-grid { grid-auto-columns: calc((100% - 16px) / 3); } }
+@media (max-width: 1023px) { html body .nn-carousel .pc-grid { grid-auto-columns: calc((100% - 16px) / 2.3); } }
+.nn-carousel-btn { position: absolute; top: 38%; width: 40px; height: 40px; border: 0; background: var(--cream-white); color: var(--black);
+  font-size: 20px; cursor: pointer; z-index: 3; display: flex; align-items: center; justify-content: center; }
+.nn-carousel-btn.prev { left: -20px; } .nn-carousel-btn.next { right: -20px; }
+@media (max-width: 1023px) { .nn-carousel-btn { display: none; } }
+/* shop by category tiles (4 + 3) */
+html body #categoryStrip { display: grid !important; grid-template-columns: repeat(4, minmax(0, 1fr)) !important; gap: 8px !important; overflow: visible !important; }
+@media (max-width: 767px) { html body #categoryStrip { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; } }
+html body #categoryStrip .category-card { display: grid; gap: 10px; text-decoration: none; color: var(--black); background: transparent !important;
+  border: 0 !important; box-shadow: none !important; padding: 0 !important; min-width: 0 !important; }
+html body #categoryStrip .category-image { position: relative; display: block; aspect-ratio: 1; background: var(--white); overflow: hidden; }
+html body #categoryStrip .category-image::after { content: ""; position: absolute; inset: 0; background: var(--img-tint); }
+html body #categoryStrip .category-image img { width: 100%; height: 100%; object-fit: cover; }
+html body #categoryStrip strong { font-size: 14px; font-weight: 500; text-align: left; }
+/* how it works */
+.nn-how { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; padding: var(--sp-xxl) var(--gutter); }
+.nn-how div { border-top: 1px solid var(--monochrome-light); padding-top: 16px; }
+.nn-how span { font-family: var(--font-display) !important; font-weight: 500; font-size: 20px; letter-spacing: .04em; }
+.nn-how h3 { font-size: 14px; font-weight: 600; margin: 8px 0 4px; }
+.nn-how p { font-size: 14px; line-height: 21px; color: var(--grey-text); margin: 0; }
+@media (max-width: 767px) { .nn-how { grid-template-columns: 1fr; } }
+
+/* ---------- Room banner restyle (PRD §6.1.5): overrides only; banner.css + the nightly-built markup are untouched ---------- */
+html body .ffb.ffp { display: grid !important; grid-template-columns: 66fr 34fr !important; gap: 0 !important; margin: var(--sp-xxl) var(--gutter) 0 !important;
+  padding: 0 !important; background: var(--white) !important; border: 0 !important; max-width: none !important; }
+html body .ffp .ffp-scene { grid-column: 1; grid-row: 1; border-radius: 0 !important; }
+html body .ffp .ffp-photo { border-radius: 0 !important; }
+html body .ffp .ffb-copy { grid-column: 2; grid-row: 1; align-self: center; padding: 40px !important; background: var(--white); }
+html body .ffp .ffp-strip { grid-column: 1 / -1; grid-row: 2; }
+html body .ffb .ffb-eyebrow { font-family: var(--font-display) !important; font-weight: 500 !important; font-size: 14px !important;
+  letter-spacing: .04em !important; color: var(--grey-text) !important; margin: 0 0 12px !important; }
+html body .ffb h2 { font-size: 30px !important; line-height: 40px !important; font-weight: 400 !important; color: var(--black) !important; margin: 0 0 16px !important; }
+html body .ffb h2 em { font-style: normal !important; color: inherit !important; }
+html body .ffb .ffb-sub { font-size: 14px !important; line-height: 21px !important; color: var(--ink) !important; max-width: none !important; }
+html body .ffb .ffb-btn { font-family: var(--font-display) !important; text-transform: uppercase; letter-spacing: .04em; font-size: 14px !important;
+  font-weight: 500 !important; min-height: 35px; padding: 3px 23px !important; background: var(--black) !important; color: var(--white) !important;
+  display: inline-flex !important; align-items: center; }
+html body .ffb .ffb-total { font-size: 14px !important; line-height: 21px !important; color: var(--ink) !important; }
+html body .ffb .ffb-dot { width: 30px !important; height: 30px !important; background: var(--white) !important; box-shadow: 0 1px 4px rgba(0, 0, 0, .2) !important;
+  animation: none !important; display: flex !important; align-items: center; justify-content: center; }
+html body .ffb .ffb-dot i { width: 14px !important; height: 14px !important; background: none !important; box-shadow: none !important; position: relative;
+  transition: transform .2s ease-out; }
+html body .ffb .ffb-dot i::before, html body .ffb .ffb-dot i::after { content: ""; position: absolute; left: 50%; top: 50%; width: 14px; height: 1.5px;
+  background: var(--ink); transform: translate(-50%, -50%); }
+html body .ffb .ffb-dot i::after { transform: translate(-50%, -50%) rotate(90deg); }
+html body .ffb .ffb-dot-tag:hover .ffb-dot i, html body .ffb .ffb-dot-tag:focus-within .ffb-dot i { transform: rotate(45deg); }
+html body .ffb .ffb-card { width: 220px !important; padding: 10px !important; box-shadow: 0 4px 16px rgba(0, 0, 0, .12) !important; font-size: 11px !important; }
+html body .ffb .ffb-card strong { font-size: 12px !important; font-weight: 700 !important; line-height: 16px !important; }
+html body .ffb .ffb-price { font-size: 12px !important; font-weight: 400 !important; }
+html body .ffb .ffb-off { color: var(--price-sale) !important; font-weight: 400 !important; }
+html body .ffb .ffb-links a { font-weight: 500 !important; font-size: 12px !important; }
+html body .ffp-strip { gap: 8px !important; padding: 16px 0 0 !important; }
+html body .ffp-item { border: 0 !important; background: var(--white) !important; box-shadow: none !important; }
+@media (max-width: 1023px) {
+  html body .ffb.ffp { grid-template-columns: 1fr !important; }
+  html body .ffp .ffp-scene { grid-row: 1; } html body .ffp .ffb-copy { grid-column: 1; grid-row: 2; padding: 24px 0 !important; }
+  html body .ffp .ffp-strip { grid-row: 3; }
+}
+
+/* ---------- Footer (PRD §5.13) ---------- */
+.nn-footer { background: var(--dark-grey); color: var(--monochrome); font-size: 14px; line-height: 21px; padding: var(--sp-xxl) var(--gutter) 40px;
+  margin-top: var(--sp-xxl); }
+.nn-footer-cols { display: grid; grid-template-columns: 1.4fr repeat(3, minmax(0, 1fr)); gap: 24px; }
+.nn-footer .nn-logo { color: var(--white); margin-bottom: 12px; }
+.nn-footer h4 { color: var(--white); font-size: 14px; font-weight: 600; margin: 0 0 12px; }
+.nn-footer a { color: var(--monochrome) !important; text-decoration: none; display: block; padding: 2px 0; }
+.nn-footer a:hover { color: var(--white) !important; text-decoration: underline; }
+.nn-footer-note { border-top: 1px solid #34383b; margin-top: 40px; padding-top: 16px; font-size: 12px; }
+@media (max-width: 767px) { .nn-footer-cols { grid-template-columns: 1fr 1fr; } }
+/* the old footers are replaced by .nn-footer */
+html body > footer:not(.nn-footer), html body .product-footer { display: none !important; }
+
+/* ---------- Existing page bodies (phase 2 redesigns them): white, square, Inter ---------- */
+html body .product-card, html body .filters, html body .product-detail, html body .compare-dialog { box-shadow: none !important; }
+html body .browse-hero, html body .search-hero { background: var(--white) !important; }
+html body .detail-price { color: var(--black); }
+html body .wish-drop { color: var(--positive-text) !important; }
+html body .wish-out { color: var(--negative-text) !important; }
+html body .wish-page h1, html body .wish-room-sec h2 { font-weight: 400 !important; }
+html body .wish-tab.on { background: var(--black) !important; border-color: var(--black) !important; }

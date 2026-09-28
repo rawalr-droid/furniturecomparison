@@ -7,26 +7,27 @@
   <title>Browse | Furnish Finder UAE</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css?v=20260920" />
   <link rel="stylesheet" href="pages.css?v=20260920" />
   <link rel="stylesheet" href="theme.css?v=20260926t" />
-  <link rel="stylesheet" href="product-card.css?v=20260928w" />
+  <link rel="stylesheet" href="product-card.css?v=20260928n1" />
+  <link rel="stylesheet" href="nordic.css?v=20260928n1" />
 </head>
 <body>
-  <header class="site-header">
-    <a class="brand" href="index.html" aria-label="Furnish Finder UAE home">
-      <span class="brand-word">FURNISH<span>FINDER</span></span><small>UAE</small>
-    </a>
-    <div class="header-actions">
-      <a class="deal-link" href="index.html">Home</a>
-      <a class="wish-link" href="wishlist.html" aria-label="Wishlist">♡ Wishlist <span class="wish-count" data-wish-count></span></a>
-      <button class="compare-trigger" id="compareTrigger" type="button" disabled hidden>
-        Compare <span id="compareCount">0</span>
-      </button>
+  <div class="nn-utility" id="announce" aria-live="polite">One search across UAE home stores</div>
+  <header class="nn-header">
+    <div class="nn-main">
+      <a class="nn-logo" href="index.html" aria-label="Furnish Finder UAE home"><span>Furnish</span><span>Finder</span></a>
+      <form class="nn-search" action="browse.html" role="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5" stroke-linecap="round"/></svg><input name="q" type="search" placeholder="Search sofas, dining tables, mirrors…" aria-label="Search furniture"></form>
+      <div class="nn-actions"><a class="nn-heart" href="wishlist.html" aria-label="Wishlist"><svg viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg><span class="nn-bubble" data-wish-count></span></a><button class="compare-trigger" id="compareTrigger" type="button" disabled hidden>Compare <span id="compareCount">0</span></button></div>
     </div>
+    <nav class="nn-nav" aria-label="Main">
+      <div class="category-nav" id="categoryNav" aria-label="Categories"></div>
+      <div class="nn-links"><a href="browse.html?deals=1&amp;sort=discount">Deals</a><a href="index.html#rooms">Rooms</a></div>
+    </nav>
   </header>
-  <nav class="retail-nav" id="categoryNav" aria-label="Furniture categories"></nav>
+  <a class="nn-promo" id="promoBar" href="browse.html?deals=1&amp;sort=discount">Tonight's biggest drops ›</a>
 
   <main>
     <section class="search-stage">
@@ -125,7 +126,16 @@
   </dialog>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="js/common.js?v=20260928w" data-v="20260928a"></script>
-  <script src="js/browse.js?v=20260928w"></script>
+<footer class="nn-footer">
+    <div class="nn-footer-cols">
+      <div><a class="nn-logo" href="index.html"><span>Furnish</span><span>Finder</span></a><p>One search. Every UAE home store. Prices refreshed nightly.</p></div>
+      <div><h4>Shop</h4><div id="footerShop"></div></div>
+      <div><h4>Rooms</h4><a href="browse.html?room=Living%20Room">Living Room</a><a href="browse.html?room=Bedroom">Bedroom</a><a href="browse.html?room=Dining%20Room">Dining Room</a><a href="browse.html?room=Home%20Office">Home Office</a><a href="browse.html?room=Kids%20Room">Kids Room</a><a href="browse.html?room=Entryway">Entryway</a><a href="browse.html?room=Bathroom">Bathroom</a><a href="browse.html?room=Kitchen">Kitchen</a><a href="browse.html?room=Outdoor">Outdoor</a></div>
+      <div><h4>About</h4><a href="index.html#how">How it works</a><a href="browse.html">All products</a><a href="wishlist.html">Wishlist</a></div>
+    </div>
+    <p class="nn-footer-note">Prices and availability can change. Always confirm details with the retailer before buying. © Furnish Finder UAE.</p>
+  </footer>
+  <script src="js/common.js?v=20260928n1" data-v="20260928a"></script>
+  <script src="js/browse.js?v=20260928n1"></script>
 </body>
 </html>
