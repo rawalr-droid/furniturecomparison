@@ -128,11 +128,12 @@ html body .t2-tl b { font-family: var(--font-display) !important; font-weight: 9
 @media (max-width: 900px) { .t2-arr { display: none; } }
 
 /* ---------- Room banner (nightly-built block): CSS only ---------- */
-html body .ffb.ffp { grid-template-columns: 1.25fr 1fr !important; margin: 72px var(--gutter) 0 !important; background: transparent !important; color: var(--cran); }
-html body .ffp .ffp-scene { border-radius: 28px 0 0 28px !important; background: var(--ivory); align-self: stretch; }
-html body .ffp .ffp-photo { border-radius: 28px 0 0 28px !important; width: 100%; height: 100%; object-fit: cover; display: block; }
+html body .ffb.ffp { grid-template-columns: 1.25fr 1fr !important; margin: 72px var(--gutter) 0 !important; background: var(--ivory) !important; color: var(--cran);
+  border-radius: 28px !important; }
+html body .ffp .ffp-scene { border-radius: 28px 0 0 0 !important; background: var(--ivory); align-self: start; }   /* keeps its own shape, so the dots stay on the products */
+html body .ffp .ffp-photo { border-radius: 28px 0 0 0 !important; width: 100%; height: auto; display: block; }
 html body .ffp .ffb-copy { align-self: stretch; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; padding: 48px !important;
-  background: var(--ivory); border-radius: 0 28px 28px 0 !important; }
+  background: transparent; }
 html body .ffb .ffb-eyebrow { font-family: var(--font-body) !important; font-weight: 700 !important; font-size: 12px !important; letter-spacing: .12em !important;
   text-transform: uppercase; color: var(--plum) !important; margin: 0 0 10px !important; }
 html body .ffb h2 { font-size: clamp(30px, 4vw, 48px) !important; line-height: 1.05 !important; color: var(--cran) !important; margin: 0 0 14px !important; }
@@ -155,9 +156,9 @@ html body .ffb .ffb-price { font-size: 14px !important; font-weight: 800 !import
 html body .ffb .ffb-price s { font-weight: 400; opacity: .75; }
 html body .ffb .ffb-off { background: var(--plum) !important; color: var(--ivory) !important; font-weight: 700 !important; font-size: 11px !important; padding: 1px 8px; }
 html body .ffb .ffb-links a { font-weight: 700 !important; font-size: 12px !important; color: var(--cran) !important; text-decoration: underline; }
-html body .ffp-strip { gap: 12px !important; padding: 18px 0 4px !important; scrollbar-color: var(--plum) var(--ivory); }
+html body .ffp-strip { gap: 12px !important; padding: 20px 24px 22px !important; scrollbar-color: var(--plum) var(--ivory); }
 html body .ffp-item { flex: 0 0 150px !important; max-width: 150px !important; display: block !important; background: transparent !important; padding: 0 !important; color: var(--cran) !important; }
-html body .ffp-item img { width: 150px !important; height: 150px !important; object-fit: cover !important; border-radius: 18px !important; background: var(--ivory); display: block; }
+html body .ffp-item img { width: 150px !important; height: 150px !important; object-fit: cover !important; border-radius: 18px !important; background: #fff; display: block; }
 html body .ffp-item span { display: block !important; font-size: 13px !important; margin-top: 6px; }
 html body .ffp-item strong { display: block; font-weight: 700; line-height: 1.25; }
 html body .ffp-item small { display: none; }
@@ -167,7 +168,8 @@ html body .ffp-item .ffb-off { margin-left: 4px; }
 @media (max-width: 1023px) {
   html body .ffb.ffp { grid-template-columns: 1fr !important; }
   html body .ffp .ffp-scene, html body .ffp .ffp-photo { border-radius: 28px 28px 0 0 !important; }
-  html body .ffp .ffb-copy { border-radius: 0 0 28px 28px !important; padding: 28px 24px !important; }
+  html body .ffp .ffb-copy { padding: 28px 24px 8px !important; }
+  html body .ffp-strip { padding: 16px 16px 20px !important; }
 }
 
 /* ---------- Deals: chips + grid ---------- */
