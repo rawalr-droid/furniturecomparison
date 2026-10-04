@@ -4,7 +4,7 @@
   const PAGE = 24;
   const params = new URLSearchParams(location.search);
   const state = {
-    q: params.get('q') || '', cat: params.get('c') || '', room: params.get('room') || '', store: params.get('store') || '', size: params.get('size') || '',
+    q: params.get('q') || '', cat: (window.FF_CAT_REDIRECTS || {})[params.get('c')] || params.get('c') || '', room: params.get('room') || '', store: params.get('store') || '', size: params.get('size') || '',
     min: '', max: '', sale: params.get('deals') === '1', sort: ['price-low', 'price-high', 'discount', 'saving', 'name'].includes(params.get('sort')) ? params.get('sort') : 'featured', shown: PAGE, compare: []
   };
   const els = {
