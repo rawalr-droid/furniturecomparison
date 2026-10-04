@@ -1,0 +1,15 @@
+{
+  "_about": "Which filters each category page shows (PRD 5.9). Key = category path by name: 'L1', 'L1 > L2' or 'L1 > L2 > L3'; the most specific match wins, then 'default'. 'bar' = the dropdowns in the bar (first 4 that have data), 'more' = extra ones in the More filters panel. Filter ids: store, size, price, disc, room, cat. A filter is hidden automatically when the page has no data for it (under 50% of products filled in, or fewer than 2 choices). 'sizeLabel' renames the size filter; 'sizeTile' is the label under the size pictures ({size} is replaced).",
+  "priceBands": [[0, 999], [1000, 2499], [2500, 4999], [5000, 9999], [10000, null]],
+  "discounts": [10, 25, 50],
+  "default": { "bar": ["store", "price", "disc", "room"], "more": ["size"] },
+  "search": { "bar": ["cat", "store", "price", "disc"], "more": ["size", "room"] },
+  "categories": {
+    "Furniture > Bedroom": { "bar": ["store", "size", "price", "disc"], "more": ["room"], "sizeLabel": "Bed size", "sizeTile": "{size} beds" },
+    "Furniture > Bedroom > Bedroom Sets": { "bar": ["store", "size", "price", "disc"], "more": ["room"], "sizeLabel": "Bed size", "sizeTile": "{size} sets" },
+    "Furniture > Mattresses": { "bar": ["store", "size", "price", "disc"], "more": ["room"], "sizeLabel": "Mattress size", "sizeTile": "{size} mattresses" },
+    "Furniture > Sofas & Seating": { "bar": ["store", "size", "price", "disc"], "more": ["room"], "sizeLabel": "Seating", "sizeTile": "{size}" },
+    "Furniture > Dining Room": { "bar": ["store", "size", "price", "disc"], "more": ["room"], "sizeLabel": "Seating", "sizeTile": "{size}" },
+    "Rugs & Carpets": { "bar": ["store", "size", "price", "disc"], "more": ["room"], "sizeLabel": "Rug size", "sizeTile": "{size}" }
+  }
+}

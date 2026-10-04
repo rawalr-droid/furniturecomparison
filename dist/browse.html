@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="pages.css?v=20260920" />
   <link rel="stylesheet" href="theme.css?v=20260926t" />
   <link rel="stylesheet" href="product-card.css?v=20260928n1" />
-  <link rel="stylesheet" href="nordic.css?v=20261004u2" />
+  <link rel="stylesheet" href="nordic.css?v=20261004f2" />
 </head>
 <body>
   <div class="nn-utility" id="announce" aria-live="polite">One search across UAE home stores</div>
@@ -38,70 +38,47 @@
           <h2 id="resultCount">Loading furniture…</h2>
           <div class="load-status" id="loadStatus" aria-live="polite"></div>
         </div>
-        <button class="filter-toggle" id="filterToggle" type="button">Filters</button>
       </div>
 
       <nav class="nn-subcats" id="subcatStrip" aria-label="Shop by type" hidden></nav>
 
-      <div class="catalogue-layout">
-        <aside class="filters" id="filters" aria-label="Product filters">
-          <div class="filter-top">
-            <h3>Filter</h3>
-            <button id="clearFilters" type="button">Clear all</button>
+      <div class="ff-bar" id="filterBar">
+        <div class="ff-row">
+          <div class="ff-group">
+            <div class="ff-lab">Filters</div>
+            <div class="ff-drops" id="ffDrops"></div>
           </div>
-          <label class="filter-field">Category
-            <select id="categoryFilter"><option value="">All categories</option></select>
-          </label>
-          <label class="filter-field">Sub-category
-            <select id="subcategoryFilter" disabled><option value="">All sub-categories</option></select>
-          </label>
-          <label class="filter-field">Type
-            <select id="typeFilter" disabled><option value="">All types</option></select>
-          </label>
-          <label class="filter-field" id="sizeField" hidden>Size
-            <select id="sizeFilter"><option value="">All sizes</option></select>
-          </label>
-          <label class="filter-field">Room
-            <select id="roomFilter"><option value="">All rooms</option></select>
-          </label>
-          <label class="filter-field">Store
-            <select id="storeFilter"><option value="">All stores</option></select>
-          </label>
-          <div class="filter-field">
-            <span>Price range</span>
-            <div class="price-row">
-              <label><span>AED</span><input id="minPrice" inputmode="numeric" type="number" min="0" placeholder="Min" /></label>
-              <label><span>AED</span><input id="maxPrice" inputmode="numeric" type="number" min="0" placeholder="Max" /></label>
-            </div>
-          </div>
-          <label class="checkbox-row"><input id="saleOnly" type="checkbox" /><span>On sale only</span></label>
-        </aside>
-
-        <div class="results-area">
-          <div class="sort-row">
-            <div class="active-filters" id="activeFilters"></div>
-            <label>Sort
-              <select id="sortSelect">
-                <option value="featured">Featured</option>
-                <option value="price-low">Price: low to high</option>
-                <option value="price-high">Price: high to low</option>
-                <option value="discount">Biggest discount (%)</option>
-                <option value="saving">Biggest saving (AED)</option>
-                <option value="name">Name</option>
-              </select>
-            </label>
-          </div>
-          <ul class="pc-grid" id="productGrid" aria-live="polite"></ul>
-          <button class="load-more" id="loadMore" type="button" hidden>Show more</button>
-          <div class="empty-state" id="emptyState" hidden>
-            <h3>No matching products</h3>
-            <p>Try removing a filter or searching for a broader term.</p>
-            <button type="button" id="emptyReset">Reset search</button>
+          <div class="ff-sort">
+            <label class="ff-lab" for="sortSelect">Sort</label>
+            <select id="sortSelect">
+              <option value="featured">Featured</option>
+              <option value="price-low">Price: low to high</option>
+              <option value="price-high">Price: high to low</option>
+              <option value="discount">Biggest discount (%)</option>
+              <option value="saving">Biggest saving (AED)</option>
+              <option value="name">Name</option>
+            </select>
           </div>
         </div>
+        <div class="ff-chips" id="activeFilters"></div>
+      </div>
+
+      <ul class="pc-grid" id="productGrid" aria-live="polite"></ul>
+      <button class="load-more" id="loadMore" type="button" hidden>Show more</button>
+      <div class="empty-state" id="emptyState" hidden>
+        <h3>No matching products</h3>
+        <p>Try removing a filter or searching for a broader term.</p>
+        <button type="button" id="emptyReset">Reset search</button>
       </div>
     </section>
   </main>
+
+  <div class="ff-ov" id="ffOv"></div>
+  <aside class="ff-drawer" id="ffDrawer" aria-label="More filters" aria-hidden="true">
+    <h2>More filters<button type="button" id="ffClose" aria-label="Close">×</button></h2>
+    <div class="ff-dl" id="ffList"></div>
+    <div class="ff-df"><button type="button" class="ff-show" id="ffShow">Show results</button></div>
+  </aside>
 
   <dialog class="compare-dialog" id="compareDialog">
     <div class="compare-head">
@@ -121,9 +98,9 @@
     </div>
     <p class="nn-footer-note">Prices and availability can change. Always confirm details with the retailer before buying. © Furnish Finder UAE.</p>
   </footer>
-  <script src="js/db-config.js?v=20261004d2"></script>
-  <script src="js/common.js?v=20261004d2" data-v="20261004e"></script>
+  <script src="js/db-config.js?v=20261004f2"></script>
+  <script src="js/common.js?v=20261004f2" data-v="20261004e"></script>
   <script src="js/cat-redirects.js?v=20261004t1"></script>
-  <script src="js/browse.js?v=20261004d2"></script>
+  <script src="js/browse.js?v=20261004f2"></script>
 </body>
 </html>
