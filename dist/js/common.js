@@ -56,6 +56,23 @@
     m.tree.forEach(l1 => l1.ch.forEach(l2 => FF.shards.push({ key: l2.f, l1: l1.n, l2: l2.n, slug: l2.s })));
     return m;
   }
+  // Database (Supabase), stage B: js/db-config.js sets window.FF_DB { url, key, enabled }. The page asks the database for what it
+  // shows; if the database is slow or unreachable the same page view carries on from the published files (data/*.json.gz).
+  // Add ?db=0 to any page to force the published files.
+  FF.db = {
+    on: !!(window.FF_DB && window.FF_DB.enabled && window.FF_DB.url && window.FF_DB.key) && !/[?&]db=0(&|$)/.test(location.search),
+    rpc(fn, body, ms = 6000, tries = 2) {           // one automatic retry (a slow or dropped connection), then the caller falls back
+      const c = window.FF_DB, ctl = new AbortController(), t = setTimeout(() => ctl.abort(), ms);
+      return fetch(`${c.url}/rest/v1/rpc/${fn}`, {
+        method: 'POST', signal: ctl.signal, body: JSON.stringify(body || {}),
+        headers: { apikey: c.key, Authorization: 'Bearer ' + c.key, 'Content-Type': 'application/json' }
+      }).then(r => { if (!r.ok) throw new Error('database answered ' + r.status); return r.json(); })
+        .finally(() => clearTimeout(t))
+        .catch(e => { if (tries > 1) return FF.db.rpc(fn, body, ms + 3000, tries - 1); throw e; });
+    },
+    fail(err) { if (FF.db.on) console.warn('database unavailable, using the published files instead', err); FF.db.on = false; }
+  };
+
   FF.loadMeta = () => FF._meta || (FF._meta = FF.fetchJSON('data/meta.json').then(prepare));
 
   // slug path ("furniture/sofas-sectionals/sofas") -> {l1, l2, l3} tree nodes

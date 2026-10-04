@@ -24,7 +24,19 @@
   async function show() {
     if (!id) return notFound();
     const meta = await FF.loadMeta();
-    const d = await FF.loadDetail(id);
+    let d = null, dbSimilar = null;
+    if (FF.db.on) {                                 // database first; the published files are the fallback
+      try {
+        const r = await FF.db.rpc('product_detail', { p_id: id });
+        if (r && r.n) {
+          r.s = FF.stores.indexOf(r.store);
+          r.c = FF.catL.findIndex(c => c.l1 === r.l1 && c.l2 === r.l2 && c.l3 === r.l3);
+          r.r = r.room ? meta.rooms.indexOf(r.room) : -1;
+          if (r.s >= 0 && r.c >= 0) { d = r; dbSimilar = r.similar || []; }
+        }
+      } catch (e) { FF.db.fail(e); }
+    }
+    if (!d) d = await FF.loadDetail(id);
     if (!d) return notFound();
 
     const cat = FF.catL[d.c], store = FF.stores[d.s], room = d.r >= 0 ? meta.rooms[d.r] : '';
@@ -110,11 +122,11 @@
     // agents/similar/build_similar.py). A size/colour card can have its own list; otherwise the product's list is used.
     // Results are always in the same group (L2), so the listing file below already holds their name, price and photo.
     try {
-      const rows = await FF.loadShard(l2.f);
+      let sim = dbSimilar ? dbSimilar.filter(r => r.img).map(r => Object.assign(r, { img: FF.fixImg(r.img) })) : [];
+      const rows = sim.length >= 4 ? [] : await FF.loadShard(l2.f);
       const base = { c: d.c, s: d.s, price: d.p, nameL: d.n.toLowerCase() };
       const own = FF.baseId(id), seenBase = new Set([own]);
-      let sim = [];
-      try {
+      if (sim.length < 4) try {
         const lists = await FF.fetchJSON('data/s/' + String(FF.fnv(own) % SIM_SHARDS).padStart(3, '0') + '.json.gz');
         sim = (lists[id] || lists[own] || []).map(x => FF.byId.get(x)).filter(r => r && r.img);
       } catch (e) { console.warn(e); }

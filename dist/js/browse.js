@@ -15,6 +15,7 @@
   };
   let token = 0;
   let cache = { key: '', rows: [], sizes: new Map() };
+  let dbv = null;            // database mode: { items, total, tiles } of the current view (null = published-files mode)
 
   // sizes in a sensible order: beds small to large, seats by number (sets last), rugs by area
   const BED = ['Single', 'Double', 'Queen', 'King', 'Super King'];
@@ -130,7 +131,8 @@
     const kids = (n.l3 || state.q ? [] : n.l2 ? n.l2.ch : n.l1 ? n.l1.ch : []).filter(c => c.c > 0);
     if (kids.length < 2) { el.hidden = true; el.innerHTML = ''; return; }
     const pic = new Map();
-    for (const k of (n.l2 ? [n.l2.f] : n.l1.ch.map(x => x.f))) {
+    if (dbv) kids.forEach(c => { if (dbv.tiles[c.n]) pic.set(n.l2 ? c.i : c.f, FF.fixImg(dbv.tiles[c.n])); });
+    else for (const k of (n.l2 ? [n.l2.f] : n.l1.ch.map(x => x.f))) {
       for (const r of FF.shardRows[k] || []) {
         const id = n.l2 ? r.c : k;
         if (!pic.has(id) && r.img && !r.id.includes('~')) pic.set(id, r.img);
@@ -165,16 +167,31 @@
     history.replaceState(null, '', location.pathname + (p.toString() ? '?' + p : ''));
   }
 
+  // ---- database mode: one question per view (cards of the page, total, size filter values, picture tiles)
+  function dbArgs() {
+    const n = FF.node(state.cat), num = v => (v === '' || v == null || isNaN(Number(v)) ? null : Number(v));
+    return { p_l1: n.l1 ? n.l1.n : null, p_l2: n.l2 ? n.l2.n : null, p_l3: n.l3 ? n.l3.n : null, p_q: state.q.trim() || null,
+             p_room: state.room || null, p_store: state.store || null, p_size: state.size || null, p_min: num(state.min), p_max: num(state.max),
+             p_sale: !!state.sale, p_sort: state.sort };
+  }
+  async function dbLoad(more) {
+    const r = await FF.db.rpc('browse_cards', Object.assign(dbArgs(), { p_limit: PAGE, p_offset: more && dbv ? dbv.items.length : 0 }));
+    const items = (r.items || []).map(x => Object.assign(x, { img: FF.fixImg(x.img) }));
+    dbv = { items: more && dbv ? dbv.items.concat(items) : items, total: r.total || 0, tiles: r.tiles || {} };
+    cache = { key: 'db', rows: [], sizes: new Map(r.sizes || []) };
+  }
+
   function render() {
-    const rows = currentRows();
-    const visible = rows.slice(0, state.shown);
+    const rows = dbv ? dbv.items : currentRows();
+    const visible = dbv ? rows : rows.slice(0, state.shown);
+    const total = dbv ? dbv.total : rows.length;
     els.grid.innerHTML = visible.map(card).join('');
     const n = FF.node(state.cat), deepest = n.l3 || n.l2 || n.l1;
-    els.count.textContent = `${rows.length.toLocaleString()} products`;
+    els.count.textContent = `${total.toLocaleString()} products`;
     els.label.textContent = state.q ? `Results for “${state.q}”` : deepest ? [n.l1, n.l2, n.l3].filter(Boolean).map(x => x.n).join(' › ') : state.sale ? 'Everything on sale' : 'All products';
     sizeOptions();
     subcats();
-    els.load.hidden = visible.length >= rows.length || !rows.length;
+    els.load.hidden = visible.length >= total || !rows.length;
     els.empty.hidden = !!rows.length; els.grid.hidden = !rows.length;
     pills();
   }
@@ -188,6 +205,15 @@
   async function refresh() {
     const my = ++token;
     syncURL();
+    if (FF.db.on) {
+      try {
+        if (!dbv) els.count.textContent = 'Loading furniture…';
+        await dbLoad(false);
+        if (my !== token) return;
+        els.status.textContent = '';
+        return render();
+      } catch (e) { FF.db.fail(e); dbv = null; cache = { key: '', rows: [], sizes: new Map() }; if (my !== token) return; loadRest(); }
+    }
     const keys = neededKeys();
     const pending = keys.filter(k => !FF.shardRows[k]);
     if (pending.length) {
@@ -205,6 +231,7 @@
 
   // once the first view is on screen, quietly load everything else so search and filters cover the whole catalogue
   async function loadRest() {
+    if (FF.db.on) return;                          // the database answers for the whole catalogue; nothing to preload
     const rest = FF.shards.map(s => s.key).filter(k => !FF.shardRows[k]);
     const total = FF.shards.length;
     for (let i = 0; i < rest.length; i += 4) {
@@ -245,7 +272,11 @@
   }
   $('clearFilters').addEventListener('click', reset); $('emptyReset').addEventListener('click', reset);
   $('filterToggle').addEventListener('click', () => $('filters').classList.toggle('open'));
-  els.load.addEventListener('click', () => { state.shown += PAGE; render(); });
+  els.load.addEventListener('click', () => {
+    if (!dbv) { state.shown += PAGE; return render(); }
+    const my = token; els.load.disabled = true;
+    dbLoad(true).then(() => { if (my === token) render(); }).catch(e => { FF.db.fail(e); dbv = null; refresh(); }).finally(() => { els.load.disabled = false; });
+  });
 
   // ------------------------------------------------------------------ compare
   function toggleCompare(id) {
