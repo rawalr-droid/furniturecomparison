@@ -121,6 +121,31 @@
 
 
 
+  // Picture tiles under the heading (owner, 2026-10-04, like Home Centre): a top-level category shows its groups, a group shows
+  // its product types; the picture is the first product photo found in that group / type. Hidden on a type page and on searches.
+  function subcats() {
+    const el = $('subcatStrip');
+    if (!el) return;
+    const n = FF.node(state.cat);
+    const kids = (n.l3 || state.q ? [] : n.l2 ? n.l2.ch : n.l1 ? n.l1.ch : []).filter(c => c.c > 0);
+    if (kids.length < 2) { el.hidden = true; el.innerHTML = ''; return; }
+    const pic = new Map();
+    for (const k of (n.l2 ? [n.l2.f] : n.l1.ch.map(x => x.f))) {
+      for (const r of FF.shardRows[k] || []) {
+        const id = n.l2 ? r.c : k;
+        if (!pic.has(id) && r.img && !r.id.includes('~')) pic.set(id, r.img);
+      }
+    }
+    const html = kids.map(c => {
+      const img = pic.get(n.l2 ? c.i : c.f);
+      return `<a class="nn-subcat" href="browse.html?c=${FF.enc(c.s)}" data-subcat="${FF.esc(c.s)}">
+        <span class="nn-subcat-img">${img ? `<img referrerpolicy="no-referrer" src="${FF.esc(img)}" alt="" loading="lazy" onerror="this.remove()">` : ''}</span>
+        <span class="nn-subcat-name">${FF.esc(c.n)}</span></a>`;
+    }).join('');
+    if (el.dataset.html !== html) { el.innerHTML = html; el.dataset.html = html; el.scrollLeft = 0; }
+    el.hidden = false;
+  }
+
   function pills() {
     const n = FF.node(state.cat), deepest = n.l3 || n.l2 || n.l1;
     const list = [['q', state.q && `“${state.q}”`], ['cat', deepest && deepest.n], ['size', state.size], ['room', state.room], ['store', state.store],
@@ -148,6 +173,7 @@
     els.count.textContent = `${rows.length.toLocaleString()} products`;
     els.label.textContent = state.q ? `Results for “${state.q}”` : deepest ? [n.l1, n.l2, n.l3].filter(Boolean).map(x => x.n).join(' › ') : state.sale ? 'Everything on sale' : 'All products';
     sizeOptions();
+    subcats();
     els.load.hidden = visible.length >= rows.length || !rows.length;
     els.empty.hidden = !!rows.length; els.grid.hidden = !rows.length;
     pills();
@@ -203,6 +229,12 @@
 
   function goSearch(q) { state.q = q.trim(); state.shown = PAGE; if (state.q) { state.cat = ''; state.size = ''; syncControls(); } /* the header search looks across everything */ els.search.value = state.q; refresh().then(() => $('browse').scrollIntoView({ behavior: 'smooth', block: 'start' })); }
   $('searchForm').addEventListener('submit', e => { e.preventDefault(); goSearch(els.search.value); });
+  $('subcatStrip') && $('subcatStrip').addEventListener('click', e => {
+    const a = e.target.closest('[data-subcat]');
+    if (!a || e.metaKey || e.ctrlKey) return;
+    e.preventDefault();
+    state.cat = a.dataset.subcat; state.size = ''; state.shown = PAGE; syncControls(); refresh();
+  });
   document.querySelectorAll('[data-query]').forEach(b => b.addEventListener('click', () => goSearch(b.dataset.query)));
   document.querySelectorAll('[data-c]').forEach(b => b.addEventListener('click', () => {
     state.q = ''; state.cat = b.dataset.c; state.shown = PAGE; syncControls(); refresh().then(() => $('browse').scrollIntoView({ behavior: 'smooth' }));
