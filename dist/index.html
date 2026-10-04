@@ -7,7 +7,7 @@
   <title>Furnish Finder UAE | Search every furniture store at once</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@300..800&family=Rubik:wght@800;900&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23000'/%3E%3Ctext x='32' y='46' font-family='Inter,Arial,sans-serif' font-weight='600' font-size='40' text-anchor='middle' fill='%23fff'%3EF%3C/text%3E%3C/svg%3E" />
   <link rel="stylesheet" href="deals.css?v=20260920" />
   <link rel="stylesheet" href="pages.css?v=20260920" />
@@ -15,8 +15,9 @@
   <link rel="stylesheet" href="product-card.css?v=20260928n1" />
   <link rel="stylesheet" href="banner.css?v=20260927" />
   <link rel="stylesheet" href="nordic.css?v=20261004f2" />
+  <link rel="stylesheet" href="theme2.css?v=20261004t1" />
 </head>
-<body>
+<body class="t2 t2-home">
   <div class="nn-utility" id="announce" aria-live="polite">One search across UAE home stores</div>
   <header class="nn-header">
     <div class="nn-main">
@@ -32,28 +33,23 @@
   <a class="nn-promo" id="promoBar" href="browse.html?deals=1&amp;sort=discount">Tonight's biggest drops ›</a>
 
   <main>
-    <section class="nn-hero">
-      <div class="nn-hero-copy">
-        <p class="nn-eyebrow">Prices refreshed tonight</p>
-        <h1>Every UAE home store. One search.</h1>
-        <p class="nn-hero-sub" id="heroSub">Search, compare and buy from stores across the UAE, all in one place.</p>
-        <a class="nn-btn nn-btn-up" href="#deals">Shop today's deals</a>
+    <section class="t2-hero" aria-label="Furnish Finder">
+      <h1 class="visually-hidden">Furnish Finder: every UAE home store, one search</h1>
+      <div class="t2-big t2-d" aria-hidden="true">finder</div>
+      <img class="t2-sofa" src="img/hero-sofa.webp" alt="Boucle sofa" width="1386" height="454">
+      <div class="t2-hero-foot">
+        <p class="t2-tag">Every UAE home store.<br>One search.</p>
+        <a class="t2-pill" href="browse.html?deals=1&amp;sort=discount">Shop today's deals &nbsp;→</a>
       </div>
-      <a id="heroProduct" href="#deals" aria-label="Today's top deal"></a>
     </section>
 
-    <div class="nn-l1"><div class="nn-pills nn-pills-scroll" id="l1Pills" aria-label="Categories"></div></div>
-
-    <section class="nn-section" id="deals">
-      <h2 class="nn-h">Tonight's best deals</h2>
-      <p class="nn-sub"><span id="dealCount">—</span> hand-picked reductions</p>
-      <div class="nn-carousel">
-        <button class="nn-carousel-btn prev" type="button" data-scroll="-1" aria-label="Previous deals">‹</button>
-        <ul class="pc-grid" id="dealGrid"></ul>
-        <button class="nn-carousel-btn next" type="button" data-scroll="1" aria-label="More deals">›</button>
+    <section class="nn-section" id="categories">
+      <h2 class="nn-h">Shop by category</h2>
+      <div class="t2-rowwrap">
+        <button class="t2-arr l" type="button" data-row="-1" aria-label="Scroll left">‹</button>
+        <div class="t2-tiles" id="catRow"></div>
+        <button class="t2-arr r" type="button" data-row="1" aria-label="Scroll right">›</button>
       </div>
-      <div class="empty" id="empty" hidden><p>Deals are being refreshed. Try the full catalogue while we update them.</p><a class="nn-btn" href="browse.html">Browse all products</a></div>
-      <a class="nn-link" href="browse.html?deals=1">View all deals</a>
     </section>
 
     <!-- ffb:start -->
@@ -73,10 +69,12 @@
 </section>
     <!-- ffb:end -->
 
-    <section class="nn-section">
-      <h2 class="nn-h">Shop by category</h2>
-      <p class="nn-sub">Start with what you need</p>
-      <div class="category-strip" id="categoryStrip"></div>
+    <section class="nn-section" id="deals">
+      <h2 class="nn-h">Tonight's best deals</h2>
+      <div class="t2-chips" id="dealChips" aria-label="Filter the deals"></div>
+      <ul class="pc-grid t2-deals" id="dealGrid"></ul>
+      <div class="empty" id="empty" hidden><p>Deals are being refreshed. Try the full catalogue while we update them.</p><a class="nn-btn" href="browse.html">Browse all products</a></div>
+      <a class="nn-link" href="browse.html?deals=1&amp;sort=discount">View all deals</a>
     </section>
 
     <section class="nn-section" id="rooms">
@@ -101,7 +99,8 @@
     </div>
     <p class="nn-footer-note">Prices and availability can change. Always confirm details with the retailer before buying. © Furnish Finder UAE.</p>
   </footer>
-  <script src="js/common.js?v=20261004f2" data-v="20261004f"></script>
-  <script src="js/home.js?v=20260928r1"></script>
+  <script src="js/home-tiles.js?v=20261004t1"></script>
+  <script src="js/common.js?v=20261004t1" data-v="20261004g"></script>
+  <script src="js/home.js?v=20261004t1"></script>
 </body>
 </html>

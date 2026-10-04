@@ -171,8 +171,11 @@
   };
   FF.wishlist = () => { const w = FF.wish.load(); return new Set(FF.ROOMS.flatMap(r => w.rooms[r].map(x => x.id))); };
   FF._snap = new Map();                               // card data by id, for the "save to room" pop-up
-  // Product card, Nordic Nest layout (PRD v1.2 §5.1): badge on the image; store + meta; one-line name; price row with the heart.
-  // Meta order: size · colour (colour cards) · "N colours" · "+N" (more colours than cards shown); the +N is never cut off.
+  // Product card, Theme v2 "Option C" (spec 8): the photo as the store shows it with the discount badge and the heart on it; a dark
+  // ribbon (store left, product type right); then name and price on the Plum panel. Size / colour sit at the right of the price row:
+  // size · colour (colour cards) · "N colours" · "+N" (more colours than cards shown).
+  FF.cleanName = n => { n = String(n || '').trim();                                         // ALL-CAPS store names read better in title case
+    return /[A-Z]/.test(n) && n === n.toUpperCase() ? n.toLowerCase().replace(/(^|[\s\-\/(])([a-z])/g, (m, a, c) => a + c.toUpperCase()) : n; };
   FF.pcCard = o => {
     FF._snap.set(o.id, { name: o.name, store: o.store, img: o.img, price: o.price, orig: o.orig, size: o.size || '', colours: o.colours || 0,
                          from: !!o.from, room: o.room || '' });
@@ -180,19 +183,21 @@
     const parts = [o.size, o.colour, !o.colour && o.colours > 1 ? `${o.colours} colours` : ''].filter(Boolean).map(FF.esc);
     const more = o.moreColours ? `+${o.moreColours}${parts.length ? '' : ' more colours'}` : '';
     const tags = parts.length || more ? `<span class="pc-tags"><span class="pc-tags-text">${parts.join(' · ')}</span>${more ? `<span class="pc-more">${more}</span>` : ''}</span>` : '';
-    const img = o.img ? `<img referrerpolicy="no-referrer" src="${FF.esc(o.img)}" alt="${FF.esc(o.name)}" loading="lazy" onerror="FF.imgErr(this)">` : '<div class="image-fallback">Image unavailable</div>';
+    const name = FF.esc(FF.cleanName(o.name));
+    const img = o.img ? `<img referrerpolicy="no-referrer" src="${FF.esc(o.img)}" alt="${name}" loading="lazy" onerror="FF.imgErr(this)">` : '<div class="image-fallback">Image unavailable</div>';
     const disc = o.disc || (o.orig > o.price ? (o.orig - o.price) / o.orig : 0);
     return `<li class="pc-card${disc ? ' on-sale' : ''}" data-product-id="${FF.esc(o.id)}">
       <div class="pc-media">
         ${disc ? `<span class="pc-badge">-${Math.round(disc * 100)}%</span>` : ''}
+        <button class="pc-wishlist" type="button" data-wish="${FF.esc(o.id)}" aria-pressed="${fav}" aria-label="${fav ? 'Saved to your wishlist' : 'Save to a room'}">${HEART}</button>
         ${img}
       </div>
+      <div class="pc-meta pc-ribbon"><span class="pc-brand">${FF.esc(o.store || '')}</span>${o.l3 ? `<span class="pc-cat">${FF.esc(o.l3)}</span>` : ''}</div>
       <div class="pc-body">
-        <div class="pc-meta"><span class="pc-brand">${FF.esc(o.store || '')}</span>${tags}</div>
-        <a class="pc-name" href="${href}" target="_blank" rel="noopener" title="${FF.esc(o.name)}">${FF.esc(o.name)}</a>
+        <a class="pc-name" href="${href}" target="_blank" rel="noopener" title="${name}">${name}</a>
         <div class="pc-row3">
           <p class="pc-price">${o.from ? '<span class="pc-price-from">From</span>' : ''}<span class="pc-price-now">${FF.money(o.price)}</span>${o.orig > o.price ? `<span class="pc-price-was"><span class="visually-hidden">Was </span>${FF.money(o.orig)}</span>` : ''}</p>
-          <button class="pc-wishlist" type="button" data-wish="${FF.esc(o.id)}" aria-pressed="${fav}" aria-label="${fav ? 'Saved to your wishlist' : 'Save to a room'}">${HEART}</button>
+          ${tags}
         </div>
       </div>
     </li>`;
