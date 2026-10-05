@@ -229,9 +229,12 @@ html body .wish-pop-link { color: var(--plum) !important; font-weight: 700 !impo
 /* ---------- Browse page: heading, picture tiles, filter bar, side panel ---------- */
 html body .section-heading h2 { font-size: clamp(28px, 3.4vw, 44px) !important; line-height: 1.05 !important; color: var(--cran) !important; }
 html body .section-heading p { color: var(--plum) !important; font-weight: 700 !important; }
-html body .nn-subcat { color: var(--cran); font-weight: 600; }
-html body .nn-subcat-img { background: #fff; border-radius: 18px !important; padding: 0; }
-html body .nn-sizetile.on .nn-subcat-img { box-shadow: inset 0 0 0 3px var(--plum); }
+/* picture tiles (owner, 2026-10-05, "Option B"): square, the photo fills the tile, no white bars; fixed width so the row scrolls sideways */
+html body .nn-subcat { color: var(--cran); font-weight: 600; flex: 0 0 170px; max-width: 170px; }
+html body .nn-subcat-img { background: #fff; border-radius: 18px !important; padding: 0; aspect-ratio: 1 / 1; }
+html body .nn-subcat-img img { width: 100%; height: 100%; object-fit: cover; }
+html body .nn-sizetile.on .nn-subcat-img::after { box-shadow: inset 0 0 0 3px var(--plum); border-radius: 18px !important; }   /* the ring sits over the photo */
+@media (max-width: 767px) { html body .nn-subcat { flex-basis: 120px; max-width: 120px; } }
 html body .ff-bar { background: var(--beige); border-color: var(--hair); }
 html body .ff-lab { color: var(--plum); font-weight: 600; }
 html body .ff-btn { background: var(--ivory); border: 1.5px solid var(--plum); color: var(--cran); font-weight: 600; padding: 0 16px; }
