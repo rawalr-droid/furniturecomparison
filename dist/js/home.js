@@ -7,11 +7,17 @@
   row.innerHTML = (window.FF_HOME_TILES || []).map(t => `<a class="t2-tile" href="browse.html?c=${enc(t.c)}">
     <img referrerpolicy="no-referrer" loading="lazy" src="${esc(FF.fixImg(t.i))}" alt="" onerror="this.remove()">
     <span class="t2-tl"><b>${esc(t.n)}</b><span>Shop →</span></span></a>`).join('');
-  document.querySelectorAll('[data-row]').forEach(b => b.addEventListener('click', () =>
-    row.scrollBy({ left: Number(b.dataset.row) * row.clientWidth * 0.8, behavior: 'smooth' })));
+  document.querySelectorAll('[data-row]').forEach(b => b.addEventListener('click', () => {
+    const r = b.parentElement.querySelector('.t2-tiles');             // each arrow scrolls the row it sits next to
+    r.scrollBy({ left: Number(b.dataset.row) * r.clientWidth * 0.8, behavior: 'smooth' });
+  }));
 
-  // Room banner (built nightly, not edited here): a dot in the upper half opens its card below, so the card is never cut off
-  document.querySelectorAll('.ffb-dot-tag').forEach(t => { if (parseFloat(t.style.top) < 50) t.classList.add('ffb-below'); });
+  // Shop by mood: the five mood boards (data/boards/index.json, rebuilt every night)
+  FF.fetchJSON('data/boards/index.json').then(d => {
+    $('moodRow').innerHTML = d.boards.map(m => `<a class="t2-tile mb-tile" href="board.html?b=${enc(m.key)}">
+      <img src="${esc(m.image)}" alt="${esc(m.name)} room" loading="lazy" onerror="this.remove()">
+      <span class="t2-tl"><b>${esc(m.name)}<small>${esc(m.line)}</small></b><span>Explore →</span></span></a>`).join('');
+  }).catch(() => { const sec = $('moods'); if (sec) sec.hidden = true; });
 
   FF.loadMeta().catch(() => {});
 

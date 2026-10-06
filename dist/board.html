@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Your wishlist | Furnish Finder UAE</title>
+  <title>Mood board | Furnish Finder UAE</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@300..800&family=Rubik:wght@800;900&display=swap" rel="stylesheet" />
@@ -30,14 +30,50 @@
   <a class="nn-promo" id="promoBar" href="browse.html?deals=1&amp;sort=discount">Tonight's biggest drops ›</a>
   
   
-  <main class="wish-page">
-    <div class="wish-head">
-      <p class="wish-eyebrow">Saved in this browser</p>
-      <h1>Your wishlist</h1>
-      <p class="wish-sub" id="wishSummary">Loading…</p>
-    </div>
-    <div class="wish-tabs" id="wishTabs" role="tablist"></div>
-    <div id="wishRooms"></div>
+  <main class="mb-page">
+    <section class="mb-hero" id="mbHero" aria-label="Mood board"><p class="mb-loading">Loading the mood board…</p></section>
+
+    <section class="nn-section mb-look">
+      <h2 class="nn-h">Shop the look</h2>
+      <p class="nn-sub">The pieces in the picture, from their own stores</p>
+      <ul class="pc-grid mb-look-grid" id="mbLook"></ul>
+    </section>
+
+    <section class="nn-section" id="mbFeed">
+      <h2 class="nn-h" id="mbFeedTitle">More in this style</h2>
+      <p class="nn-sub">In-stock pieces from every store that look like the ones in the picture. Pick a category to narrow it down.</p>
+      <div class="t2-chips" id="mbChips" aria-label="Category"></div>
+      <div class="mb-tools">
+        <select id="mbPrice" aria-label="Price">
+          <option value="">Any price</option>
+          <option value="0-499">Under AED 500</option>
+          <option value="500-1499">AED 500 – 1,499</option>
+          <option value="1500-4999">AED 1,500 – 4,999</option>
+          <option value="5000-">AED 5,000 and above</option>
+        </select>
+        <select id="mbStore" aria-label="Store"><option value="">All stores</option></select>
+        <label class="mb-check"><input type="checkbox" id="mbSale"><span>On sale</span></label>
+        <select id="mbSort" aria-label="Sort" class="mb-sort">
+          <option value="match">Closest match</option>
+          <option value="price-low">Price: low to high</option>
+          <option value="price-high">Price: high to low</option>
+          <option value="discount">Biggest discount</option>
+        </select>
+      </div>
+      <p class="mb-count" id="mbCount" aria-live="polite"></p>
+      <ul class="pc-grid" id="mbGrid"></ul>
+      <button class="load-more" id="mbMore" type="button" hidden>Show more</button>
+      <div class="empty-state" id="mbEmpty" hidden>
+        <h3>Nothing matches those filters</h3>
+        <p>Try another category or remove a filter.</p>
+        <button type="button" id="mbReset">Clear filters</button>
+      </div>
+    </section>
+
+    <section class="nn-section" id="mbOtherSec">
+      <h2 class="nn-h">Other mood boards</h2>
+      <div class="t2-rowwrap"><div class="t2-tiles" id="mbOthers"></div></div>
+    </section>
   </main>
 <footer class="nn-footer">
     <div class="nn-footer-cols">
@@ -49,6 +85,6 @@
     <p class="nn-footer-note">Prices and availability can change. Always confirm details with the retailer before buying. © Furnish Finder UAE.</p>
   </footer>
   <script src="js/common.js?v=20261004t1" data-v="20261006f"></script>
-  <script src="js/wishlist.js?v=20261004t1"></script>
+  <script src="js/boards.js?v=20261006m1"></script>
 </body>
 </html>
