@@ -191,6 +191,12 @@ html body .pc-media::after { content: none; }
 html body .pc-media img, html body .pc-card:hover .pc-media img { width: 100%; height: 100%; object-fit: contain; display: block; transform: none !important; transition: none;
   mix-blend-mode: normal !important; filter: none !important; }
 html body .pc-media .image-fallback { display: grid; place-items: center; height: 100%; color: var(--plum); }
+/* photos that are not square: a soft blurred, enlarged copy of the same photo fills the bars; the photo itself stays whole on top (common.js FF.imgFit) */
+html body .pc-media::before { content: none; }
+html body .pc-media.has-bars::before { content: ""; position: absolute; inset: -10%; z-index: 0; background: var(--pc-bg) center / cover no-repeat;
+  filter: blur(22px) saturate(1.1); transform: scale(1.15); pointer-events: none; }
+html body .pc-media.has-bars img { position: relative; z-index: 1; }
+@media (max-width: 700px) { html body .pc-media.has-bars::before { filter: blur(14px) saturate(1.1); } }
 html body .pc-badge { position: absolute; top: 12px !important; left: 12px !important; height: 26px; padding: 0 11px !important; background: var(--plum) !important;
   color: var(--ivory) !important; font-size: 14px !important; font-weight: 700 !important; z-index: 2; }
 html body .pc-media .pc-wishlist { position: absolute !important; top: 10px !important; right: 10px !important; width: 42px !important; height: 42px !important; margin: 0;

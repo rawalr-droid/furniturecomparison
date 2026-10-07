@@ -94,13 +94,14 @@
 
   FF.rowFrom = a => {
     const [id, name, s, c, price, orig, img0, room, opts, at] = a;
+    // a[10] = the nightly "Featured" number (photo look + capped discount + variety, agents/ff_agents/featured.py); rows without it sort last
     const img = FF.fixImg(img0);
     const cat = FF.catL[c];
     const x = at || {};
     return {
       id, name, s, c, price, orig, img, opts, store: FF.stores[s], room: room >= 0 ? FF.meta.rooms[room] : '',
       size: x.z || '', colour: x.k || '', colours: x.c || 0, moreColours: x.m || 0, from: at ? !!x.f : opts > 1, q: x.q,
-      save: orig > price ? orig - price : 0, disc: orig > price ? (orig - price) / orig : 0, f: (orig > price ? (orig - price) / orig : 0) * 2 + (img ? 1 : 0), l1: cat.l1, l2: cat.l2, l3: cat.l3,
+      save: orig > price ? orig - price : 0, disc: orig > price ? (orig - price) / orig : 0, f: a[10] != null ? a[10] : (orig > price ? (orig - price) / orig : 0) * 2 + (img ? 1 : 0) - 1e7, l1: cat.l1, l2: cat.l2, l3: cat.l3,
       nameL: name.toLowerCase(), catL: cat.text, storeL: FF.stores[s].toLowerCase(), pri: FF.l1Order.get(cat.l1)
     };
   };
@@ -125,6 +126,12 @@
   FF.img = (src, alt, cls) => src
     ? `<img referrerpolicy="no-referrer" class="${cls}" src="${FF.esc(src)}" alt="${FF.esc(alt)}" loading="lazy" onerror="FF.imgErr(this)">`
     : '<div class="image-fallback">Image unavailable</div>';
+  // Card photos that do not fill the square (wide room photos, tall ones) get a soft blurred copy of themselves behind them instead of
+  // white bars (owner, 2026-10-07). Square photos and plain studio shots stay exactly as they were.
+  FF.imgFit = img => {
+    const w = img.naturalWidth, h = img.naturalHeight;
+    if (w && h && img.parentElement) img.parentElement.classList.toggle('has-bars', Math.abs(w / h - 1) > 0.06);
+  };
   FF.imgErr = img => {
     // Pan Home image links carry an empty resize option; try the plain media path once before giving up
     if (!img.dataset.retry && /\/cdn-cgi\/image\/[^/]*\//.test(img.src)) {
@@ -184,10 +191,12 @@
     const more = o.moreColours ? `+${o.moreColours}${parts.length ? '' : ' more colours'}` : '';
     const tags = parts.length || more ? `<span class="pc-tags"><span class="pc-tags-text">${parts.join(' · ')}</span>${more ? `<span class="pc-more">${more}</span>` : ''}</span>` : '';
     const name = FF.esc(FF.cleanName(o.name));
-    const img = o.img ? `<img referrerpolicy="no-referrer" src="${FF.esc(o.img)}" alt="${name}" loading="lazy" onerror="FF.imgErr(this)">` : '<div class="image-fallback">Image unavailable</div>';
+    const img = o.img ? `<img referrerpolicy="no-referrer" src="${FF.esc(o.img)}" alt="${name}" loading="lazy" onload="FF.imgFit(this)" onerror="FF.imgErr(this)">` : '<div class="image-fallback">Image unavailable</div>';
+    // the photo's address for the blurred backdrop (theme2.css .pc-media.has-bars), safe inside url('...') in a style attribute
+    const bg = o.img ? ` style="--pc-bg:url('${FF.esc(String(o.img).replace(/[\\'()\s]/g, c => '%' + c.charCodeAt(0).toString(16).padStart(2, '0')))}')"` : '';
     const disc = o.disc || (o.orig > o.price ? (o.orig - o.price) / o.orig : 0);
     return `<li class="pc-card${disc ? ' on-sale' : ''}" data-product-id="${FF.esc(o.id)}">
-      <div class="pc-media">
+      <div class="pc-media"${bg}>
         ${disc ? `<span class="pc-badge">-${Math.round(disc * 100)}%</span>` : ''}
         <button class="pc-wishlist" type="button" data-wish="${FF.esc(o.id)}" aria-pressed="${fav}" aria-label="${fav ? 'Saved to your wishlist' : 'Save to a room'}">${HEART}</button>
         ${img}
