@@ -133,11 +133,13 @@
     if (w && h && img.parentElement) img.parentElement.classList.toggle('has-bars', Math.abs(w / h - 1) > 0.06);
   };
   FF.imgErr = img => {
-    // Pan Home image links carry an empty resize option; try the plain media path once before giving up
-    if (!img.dataset.retry && /\/cdn-cgi\/image\/[^/]*\//.test(img.src)) {
-      img.dataset.retry = 1;
-      img.src = img.src.replace(/\/cdn-cgi\/image\/[^/]*\//, '/');
-      return;
+    // Pan Home photos have two addresses: the plain media path and the store's resized one. Now and then its image server answers one of
+    // them with an empty page (seen 2026-10-07 on photos 2-6 of one table), so try the other address once before giving up.
+    if (!img.dataset.retry) {
+      const src = img.src;
+      const other = /\/cdn-cgi\/image\/[^/]*\//.test(src) ? src.replace(/\/cdn-cgi\/image\/[^/]*\//, '/')
+        : /^https:\/\/cdn2\.panhomestores\.com\/media\//.test(src) ? src.replace('/media/', '/cdn-cgi/image/quality=70,height=,width=/media/') : '';
+      if (other) { img.dataset.retry = 1; img.src = other; return; }
     }
     const d = document.createElement('div');
     d.className = 'image-fallback';
