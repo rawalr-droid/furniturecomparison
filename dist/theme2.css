@@ -411,11 +411,16 @@ html body .mb-index-sec .nn-sub { margin: 0 0 24px; }
   #mbChips .t2-chip, #mbChips .mb-chip-sep { flex: none; white-space: nowrap; }
   .mb-index .t2-tile.mb-tile:first-child { aspect-ratio: 16 / 10; }
 }
-/* homepage "Shop by mood": all five boards visible at once as large tiles (owner, 2026-10-06): two wide on top, three below */
+/* homepage "Shop by mood": all boards visible at once as large tiles (owner, 2026-10-06): two wide on top, rows of three below */
 .mb-home { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 16px; }
 .mb-home .t2-tile.mb-tile { flex: none; width: auto; grid-column: span 2; aspect-ratio: 4 / 3; }
 .mb-home .t2-tile.mb-tile:nth-child(-n+2) { grid-column: span 3; aspect-ratio: 16 / 9; }
 html body .mb-home .mb-tile:nth-child(-n+2) .t2-tl b { font-size: 30px; }
+/* a last row of only two (7 boards, 10, ...) fills the width like the first row instead of leaving a gap */
+@media (min-width: 900px) {
+  .mb-home .t2-tile.mb-tile:nth-child(3n):nth-last-child(2), .mb-home .t2-tile.mb-tile:nth-child(3n+1):last-child { grid-column: span 3; aspect-ratio: 16 / 9; }
+  html body .mb-home .mb-tile:nth-child(3n):nth-last-child(2) .t2-tl b, html body .mb-home .mb-tile:nth-child(3n+1):last-child .t2-tl b { font-size: 30px; }
+}
 @media (max-width: 899px) {
   .mb-home { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
   .mb-home .t2-tile.mb-tile { grid-column: span 1; aspect-ratio: 4 / 3; }

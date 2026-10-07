@@ -19,7 +19,9 @@
   if (!$('mbHero')) return;
 
   // ---------------------------------------------------------------- one board
-  const key = /^[a-z0-9_-]+$/.test(params.get('b') || '') ? params.get('b') : 'japandi';
+  const RENAMED = { wooden: 'earthy' };                 // old links keep working (the Wooden board became Earthy, 2026-10-07)
+  const asked = /^[a-z0-9_-]+$/.test(params.get('b') || '') ? params.get('b') : 'japandi';
+  const key = RENAMED[asked] || asked;
   const SORTS = ['price-low', 'price-high', 'discount'];
   const state = { cat: params.get('cat') || '', price: params.get('price') || '', store: params.get('store') || '', sale: params.get('sale') === '1',
                   sort: SORTS.includes(params.get('sort')) ? params.get('sort') : 'match', shown: PAGE };
