@@ -22,6 +22,11 @@
   let dbv = null;            // database mode: { items, total } of the current view (null = published-files mode)
   let facets = null;         // counts for the filter bar of the current scope (category + search + deals), same shape in both modes
   let facetKey = '', barSig = '';
+  // Room pages (owner, 2026-10-08): with exactly one room ticked and no category chosen, the page shows that room's picture tiles
+  // (data/rooms.json, built nightly by agents/ff_agents/rooms.py); a tile opens its category with the room still ticked.
+  let ROOMS = null;
+  const oneRoom = () => (state.room.length === 1 ? state.room[0] : '');
+  const roomHome = () => (oneRoom() && !state.cat && !state.q.trim() ? oneRoom() : '');
 
   // ------------------------------------------------------------------ filter set-up (PRD 5.9): js/filters.json says which filters a category shows
   let CFG = {
@@ -171,8 +176,13 @@
     if (!el) return;
     const n = FF.node(state.cat), f = facets || {};
     const kids = (n.l3 || state.q ? [] : n.l2 ? n.l2.ch : n.l1 ? n.l1.ch : []).filter(c => c.c > 0);
+    const room = roomHome(), roomTiles = (room && ROOMS && ROOMS[room] && ROOMS[room].tiles) || [];
     let html = '';
-    if (kids.length >= 2) {
+    if (roomTiles.length >= 2) {
+      html = roomTiles.map(t => `<a class="nn-subcat" href="browse.html?c=${enc(t.c)}&amp;room=${enc(room)}" data-subcat="${esc(t.c)}">
+        <span class="nn-subcat-img">${t.i ? `<img referrerpolicy="no-referrer" src="${esc(FF.fixImg(t.i))}" alt="" loading="lazy" onerror="this.remove()">` : ''}</span>
+        <span class="nn-subcat-name">${esc(t.n)}</span></a>`).join('');
+    } else if (kids.length >= 2) {
       html = kids.map(c => {
         const img = (f.tiles || {})[c.n] ? FF.fixImg(f.tiles[c.n]) : '';
         return `<a class="nn-subcat" href="browse.html?c=${enc(c.s)}" data-subcat="${esc(c.s)}">
@@ -189,7 +199,7 @@
     if (!html) { el.hidden = true; el.innerHTML = ''; el.dataset.html = ''; return; }
     if (el.dataset.html !== html) {
       el.innerHTML = html; el.dataset.html = html;
-      if (el.dataset.cat !== state.cat) { el.scrollLeft = 0; el.dataset.cat = state.cat; }
+      if (el.dataset.scope !== state.cat + '|' + room) { el.scrollLeft = 0; el.dataset.scope = state.cat + '|' + room; }   // not data-cat: clicks on [data-cat] are category links
     }
     el.hidden = false;
   }
@@ -291,7 +301,11 @@
     const crumbs = [FF.node(state.cat).l1, FF.node(state.cat).l2, FF.node(state.cat).l3].filter(Boolean);
     const trail = crumbs.map((x, i) => (i === crumbs.length - 1 && !state.q ? `<span>${esc(x.n)}</span>` : `<a href="browse.html?c=${enc(x.s)}" data-cat="${esc(x.s)}">${esc(x.n)}</a>`)).join(' › ');
     els.count.textContent = `${total.toLocaleString()} products`;
-    els.label.innerHTML = state.q ? `Results for “${esc(state.q)}”${trail ? ' in ' + trail : ''}` : crumbs.length ? `<a href="browse.html" data-cat="">All products</a> › ${trail}` : state.sale ? 'Everything on sale' : 'All products';
+    const room = oneRoom();          // inside a room the trail starts at the room, not at "All products"
+    const start = room ? `<a href="browse.html?room=${enc(room)}" data-cat="">${esc(room)}</a>` : '<a href="browse.html" data-cat="">All products</a>';
+    els.label.innerHTML = state.q ? `Results for “${esc(state.q)}”${trail ? ' in ' + trail : ''}` : crumbs.length ? `${start} › ${trail}`
+      : room ? `<a href="index.html#rooms">Shop by room</a> › <span>${esc(room)}</span>` : state.sale ? 'Everything on sale' : 'All products';
+    document.title = `${state.q ? `“${state.q}”` : crumbs.length ? crumbs[crumbs.length - 1].n + (room ? ', ' + room : '') : room || 'Browse'} | Furnish Finder UAE`;
     renderBar();
     subcats();
     els.show.textContent = `Show ${total.toLocaleString()} ${total === 1 ? 'result' : 'results'}`;
@@ -442,6 +456,7 @@
   // ------------------------------------------------------------------ start
   Promise.all([FF.loadMeta(), loadCfg]).then(() => {
     syncControls();
+    FF.fetchJSON('data/rooms.json').then(d => { ROOMS = (d && d.rooms) || {}; subcats(); }).catch(() => { ROOMS = {}; });
     return refresh();
   }).then(loadRest).catch(err => {
     console.error(err);
