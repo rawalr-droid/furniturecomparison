@@ -1,78 +1,49 @@
-// Homepage 'Shop by category' row (Theme v2 spec 5): a fixed list, not nightly. n = label, c = category link, i = photo.
-window.FF_HOME_TILES = [
+// Homepage 'Shop by room' row (owner, 2026-10-08; it replaced 'Shop by category'): a fixed list, not nightly.
+// n = room, c = link, i = photo (a smaller version of the store's photo where its image server offers one).
+window.FF_HOME_ROOMS = [
  {
-  "n": "Sofas & Seating",
-  "c": "furniture/sofas-seating",
-  "i": "https://assets.danubehome.com/media/dh-seller/p/810302801941/8103028019413.jpg"
- },
- {
-  "n": "Dining Room",
-  "c": "furniture/dining-room",
-  "i": "https://cdn.shopify.com/s/files/1/0557/0956/5096/files/Untitled-12_ae7218ef-22d6-462f-8f1c-3e6630f1c07c.jpg?v=1771083547"
+  "n": "Living Room",
+  "c": "browse.html?room=Living%20Room",
+  "i": "https://media.homecentre.com/i/homecentre/166924839-166469820-HC07062024_04-2100.jpg?w=900"
  },
  {
   "n": "Bedroom",
-  "c": "furniture/bedroom",
-  "i": "https://media.homecentre.com/i/homecentre/163683272-163683270-HC12122021_04-2100.jpg?v=4"
+  "c": "browse.html?room=Bedroom",
+  "i": "https://media.homecentre.com/i/homecentre/165872248-165872246-HC24102023_05-2100.jpg?w=900"
  },
  {
-  "n": "Armchairs",
-  "c": "furniture/sofas-seating/armchairs-accent-chairs",
-  "i": "https://assets.danubehome.com/media/dh-seller/p/assets/179900130741/400x400/5/385/6.jpeg"
+  "n": "Dining Room",
+  "c": "browse.html?room=Dining%20Room",
+  "i": "https://media.homeboxstores.com/i/homebox/169822475-169822475-HMBX16072026N_05-2100.jpg?v=7&w=900"
  },
  {
-  "n": "Living Room",
-  "c": "furniture/living-room",
-  "i": "https://media.homecentre.com/i/homecentre/166924839-166469820-HC07062024_04-2100.jpg"
+  "n": "Kitchen",
+  "c": "browse.html?room=Kitchen",
+  "i": "https://cdn.shopify.com/s/files/1/0740/8595/7668/files/Image_4_d11f0862-4040-4de4-b0da-e4a9f5306cd5.png?v=1780487655&width=900&format=pjpg"
  },
  {
-  "n": "Storage",
-  "c": "furniture/living-room/cabinets-display-units",
-  "i": "https://assets.danubehome.com/media/dh-seller/p/sellers/HOMELVES/pi/179900161980/image_1784748373170.png"
+  "n": "Bathroom",
+  "c": "browse.html?room=Bathroom",
+  "i": "https://media.homecentre.com/i/homecentre/165097460-165097460-HC14112022_04-2100.jpg?w=900"
+ },
+ {
+  "n": "Home Office",
+  "c": "browse.html?room=Home%20Office",
+  "i": "https://hocfurniture.ae/wp-content/uploads/2026/04/Oren-Work-Desk-4.webp"
+ },
+ {
+  "n": "Kids Room",
+  "c": "browse.html?room=Kids%20Room",
+  "i": "https://cdn.media.amplience.net/i/lmg/169780084-169780084-HC20042066_03-2100.jpg?w=900"
  },
  {
   "n": "Outdoor",
-  "c": "furniture/outdoor",
-  "i": "https://media.homeboxstores.com/i/homebox/165815966-165815966-HMBX03082023N_03-2100.JPG?v=1"
+  "c": "browse.html?room=Outdoor",
+  "i": "https://cdn.shopify.com/s/files/1/0632/0580/2143/files/ChatGPTImageFeb26_2026_03_14_58AM.png?v=1772729158&width=900&format=pjpg"
  },
  {
-  "n": "Home Decor",
-  "c": "home-decor",
-  "i": "https://media.homecentre.com/i/homecentre/161888872-161888872-HC110220_04-2100.jpg"
- },
- {
-  "n": "Lighting",
-  "c": "lighting",
-  "i": "https://media.homecentre.com/i/homecentre/168514894-168514894-HC09012025_05-2100.jpg?v=1"
- },
- {
-  "n": "Rugs & Carpets",
-  "c": "rugs-carpets",
-  "i": "https://cdn.media.amplience.net/i/lmg/167850670-167850670-HC18022025_03-2100.jpg"
- },
- {
-  "n": "Soft Furnishings",
-  "c": "soft-furnishings",
-  "i": "https://cdn.media.amplience.net/i/lmg/165745266-165745266-HC24052023_04-2100.jpg?v=1"
- },
- {
-  "n": "Bed & Bath",
-  "c": "bed-bath",
-  "i": "https://cdn2.panhomestores.com/media/catalog/product/1/2/121KEM9900842_03_2.JPG"
- },
- {
-  "n": "Kitchen & Dining",
-  "c": "kitchen-dining",
-  "i": "https://cdn2.panhomestores.com/media/catalog/product/1/7/171HPL9900003_03_1.JPG"
- },
- {
-  "n": "Storage & Organisation",
-  "c": "storage-organisation",
-  "i": "https://media.homeboxstores.com/i/homebox/166797496-166797496-HMBX25062024N_04-2100.jpg"
- },
- {
-  "n": "Outdoor & Garden",
-  "c": "outdoor-garden",
-  "i": "https://assets.danubehome.com/media/dh-seller/p/231202710732/231202710732-3.jpg"
+  "n": "Entryway",
+  "c": "browse.html?room=Entryway",
+  "i": "https://media.homecentre.com/i/homecentre/161324875-161324875-HC050119_04-2100.jpg?v=1&w=900"
  }
 ];
