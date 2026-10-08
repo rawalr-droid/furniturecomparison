@@ -9,7 +9,8 @@
     q: params.get('q') || '', cat: (window.FF_CAT_REDIRECTS || {})[params.get('c')] || params.get('c') || '',
     room: many('room'), store: many('store'), size: many('size'), price: many('price').filter(t => /^\d+-\d*$/.test(t)),
     disc: Math.max(0, Math.min(80, parseInt(params.get('disc'), 10) || 0)), sale: params.get('deals') === '1',
-    sort: SORTS.includes(params.get('sort')) ? params.get('sort') : 'featured', shown: PAGE, compare: []
+    sort: SORTS.includes(params.get('sort')) ? params.get('sort') : 'featured', shown: PAGE, compare: [],
+    via: params.get('via') || ''          // the room page a shared category was opened from (curtains): only for the trail, it filters nothing
   };
   const els = {
     grid: $('productGrid'), count: $('resultCount'), label: $('resultLabel'), status: $('loadStatus'), search: $('searchInput'),
@@ -24,9 +25,12 @@
   let facetKey = '', barSig = '';
   // Room pages (owner, 2026-10-08): with exactly one room ticked and no category chosen, the page shows that room's picture tiles
   // (data/rooms.json, built nightly by agents/ff_agents/rooms.py); a tile opens its category with the room still ticked.
+  // A tile either keeps the room ticked (t.f: "Bedroom > Benches" = the bedroom benches) or, for a category that several rooms share
+  // (curtains), opens the whole category and only remembers the room it came from (state.via).
   let ROOMS = null;
   const oneRoom = () => (state.room.length === 1 ? state.room[0] : '');
   const roomHome = () => (oneRoom() && !state.cat && !state.q.trim() ? oneRoom() : '');
+  const cameFrom = () => (state.via && state.cat && !state.room.length && !state.q.trim() && FF.meta && FF.meta.rooms.includes(state.via) ? state.via : '');
 
   // ------------------------------------------------------------------ filter set-up (PRD 5.9): js/filters.json says which filters a category shows
   let CFG = {
@@ -179,7 +183,7 @@
     const room = roomHome(), roomTiles = (room && ROOMS && ROOMS[room] && ROOMS[room].tiles) || [];
     let html = '';
     if (roomTiles.length >= 2) {
-      html = roomTiles.map(t => `<a class="nn-subcat" href="browse.html?c=${enc(t.c)}&amp;room=${enc(room)}" data-subcat="${esc(t.c)}">
+      html = roomTiles.map(t => `<a class="nn-subcat" href="browse.html?c=${enc(t.c)}&amp;${t.f ? 'room' : 'via'}=${enc(room)}" data-subcat="${esc(t.c)}"${t.f ? '' : ` data-via="${esc(room)}"`}>
         <span class="nn-subcat-img">${t.i ? `<img referrerpolicy="no-referrer" src="${esc(FF.fixImg(t.i))}" alt="" loading="lazy" onerror="this.remove()">` : ''}</span>
         <span class="nn-subcat-name">${esc(t.n)}</span></a>`).join('');
     } else if (kids.length >= 2) {
@@ -256,6 +260,7 @@
     const p = new URLSearchParams();
     if (state.q) p.set('q', state.q);
     if (state.cat) p.set('c', state.cat);
+    if (cameFrom()) p.set('via', state.via);
     ['room', 'store', 'size', 'price'].forEach(k => { if (state[k].length) p.set(k, state[k].join(',')); });
     if (state.disc) p.set('disc', state.disc);
     if (state.sale) p.set('deals', '1');
@@ -301,8 +306,9 @@
     const crumbs = [FF.node(state.cat).l1, FF.node(state.cat).l2, FF.node(state.cat).l3].filter(Boolean);
     const trail = crumbs.map((x, i) => (i === crumbs.length - 1 && !state.q ? `<span>${esc(x.n)}</span>` : `<a href="browse.html?c=${enc(x.s)}" data-cat="${esc(x.s)}">${esc(x.n)}</a>`)).join(' › ');
     els.count.textContent = `${total.toLocaleString()} products`;
-    const room = oneRoom();          // inside a room the trail starts at the room, not at "All products"
-    const start = room ? `<a href="browse.html?room=${enc(room)}" data-cat="">${esc(room)}</a>` : '<a href="browse.html" data-cat="">All products</a>';
+    const room = oneRoom() || cameFrom();          // inside a room the trail starts at the room, not at "All products"
+    const start = !room ? '<a href="browse.html" data-cat="">All products</a>'
+      : `<a href="browse.html?room=${enc(room)}" ${oneRoom() ? 'data-cat=""' : `data-roomback="${esc(room)}"`}>${esc(room)}</a>`;
     els.label.innerHTML = state.q ? `Results for “${esc(state.q)}”${trail ? ' in ' + trail : ''}` : crumbs.length ? `${start} › ${trail}`
       : room ? `<a href="index.html#rooms">Shop by room</a> › <span>${esc(room)}</span>` : state.sale ? 'Everything on sale' : 'All products';
     document.title = `${state.q ? `“${state.q}”` : crumbs.length ? crumbs[crumbs.length - 1].n + (room ? ', ' + room : '') : room || 'Browse'} | Furnish Finder UAE`;
@@ -397,7 +403,7 @@
     state.q = ''; setCat(b.dataset.c).then(() => $('browse').scrollIntoView({ behavior: 'smooth' }));
   }));
   function reset() {
-    Object.assign(state, { q: '', cat: '', room: [], store: [], size: [], price: [], disc: 0, sale: false, sort: 'featured' });
+    Object.assign(state, { q: '', cat: '', room: [], store: [], size: [], price: [], disc: 0, sale: false, sort: 'featured', via: '' });
     go();
   }
   $('emptyReset').addEventListener('click', reset);
@@ -447,7 +453,9 @@
     const chip = t.closest('[data-clear]'); if (chip) return clearOne(chip.dataset.clear, chip.dataset.v);
     if (t.closest('[data-clearall]')) { Object.assign(state, { room: [], store: [], size: [], price: [], disc: 0, sale: false }); return go(); }
     const st = t.closest('[data-sizetile]'); if (st) return tick('size', st.dataset.sizetile, !state.size.includes(st.dataset.sizetile));
-    const sub = t.closest('[data-subcat]'); if (sub && plain) { e.preventDefault(); return setCat(sub.dataset.subcat); }
+    const back = t.closest('[data-roomback]'); if (back && plain) { e.preventDefault(); state.room = [back.dataset.roomback]; state.via = ''; return setCat(''); }
+    const sub = t.closest('[data-subcat]');
+    if (sub && plain) { e.preventDefault(); if (sub.dataset.via) { state.via = sub.dataset.via; state.room = []; } return setCat(sub.dataset.subcat); }
     const crumb = t.closest('[data-cat]'); if (crumb && plain) { e.preventDefault(); return setCat(crumb.dataset.cat); }
     if (!t.closest('.ff-dd')) closeDrops();
   });
