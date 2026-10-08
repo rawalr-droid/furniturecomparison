@@ -434,3 +434,10 @@ html body .mb-home .mb-tile:nth-child(-n+2) .t2-tl b { font-size: 30px; }
   html body .mb-home .mb-tile:not(:first-child) .t2-tl b small { display: none; }
 }
 @media (max-width: 480px) { html body .mb-home .mb-tile:not(:first-child) .t2-tl b { font-size: 16px; } .mb-home .mb-tile:not(:first-child) .t2-tl { left: 12px; right: 8px; bottom: 12px; } }
+
+/* room pages: the tile strip names its groups ("Sofas & Seating", "Tables", "TV Units & Storage") above the first tile of each */
+html body .nn-subcats.has-groups { padding-top: 30px; }
+html body .nn-subcats.has-groups .nn-subcat { position: relative; }
+html body .nn-subcats.has-groups .nn-subcat[data-g]::before { content: attr(data-g); position: absolute; left: 0; top: -26px; white-space: nowrap;
+  font-size: 12px; line-height: 18px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--plum); }
+html body .nn-subcats.has-groups .nn-subcat[data-g]:not(:first-child) { margin-left: 18px; }

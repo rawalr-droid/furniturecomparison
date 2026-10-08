@@ -27,9 +27,23 @@
   // (data/rooms.json, built nightly by agents/ff_agents/rooms.py); a tile opens its category with the room still ticked.
   // A tile either keeps the room ticked (t.f: "Bedroom > Benches" = the bedroom benches) or, for a category that several rooms share
   // (curtains), opens the whole category and only remembers the room it came from (state.via).
+  // Furniture is navigated room first (2026-10-08): "Furniture > Living Room" = c=furniture with that room ticked, and shows only the
+  // room's furniture types; the room page from the homepage (no category) shows everything for the room, bedding and curtains too.
   let ROOMS = null;
+  const FURN = 'furniture';
   const oneRoom = () => (state.room.length === 1 ? state.room[0] : '');
-  const roomHome = () => (oneRoom() && !state.cat && !state.q.trim() ? oneRoom() : '');
+  const roomHome = () => (oneRoom() && (!state.cat || state.cat === FURN) && !state.q.trim() ? oneRoom() : '');
+  const isFurn = () => { const n = FF.node(state.cat); return !!(n.l1 && n.l1.s === FURN); };
+  // an old link to one of the catalogue's furniture groups (c=furniture/sofas-seating) opens the room it now lives in
+  function settle() {
+    const n = FF.node(state.cat);
+    if (!n.l2 || n.l3 || n.l1.s !== FURN || state.q.trim()) return;
+    const room = FF.rooms.of[n.l2.s];
+    if (!room) return;
+    if (n.l2.ch.length === 1) { state.cat = n.l2.ch[0].s; return; }           // "Mattresses" has one type: open it
+    state.cat = FURN;
+    if (!state.room.length) state.room = [room];
+  }
   const cameFrom = () => (state.via && state.cat && !state.room.length && !state.q.trim() && FF.meta && FF.meta.rooms.includes(state.via) ? state.via : '');
 
   // ------------------------------------------------------------------ filter set-up (PRD 5.9): js/filters.json says which filters a category shows
@@ -180,12 +194,20 @@
     if (!el) return;
     const n = FF.node(state.cat), f = facets || {};
     const kids = (n.l3 || state.q ? [] : n.l2 ? n.l2.ch : n.l1 ? n.l1.ch : []).filter(c => c.c > 0);
-    const room = roomHome(), roomTiles = (room && ROOMS && ROOMS[room] && ROOMS[room].tiles) || [];
+    const room = roomHome(), furnOnly = state.cat === FURN;
+    const roomTiles = ((room && ROOMS && ROOMS[room] && ROOMS[room].tiles) || []).filter(t => !furnOnly || (t.f && t.c.startsWith(FURN + '/')));
+    const furnRooms = furnOnly && !room && !state.q.trim() ? FF.rooms.furniture : [];
     let html = '';
     if (roomTiles.length >= 2) {
-      html = roomTiles.map(t => `<a class="nn-subcat" href="browse.html?c=${enc(t.c)}&amp;${t.f ? 'room' : 'via'}=${enc(room)}" data-subcat="${esc(t.c)}"${t.f ? '' : ` data-via="${esc(room)}"`}>
+      // the first tile of a group carries the group's name ("Sofas & Seating", "Tables", "TV Units & Storage")
+      html = roomTiles.map(t => `<a class="nn-subcat" href="browse.html?c=${enc(t.c)}&amp;${t.f ? 'room' : 'via'}=${enc(room)}" data-subcat="${esc(t.c)}"${t.f ? '' : ` data-via="${esc(room)}"`}${t.g ? ` data-g="${esc(t.g)}"` : ''}>
         <span class="nn-subcat-img">${t.i ? `<img referrerpolicy="no-referrer" src="${esc(FF.fixImg(t.i))}" alt="" loading="lazy" onerror="this.remove()">` : ''}</span>
         <span class="nn-subcat-name">${esc(t.n)}</span></a>`).join('');
+    } else if (furnRooms.length >= 2) {
+      // the Furniture page: its rooms
+      html = furnRooms.map(r => `<a class="nn-subcat" href="${FF.furnRoomLink(r.n)}" data-furnroom="${esc(r.n)}">
+        <span class="nn-subcat-img">${r.i ? `<img referrerpolicy="no-referrer" src="${esc(FF.fixImg(r.i))}" alt="" loading="lazy" onerror="this.remove()">` : ''}</span>
+        <span class="nn-subcat-name">${esc(r.n)}</span></a>`).join('');
     } else if (kids.length >= 2) {
       html = kids.map(c => {
         const img = (f.tiles || {})[c.n] ? FF.fixImg(f.tiles[c.n]) : '';
@@ -201,6 +223,7 @@
         <span class="nn-subcat-name">${esc(tile.replace('{size}', z))}</span></button>`).join('');
     }
     if (!html) { el.hidden = true; el.innerHTML = ''; el.dataset.html = ''; return; }
+    el.classList.toggle('has-groups', html.includes(' data-g="'));
     if (el.dataset.html !== html) {
       el.innerHTML = html; el.dataset.html = html;
       if (el.dataset.scope !== state.cat + '|' + room) { el.scrollLeft = 0; el.dataset.scope = state.cat + '|' + room; }   // not data-cat: clicks on [data-cat] are category links
@@ -270,6 +293,7 @@
   }
   function syncControls() {
     if (state.cat && !FF.node(state.cat).l1) state.cat = '';
+    settle();
     els.sort.value = state.sort; els.search.value = state.q;
   }
 
@@ -309,9 +333,25 @@
     const room = oneRoom() || cameFrom();          // inside a room the trail starts at the room, not at "All products"
     const start = !room ? '<a href="browse.html" data-cat="">All products</a>'
       : `<a href="browse.html?room=${enc(room)}" ${oneRoom() ? 'data-cat=""' : `data-roomback="${esc(room)}"`}>${esc(room)}</a>`;
-    els.label.innerHTML = state.q ? `Results for “${esc(state.q)}”${trail ? ' in ' + trail : ''}` : crumbs.length ? `${start} › ${trail}`
-      : room ? `<a href="index.html#rooms">Shop by room</a> › <span>${esc(room)}</span>` : state.sale ? 'Everything on sale' : 'All products';
-    document.title = `${state.q ? `“${state.q}”` : crumbs.length ? crumbs[crumbs.length - 1].n + (room ? ', ' + room : '') : room || 'Browse'} | Furnish Finder UAE`;
+    const node = FF.node(state.cat);
+    let label, title;
+    if (state.q) {
+      label = `Results for “${esc(state.q)}”${trail ? ' in ' + trail : ''}`; title = `“${state.q}”`;
+    } else if (isFurn()) {
+      // furniture reads Furniture > Room > Type; the room is the ticked one, else the room the type belongs to
+      const fr = oneRoom() || (node.l3 ? FF.rooms.of[node.l3.s] : '') || '';
+      const furn = `<a href="browse.html?c=${FURN}" data-furn>${esc(node.l1.n)}</a>`;
+      const type = node.l3 ? `<span>${esc(node.l3.n)}</span>` : node.l2 ? `<span>${esc(node.l2.n)}</span>` : '';
+      label = !fr ? `<a href="browse.html" data-cat="">All products</a> › ${type ? `${furn} › ${type}` : `<span>${esc(node.l1.n)}</span>`}`
+        : type ? `${furn} › <a href="${FF.furnRoomLink(fr)}" data-furnroom="${esc(fr)}">${esc(fr)}</a> › ${type}` : `${furn} › <span>${esc(fr)}</span>`;
+      title = node.l3 ? node.l3.n + (fr ? ', ' + fr : '') : fr ? fr + ' furniture' : node.l1.n;
+    } else if (crumbs.length) {
+      label = `${start} › ${trail}`; title = crumbs[crumbs.length - 1].n + (room ? ', ' + room : '');
+    } else {
+      label = room ? `<a href="index.html#rooms">Shop by room</a> › <span>${esc(room)}</span>` : state.sale ? 'Everything on sale' : 'All products'; title = room || 'Browse';
+    }
+    els.label.innerHTML = label;
+    document.title = `${title} | Furnish Finder UAE`;
     renderBar();
     subcats();
     els.show.textContent = `Show ${total.toLocaleString()} ${total === 1 ? 'result' : 'results'}`;
@@ -453,6 +493,8 @@
     const chip = t.closest('[data-clear]'); if (chip) return clearOne(chip.dataset.clear, chip.dataset.v);
     if (t.closest('[data-clearall]')) { Object.assign(state, { room: [], store: [], size: [], price: [], disc: 0, sale: false }); return go(); }
     const st = t.closest('[data-sizetile]'); if (st) return tick('size', st.dataset.sizetile, !state.size.includes(st.dataset.sizetile));
+    const furn = t.closest('[data-furn]'); if (furn && plain) { e.preventDefault(); state.room = []; state.via = ''; return setCat(FURN); }
+    const fr = t.closest('[data-furnroom]'); if (fr && plain) { e.preventDefault(); state.room = [fr.dataset.furnroom]; state.via = ''; return setCat(FURN); }
     const back = t.closest('[data-roomback]'); if (back && plain) { e.preventDefault(); state.room = [back.dataset.roomback]; state.via = ''; return setCat(''); }
     const sub = t.closest('[data-subcat]');
     if (sub && plain) { e.preventDefault(); if (sub.dataset.via) { state.via = sub.dataset.via; state.room = []; } return setCat(sub.dataset.subcat); }
@@ -462,9 +504,9 @@
   els.compareDialog.addEventListener('click', e => { if (e.target === els.compareDialog) els.compareDialog.close(); });
 
   // ------------------------------------------------------------------ start
-  Promise.all([FF.loadMeta(), loadCfg]).then(() => {
+  Promise.all([FF.loadMeta(), loadCfg, FF.loadRooms()]).then(() => {
+    ROOMS = FF.rooms.rooms;
     syncControls();
-    FF.fetchJSON('data/rooms.json').then(d => { ROOMS = (d && d.rooms) || {}; subcats(); }).catch(() => { ROOMS = {}; });
     return refresh();
   }).then(loadRest).catch(err => {
     console.error(err);

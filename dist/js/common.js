@@ -272,12 +272,22 @@
 
   // Header category nav: one item per Level-1 category, each with a Level-2 dropdown. Built from the live
   // taxonomy (meta.json), so it always matches whatever categories actually exist - nothing hardcoded here.
+  // Rooms (data/rooms.json, rebuilt nightly by agents/ff_agents/rooms.py). Owner, 2026-10-08: furniture is navigated room first,
+  // product groups inside (Furniture > Living Room > Sofas), the way Pan Home does it; the catalogue's own furniture groups
+  // ("Sofas & Seating" next to "Living Room") are no longer shown in the menu.
+  FF.rooms = { rooms: {}, furniture: [], of: {} };
+  FF.loadRooms = () => FF._rooms || (FF._rooms = FF.fetchJSON('data/rooms.json')
+    .then(d => (FF.rooms = { rooms: d.rooms || {}, furniture: d.furniture || [], of: d.of || {} })).catch(() => FF.rooms));
+  FF.furnRoomLink = room => 'browse.html?c=furniture&room=' + FF.enc(room);
+
   FF.renderNav = el => {
+    const rooms = FF.rooms.furniture;
     el.innerHTML = FF.meta.tree.map(l1 => `
       <div class="nav-item">
         <a class="nav-l1" href="browse.html?c=${FF.enc(l1.s)}">${FF.esc(l1.n)}</a>
         <div class="nav-dropdown">
-          ${l1.ch.map(l2 => `<a href="browse.html?c=${FF.enc(l2.s)}">${FF.esc(l2.n)}</a>`).join('')}
+          ${l1.s === 'furniture' && rooms.length ? rooms.map(r => `<a href="${FF.furnRoomLink(r.n)}">${FF.esc(r.n)}</a>`).join('')
+            : l1.ch.map(l2 => `<a href="browse.html?c=${FF.enc(l2.s)}">${FF.esc(l2.n)}</a>`).join('')}
         </div>
       </div>`).join('');
   };
@@ -301,7 +311,7 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     const nav = FF.$('categoryNav');
-    if (nav) FF.loadMeta().then(() => FF.renderNav(nav));
+    if (nav) Promise.all([FF.loadMeta(), FF.loadRooms()]).then(() => FF.renderNav(nav));
     FF.headerInit();
   });
 })();

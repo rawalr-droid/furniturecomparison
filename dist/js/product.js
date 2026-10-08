@@ -24,6 +24,7 @@
   async function show() {
     if (!id) return notFound();
     const meta = await FF.loadMeta();
+    await FF.loadRooms();
     let d = null, dbSimilar = null;
     if (FF.db.on) {                                 // database first; the published files are the fallback
       try {
@@ -41,6 +42,11 @@
 
     const cat = FF.catL[d.c], store = FF.stores[d.s], room = d.r >= 0 ? meta.rooms[d.r] : '';
     const l1 = meta.tree.find(n => n.n === cat.l1), l2 = l1.ch.find(n => n.n === cat.l2), l3 = l2.ch.find(n => n.n === cat.l3);
+    // furniture reads Furniture > Room > Type (the product's own room, else the room its type belongs to); the rest as filed
+    const furnRoom = l1.s === 'furniture' ? (room || FF.rooms.of[l3.s] || '') : '';
+    const crumbs = furnRoom
+      ? `<a href="browse.html?c=${enc(l1.s)}">${esc(l1.n)}</a> › <a href="${FF.furnRoomLink(furnRoom)}">${esc(furnRoom)}</a> › <a href="browse.html?c=${enc(l3.s)}&amp;room=${enc(furnRoom)}">${esc(l3.n)}</a>`
+      : `<a href="browse.html?c=${enc(l1.s)}">${esc(l1.n)}</a> › <a href="browse.html?c=${enc(l2.s)}">${esc(l2.n)}</a> › <a href="browse.html?c=${enc(l3.s)}">${esc(l3.n)}</a>`;
     const images = [...new Set([d.i, ...(d.g || [])].filter(Boolean).map(FF.fixImg))];
     const variants = d.v || [];
     let current = variants.length ? Math.max(0, variants.findIndex(v => v.p === d.p)) : -1;
@@ -100,7 +106,7 @@
         </div>
         <div class="detail-copy">
           <div class="store">${esc(store)}</div>
-          <nav class="crumbs" aria-label="Category"><a href="browse.html?c=${enc(l1.s)}">${esc(l1.n)}</a> › <a href="browse.html?c=${enc(l2.s)}">${esc(l2.n)}</a> › <a href="browse.html?c=${enc(l3.s)}">${esc(l3.n)}</a></nav>
+          <nav class="crumbs" aria-label="Category">${crumbs}</nav>
           <h2>${esc(d.n)}</h2>
           ${pickers}${variants.some(x => x.t) && (!pickers || otherOptions) ? `<p class="selected-variant"><span>Option</span>${esc(v.t)} <small>${current + 1} of ${variants.length}</small></p><div class="chip-row">${chips}</div>` : ''}
           <p class="detail-price">${money(price)}${orig > price ? ` <span class="was-price">${money(orig)}</span>` : ''}</p>
