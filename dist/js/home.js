@@ -14,7 +14,7 @@
   let storeCount = 0;
   FF.loadMeta().then(m => {
     storeCount = m.stores.filter(s => s.c > 0).length;                // only stores that have products on the site
-    $('heroRibbon').textContent = `Prices checked every night · ${num(m.total)} products · ${storeCount} UAE stores`;
+    $('heroRibbon').textContent = `Prices checked every night · ${num(m.total)} products`;
     $('heroPills').innerHTML = '<a href="browse.html">All</a>' + PILLS.filter(p => FF.node(p[1]).l3)
       .map(([t, c, room]) => `<a href="browse.html?c=${enc(c)}&amp;room=${enc(room)}">${esc(t)}</a>`).join('');
     moodCopy();
