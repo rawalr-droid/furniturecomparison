@@ -51,7 +51,7 @@
         <a class="t2-pill" href="#mbFeed">Shop this style ↓</a></div>`;
     els.look.innerHTML = shown.map(card).join('');
     $('mbFeedTitle').textContent = `More ${board.name} pieces`;
-    document.title = `${board.name} mood board | Furnish Finder UAE`;
+    document.title = `${board.name} mood board | couchpotato.ae`;
   }
 
   // ---- the feed: category first (chips), then price / store / on sale, then the order

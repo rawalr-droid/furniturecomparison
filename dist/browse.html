@@ -4,29 +4,34 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Search and compare furniture and home products from stores across the UAE." />
-  <title>Browse | Furnish Finder UAE</title>
+  <title>Browse | couchpotato.ae</title>
+  <meta property="og:site_name" content="couchpotato.ae" />
+  <meta name="application-name" content="couchpotato.ae" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23EE5A0B'/%3E%3Ctext x='32' y='45' font-family='Georgia,serif' font-weight='700' font-size='42' text-anchor='middle' fill='%23fff'%3Ec%3C/text%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@300..800&family=Rubik:wght@800;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800&family=Plus+Jakarta+Sans:wght@400;600;700&family=Caveat:wght@700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css?v=20260920" />
   <link rel="stylesheet" href="pages.css?v=20260920" />
   <link rel="stylesheet" href="theme.css?v=20260926t" />
   <link rel="stylesheet" href="product-card.css?v=20260928n1" />
   <link rel="stylesheet" href="nordic.css?v=20261004f2" />
   <link rel="stylesheet" href="theme2.css?v=20261008n1" />
+  <link rel="stylesheet" href="couchpotato.css?v=20261009a3" />
 </head>
-<body class="t2">
+<body class="t2 cp">
   <div class="nn-utility" id="announce" aria-live="polite">One search across UAE home stores</div>
   <header class="nn-header">
     <div class="nn-main">
-      <a class="nn-logo" href="index.html" aria-label="Furnish Finder UAE home"><span>Furnish</span><span>Finder</span></a>
+      <a class="nn-logo cp-logo" href="index.html" aria-label="couchpotato.ae home">couchpotato<i>.ae</i></a>
       <form class="nn-search" id="searchForm" action="browse.html" role="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5" stroke-linecap="round"/></svg><input id="searchInput" name="q" type="search" placeholder="Search sofas, dining tables, mirrors…" aria-label="Search furniture"></form>
-      <div class="nn-actions"><a class="nn-heart" href="wishlist.html" aria-label="Wishlist"><svg viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg><span class="nn-bubble" data-wish-count></span></a><button class="compare-trigger" id="compareTrigger" type="button" disabled hidden>Compare <span id="compareCount">0</span></button></div>
+      <nav class="cp-nav" aria-label="Main">
+        <div class="cp-cats"><button type="button" class="cp-catbtn" id="cpCatBtn" aria-expanded="false" aria-controls="categoryNav"><span class="cp-cat-l">All categories</span><span class="cp-cat-s">Menu</span><span class="cp-caret" aria-hidden="true">▾</span></button>
+          <div class="category-nav cp-catmenu" id="categoryNav" aria-label="Categories"></div></div>
+        <a href="index.html#rooms">Rooms</a><a href="moodboards.html">Moods</a><a href="browse.html?deals=1&amp;sort=discount">Top deals</a>
+      </nav>
+      <div class="nn-actions"><a class="nn-heart" href="wishlist.html" aria-label="Wishlist"><span class="cp-wl">Wishlist</span><svg viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg><span class="nn-bubble" data-wish-count></span></a><button class="compare-trigger" id="compareTrigger" type="button" disabled hidden>Compare <span id="compareCount">0</span></button></div>
     </div>
-    <nav class="nn-nav" aria-label="Main">
-      <div class="category-nav" id="categoryNav" aria-label="Categories"></div>
-      <div class="nn-links"><a href="moodboards.html">Mood boards</a><a href="browse.html?deals=1&amp;sort=discount">Deals</a><a href="index.html#rooms">Rooms</a></div>
-    </nav>
   </header>
   <a class="nn-promo" id="promoBar" href="browse.html?deals=1&amp;sort=discount">Tonight's biggest drops ›</a>
 
@@ -37,6 +42,7 @@
         <div>
           <p id="resultLabel">Browse the catalogue</p>
           <h2 id="resultCount">Loading furniture…</h2>
+          <p class="cp-hand" id="resultNote" hidden></p>
           <div class="load-status" id="loadStatus" aria-live="polite"></div>
         </div>
       </div>
@@ -92,16 +98,16 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <footer class="nn-footer">
     <div class="nn-footer-cols">
-      <div><a class="nn-logo" href="index.html"><span>Furnish</span><span>Finder</span></a><p>One search. Every UAE home store. Prices refreshed nightly.</p></div>
+      <div><a class="nn-logo cp-logo" href="index.html">couchpotato<i>.ae</i></a><p>One search. Every UAE home store. Prices refreshed nightly.</p></div>
       <div><h4>Shop</h4><div id="footerShop"></div></div>
       <div><h4>Rooms</h4><a href="browse.html?room=Living%20Room">Living Room</a><a href="browse.html?room=Bedroom">Bedroom</a><a href="browse.html?room=Dining%20Room">Dining Room</a><a href="browse.html?room=Home%20Office">Home Office</a><a href="browse.html?room=Kids%20Room">Kids Room</a><a href="browse.html?room=Entryway">Entryway</a><a href="browse.html?room=Bathroom">Bathroom</a><a href="browse.html?room=Kitchen">Kitchen</a><a href="browse.html?room=Outdoor">Outdoor</a></div>
       <div><h4>About</h4><a href="index.html#how">How it works</a><a href="browse.html">All products</a><a href="moodboards.html">Mood boards</a><a href="wishlist.html">Wishlist</a></div>
     </div>
-    <p class="nn-footer-note">Prices and availability can change. Always confirm details with the retailer before buying. © Furnish Finder UAE.</p>
+    <p class="nn-footer-note">Prices and availability can change. Confirm details with the retailer before buying. © couchpotato.ae</p>
   </footer>
   <script src="js/db-config.js?v=20261004t1"></script>
-  <script src="js/common.js?v=20261008n1" data-v="20261008j"></script>
+  <script src="js/common.js?v=20261009a3" data-v="20261008j"></script>
   <script src="js/cat-redirects.js?v=20261004t1"></script>
-  <script src="js/browse.js?v=20261008n1"></script>
+  <script src="js/browse.js?v=20261009a3"></script>
 </body>
 </html>

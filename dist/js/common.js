@@ -1,4 +1,4 @@
-/* Furnish Finder UAE - shared data layer.
+/* couchpotato.ae (formerly Furnish Finder UAE) - shared data layer.
    Data lives in dist/data:  meta.json (taxonomy), l/<category>.json (listing rows), d/<n>.json (product details). */
 (function () {
   'use strict';
@@ -207,7 +207,7 @@
       <div class="pc-body">
         <a class="pc-name" href="${href}" target="_blank" rel="noopener" title="${name}">${name}</a>
         <div class="pc-row3">
-          <p class="pc-price">${o.from ? '<span class="pc-price-from">From</span>' : ''}<span class="pc-price-now">${FF.money(o.price)}</span>${o.orig > o.price ? `<span class="pc-price-was"><span class="visually-hidden">Was </span>${FF.money(o.orig)}</span>` : ''}</p>
+          <p class="pc-price">${o.from ? '<span class="pc-price-from">From</span>' : ''}<span class="pc-price-now">${FF.money(o.price)}</span>${o.orig > o.price ? `<span class="pc-price-was"><span class="visually-hidden">Was </span>${FF.money(o.orig)}</span>` : ''}${disc ? `<span class="pc-off">-${Math.round(disc * 100)}%</span>` : ''}</p>
           ${tags}
         </div>
       </div>
@@ -312,6 +312,14 @@
   document.addEventListener('DOMContentLoaded', () => {
     const nav = FF.$('categoryNav');
     if (nav) Promise.all([FF.loadMeta(), FF.loadRooms()]).then(() => FF.renderNav(nav));
+    // "All categories" in the header: a panel with every department and what is inside it
+    const catBtn = FF.$('cpCatBtn');
+    if (catBtn) {
+      const box = catBtn.parentElement, set = on => { box.classList.toggle('open', on); catBtn.setAttribute('aria-expanded', String(on)); };
+      catBtn.addEventListener('click', e => { e.stopPropagation(); set(!box.classList.contains('open')); });
+      document.addEventListener('click', e => { if (!box.contains(e.target)) set(false); });
+      document.addEventListener('keydown', e => { if (e.key === 'Escape') set(false); });
+    }
     FF.headerInit();
   });
 })();

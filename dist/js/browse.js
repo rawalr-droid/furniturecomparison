@@ -329,7 +329,6 @@
     els.grid.innerHTML = visible.map(card).join('');
     const crumbs = [FF.node(state.cat).l1, FF.node(state.cat).l2, FF.node(state.cat).l3].filter(Boolean);
     const trail = crumbs.map((x, i) => (i === crumbs.length - 1 && !state.q ? `<span>${esc(x.n)}</span>` : `<a href="browse.html?c=${enc(x.s)}" data-cat="${esc(x.s)}">${esc(x.n)}</a>`)).join(' › ');
-    els.count.textContent = `${total.toLocaleString()} products`;
     const room = oneRoom() || cameFrom();          // inside a room the trail starts at the room, not at "All products"
     const start = !room ? '<a href="browse.html" data-cat="">All products</a>'
       : `<a href="browse.html?room=${enc(room)}" ${oneRoom() ? 'data-cat=""' : `data-roomback="${esc(room)}"`}>${esc(room)}</a>`;
@@ -351,7 +350,14 @@
       label = room ? `<a href="index.html#rooms">Shop by room</a> › <span>${esc(room)}</span>` : state.sale ? 'Everything on sale' : 'All products'; title = room || 'Browse';
     }
     els.label.innerHTML = label;
-    document.title = `${title} | Furnish Finder UAE`;
+    document.title = `${title} | couchpotato.ae`;
+    // the heading is the page's name; the count sits under it as the one handwritten line (brand book section 9)
+    const heading = state.q ? `Results for “${state.q}”` : isFurn() ? (node.l3 ? node.l3.n : oneRoom() ? oneRoom() + ' furniture' : node.l1.n)
+      : crumbs.length ? crumbs[crumbs.length - 1].n : room ? room : state.sale ? 'Top deals' : 'All products';
+    els.count.textContent = heading;
+    const note = $('resultNote'), plain = !(state.room.length || state.store.length || state.size.length || state.price.length || state.disc);
+    const nStores = plain && facets && facets.store ? facets.store.length : 0;       // the store count is for the whole page, so only shown when nothing is ticked
+    if (note) { note.hidden = false; note.textContent = `${total.toLocaleString()} ${total === 1 ? 'piece' : 'pieces'}${nStores > 1 ? ` from ${nStores} UAE stores` : ''} · prices checked last night`; }
     renderBar();
     subcats();
     els.show.textContent = `Show ${total.toLocaleString()} ${total === 1 ? 'result' : 'results'}`;
@@ -371,7 +377,7 @@
     syncURL();
     if (FF.db.on) {
       try {
-        if (!dbv) els.count.textContent = 'Loading furniture…';
+        if (!dbv) { const n0 = $('resultNote'); if (n0) { n0.hidden = false; n0.textContent = 'loading…'; } }
         dbFacets();
         await dbLoad(false);
         if (my !== token) return;
@@ -382,7 +388,7 @@
     const keys = neededKeys();
     const pending = keys.filter(k => !FF.shardRows[k]);
     if (pending.length) {
-      els.count.textContent = 'Loading furniture…'; setStatus(keys);
+      { const n0 = $('resultNote'); if (n0) { n0.hidden = false; n0.textContent = 'loading…'; } } setStatus(keys);
       try {
         await Promise.all(pending.map(k => FF.loadShard(k).then(() => { if (my === token) setStatus(keys); })));
       } catch (e) {
