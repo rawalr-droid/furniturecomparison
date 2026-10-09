@@ -359,3 +359,4 @@ html body.cp .cp-cookies button { font: 600 14px var(--cp-sans); padding: 9px 18
 html body.cp .cp-cookies .cp-ck-yes { background: var(--cp-ink); border-color: var(--cp-ink); color: #fff; }
 html body.cp .cp-ck-link { background: none; border: 0; padding: 0; font: inherit; color: inherit; text-decoration: underline; cursor: pointer; }
 @media (max-width: 600px) { html body.cp .cp-cookies { flex-direction: column; align-items: stretch; gap: 12px; padding: 16px; } html body.cp .cp-cookies div { justify-content: flex-end; } }
+html body.cp .nn-footer-note a { color: inherit; text-decoration: underline; }
