@@ -357,7 +357,7 @@
     els.count.textContent = heading;
     const note = $('resultNote'), plain = !(state.room.length || state.store.length || state.size.length || state.price.length || state.disc);
     const nStores = plain && facets && facets.store ? facets.store.length : 0;       // the store count is for the whole page, so only shown when nothing is ticked
-    if (note) { note.hidden = false; note.textContent = `${total.toLocaleString()} ${total === 1 ? 'piece' : 'pieces'}${nStores > 1 ? ` from ${nStores} UAE stores` : ''} · prices checked last night`; }
+    if (note) { note.hidden = false; note.textContent = `${total.toLocaleString()} ${total === 1 ? 'piece' : 'pieces'}${nStores > 1 ? ` from ${nStores} UAE stores` : ''}`; }
     renderBar();
     subcats();
     els.show.textContent = `Show ${total.toLocaleString()} ${total === 1 ? 'result' : 'results'}`;

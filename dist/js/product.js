@@ -110,7 +110,6 @@
           <h2>${esc(d.n)}</h2>
           ${pickers}${variants.some(x => x.t) && (!pickers || otherOptions) ? `<p class="selected-variant"><span>Option</span>${esc(v.t)} <small>${current + 1} of ${variants.length}</small></p><div class="chip-row">${chips}</div>` : ''}
           <p class="detail-price${orig > price ? ' on-sale' : ''}">${money(price)}${orig > price ? ` <span class="was-price">${money(orig)}</span><span class="pc-off">-${Math.round((orig - price) / orig * 100)}%</span>` : ''}</p>
-          <p class="cp-hand">price checked last night</p>
           <div class="facts">${fact('Category', cat.l3)}${fact('Room', room)}${fact('Material', d.m)}${fact('Size', v && v.z)}${fact('Colour', (v && v.k) || d.k)}${fact('Dimensions', /\d{2}|\d\s*(cm|mm|in\b|inch|"|ft)|\d\s*[x×*]\s*\d/i.test(d.z || '') ? d.z : '')}${fact('Brand', d.b)}${fact('Style', d.y)}${d.t === 0 ? fact('Availability', 'Out of stock at last check') : v && v.n === 0 ? fact('Availability', 'This option was sold out at last check') : ''}</div>
           <p class="description">${esc(d.d || 'See the retailer website for full product information.')}</p>
           <div class="detail-actions"><a class="retailer-link" href="${esc(FF.retailerURL(d.u, v && v.x))}" target="_blank" rel="noopener sponsored">View ${variants.length ? 'this option' : 'product'} at ${esc(store)} ↗</a>

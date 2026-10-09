@@ -75,7 +75,7 @@
   let moods = [];
   function moodCopy() {
     if (!moods.length || !storeCount) return;
-    $('moodCopy').textContent = `We've pulled together ${moods.length} of the most-loved home styles from ${storeCount} UAE stores. Pick the one that feels like you. Every piece is real and priced tonight.`;
+    $('moodCopy').textContent = `We've pulled together ${moods.length} of the most-loved home styles from leading UAE stores. Pick the one that feels like you. Every piece is real and priced tonight.`;
   }
   function setMood(i) {
     const m = moods[i], sec = $('moods'), img = $('moodImg');
