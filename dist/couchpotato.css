@@ -360,3 +360,35 @@ html body.cp .cp-cookies .cp-ck-yes { background: var(--cp-ink); border-color: v
 html body.cp .cp-ck-link { background: none; border: 0; padding: 0; font: inherit; color: inherit; text-decoration: underline; cursor: pointer; }
 @media (max-width: 600px) { html body.cp .cp-cookies { flex-direction: column; align-items: stretch; gap: 12px; padding: 16px; } html body.cp .cp-cookies div { justify-content: flex-end; } }
 html body.cp .nn-footer-note a { color: inherit; text-decoration: underline; }
+
+/* ---------- account: sign-in button in the header, account card on the wishlist page ---------- */
+html body.cp .cp-acct-box { position: relative; display: flex; align-items: center; }
+html body.cp .cp-acct { display: inline-flex; align-items: center; gap: 8px; background: none; border: 0; padding: 8px 0; font: 600 14px var(--cp-sans); color: var(--cp-ink); cursor: pointer; white-space: nowrap; }
+html body.cp .cp-acct:hover .cp-acct-t { text-decoration: underline; text-underline-offset: 5px; }
+html body.cp .cp-acct-i { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50% !important; background: var(--cp-ink); color: #fff; font: 700 13px var(--cp-sans); }
+html body.cp .cp-acct-o { display: none; }
+html body.cp .cp-acct-menu { position: absolute; right: 0; top: calc(100% + 10px); z-index: 60; min-width: 220px; background: #fff; border: 1px solid var(--cp-bd); border-radius: 12px !important;
+  box-shadow: 0 12px 32px rgba(18, 19, 22, .14); padding: 14px 16px; display: grid; gap: 10px; font: 400 14px var(--cp-sans); }
+html body.cp .cp-acct-menu[hidden] { display: none; }
+html body.cp .cp-acct-menu p { margin: 0; color: var(--cp-mut); font-size: 13px; overflow-wrap: anywhere; }
+html body.cp .cp-acct-menu a, html body.cp .cp-acct-menu button { background: none; border: 0; padding: 0; text-align: left; font: 600 14px var(--cp-sans); color: var(--cp-ink); text-decoration: none; cursor: pointer; }
+html body.cp .cp-acct-menu a:hover, html body.cp .cp-acct-menu button:hover { text-decoration: underline; }
+html body.cp .cp-acct-card { display: flex; align-items: center; justify-content: space-between; gap: 16px 24px; flex-wrap: wrap; margin: 16px 0 4px; padding: 16px 20px; background: #fff; border: 1px solid var(--cp-bd); border-radius: 12px !important; }
+html body.cp .cp-acct-card p { margin: 0; flex: 1 1 320px; font: 400 14px/1.5 var(--cp-sans); color: var(--cp-ink); }
+html body.cp .cp-acct-card a { color: inherit; }
+html body.cp .cp-google { display: inline-flex; align-items: center; gap: 10px; height: 44px; padding: 0 18px; background: #fff; color: #1F1F1F; border: 1px solid #747775; border-radius: 99px !important; font: 600 14px var(--cp-sans); cursor: pointer; flex: none; }
+html body.cp .cp-google:hover { background: #F8FAFD; }
+html body.cp .cp-acct-out { background: none; border: 1px solid var(--cp-bd); border-radius: 99px !important; padding: 9px 18px; font: 600 14px var(--cp-sans); color: var(--cp-ink); cursor: pointer; flex: none; }
+@media (max-width: 900px) {
+  html body.cp .cp-acct-t { display: none; }
+  html body.cp .cp-acct-o { display: inline-grid; background: none; color: var(--cp-ink); border: 1px solid var(--cp-bd); }
+  html body.cp .cp-acct { padding: 4px 0; }
+}
+/* ---------- plain text pages (privacy) ---------- */
+html body.cp .cp-doc { max-width: 760px; margin: 0 auto; padding: 48px 20px 72px; font: 400 16px/1.65 var(--cp-sans); color: var(--cp-ink); }
+html body.cp .cp-doc h1 { font: 700 clamp(30px, 4vw, 44px)/1.1 var(--cp-serif); margin: 0 0 8px; }
+html body.cp .cp-doc h2 { font: 700 22px/1.25 var(--cp-serif); margin: 36px 0 8px; }
+html body.cp .cp-doc p, html body.cp .cp-doc li { margin: 0 0 10px; }
+html body.cp .cp-doc ul { padding-left: 20px; margin: 0 0 10px; }
+html body.cp .cp-doc a { color: var(--cp-ac); }
+html body.cp .cp-doc .cp-doc-date { color: var(--cp-mut); font-size: 14px; }

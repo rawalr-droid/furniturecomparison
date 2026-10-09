@@ -310,6 +310,122 @@
     }).catch(() => {});
   };
 
+  // Accounts (owner, 2026-10-09): "Sign in with Google" through Supabase Auth, so a wishlist follows the shopper to every device.
+  // We never see a password: Google confirms who it is, Supabase keeps the session (its official library, js/vendor/, loaded only
+  // when someone signs in or is signed in). The account holds one thing, the wishlist, in the table "wishlists", where the database
+  // itself lets a signed-in person read and write only their own row (agents/ff_agents/db_sync.py ACCOUNTS_SQL).
+  // LOGIN: 'off' = nothing shown; 'preview' = shown only after opening a page with ?login=1 (for the owner's test); 'on' = everyone.
+  const LOGIN = 'preview';
+  const SB_REF = ((window.FF_DB && window.FF_DB.url || '').match(/^https:\/\/([a-z0-9]+)\./) || [])[1] || '';
+  const OKEY = 'cp-wl-owner';                                   // the account this browser's wishlist copy belongs to
+  const G_LOGO = '<svg viewBox="0 0 18 18" width="18" height="18" aria-hidden="true"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.92c1.7-1.57 2.68-3.88 2.68-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.8.54-1.84.86-3.04.86-2.34 0-4.33-1.58-5.04-3.71H.96v2.33A9 9 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.96 10.71a5.4 5.4 0 0 1 0-3.42V4.96H.96a9 9 0 0 0 0 8.08l3-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0A9 9 0 0 0 .96 4.96l3 2.33C4.67 5.16 6.66 3.58 9 3.58z"/></svg>';
+  const loginShown = () => {
+    if (LOGIN === 'off' || !SB_REF || !window.FF_DB.key) return false;
+    try {
+      if (/[?&]login=1(&|$)/.test(location.search)) sessionStorage.setItem('cp-login', '1');
+      return LOGIN === 'on' || sessionStorage.getItem('cp-login') === '1' || !!localStorage.getItem(`sb-${SB_REF}-auth-token`);
+    } catch (_) { return LOGIN === 'on'; }
+  };
+  let sbP = null;
+  function sb() {                                               // Supabase's own client, fetched on first use
+    return sbP || (sbP = new Promise((res, rej) => {
+      const s = document.createElement('script'); s.src = 'js/vendor/supabase-2.117.3.js';
+      s.onload = () => res(window.supabase.createClient(window.FF_DB.url, window.FF_DB.key,
+        { auth: { flowType: 'pkce', detectSessionInUrl: true, persistSession: true, autoRefreshToken: true } }));
+      s.onerror = () => { sbP = null; rej(new Error('the sign-in library did not load')); };
+      document.head.appendChild(s);
+    }));
+  }
+  // only what a wishlist is made of is taken from, or sent to, the account
+  const cleanWish = d => {
+    const out = { v: 1, rooms: {} };
+    for (const r of FF.ROOMS) out.rooms[r] = (d && d.rooms && Array.isArray(d.rooms[r]) ? d.rooms[r] : []).filter(x => x && typeof x.id === 'string' && x.id.length < 300).slice(0, 300);
+    return out;
+  };
+  let wlTimer = null, wlQuiet = false;
+  async function wlPush() {
+    const u = FF.account.user; if (!u) return;
+    const c = await sb();
+    const { error } = await c.from('wishlists').upsert({ user_id: u.id, data: cleanWish(FF.wish.load()), updated_at: new Date().toISOString() });
+    if (error) console.warn('wishlist not saved to the account:', error.message);
+  }
+  async function wlSync() {
+    const u = FF.account.user; if (!u) return;
+    const c = await sb();
+    const { data, error } = await c.from('wishlists').select('data').eq('user_id', u.id).maybeSingle();
+    if (error) { console.warn('wishlist not read from the account:', error.message); return; }
+    let owner = ''; try { owner = localStorage.getItem(OKEY) || ''; } catch (_) {}
+    const local = cleanWish(FF.wish.load()), remote = data ? cleanWish(data.data) : null;
+    let next;
+    if (owner === u.id) next = remote || local;                 // this browser is already on the account: the account's copy wins
+    else {                                                      // first sign-in here: what was saved before is added to the account
+      next = cleanWish(remote);                                 // a copy: the account's list, plus what this browser had
+      for (const r of FF.ROOMS) for (const it of local.rooms[r]) if (!next.rooms[r].some(x => x.id === it.id)) next.rooms[r].push(it);
+    }
+    try { localStorage.setItem(OKEY, u.id); } catch (_) {}
+    if (JSON.stringify(next) !== JSON.stringify(local)) { wlQuiet = true; FF.wish.save(next); wlQuiet = false; }
+    if (!remote || JSON.stringify(remote) !== JSON.stringify(next)) await wlPush();
+  }
+  document.addEventListener('ff-wish', () => { if (wlQuiet || !FF.account.user) return; clearTimeout(wlTimer); wlTimer = setTimeout(() => wlPush().catch(() => {}), 700); });
+
+  function acctDraw() {
+    const u = FF.account.user, first = u ? String((u.user_metadata && (u.user_metadata.full_name || u.user_metadata.name)) || u.email || '').split(/[ @]/)[0] : '';
+    const acts = document.querySelector('.nn-actions');
+    if (acts) {
+      let box = FF.$('cpAcctBox');
+      if (!box) { box = document.createElement('div'); box.id = 'cpAcctBox'; box.className = 'cp-acct-box'; acts.insertBefore(box, acts.firstChild); }
+      box.innerHTML = u
+        ? `<button type="button" class="cp-acct" id="cpAcctBtn" aria-expanded="false" aria-controls="cpAcctMenu"><span class="cp-acct-i" aria-hidden="true">${FF.esc(first.slice(0, 1).toUpperCase())}</span><span class="cp-acct-t">Hi, ${FF.esc(first)}</span></button>
+           <div class="cp-acct-menu" id="cpAcctMenu" hidden><p>${FF.esc(u.email || '')}</p><a href="wishlist.html">My wishlist</a><button type="button" data-signout>Sign out</button></div>`
+        : '<button type="button" class="cp-acct" data-signin aria-label="Sign in"><span class="cp-acct-t">Sign in</span><span class="cp-acct-i cp-acct-o" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.600 8 7"/></svg></span></button>';
+    }
+    const sum = FF.$('wishSummary');                            // the wishlist page: say where the list is kept
+    if (sum) {
+      let card = FF.$('cpAcctCard');
+      if (!card) { card = document.createElement('div'); card.id = 'cpAcctCard'; card.className = 'cp-acct-card'; sum.insertAdjacentElement('afterend', card); }
+      card.innerHTML = u
+        ? `<p>Saved to your account <strong>${FF.esc(u.email || '')}</strong>. Sign in on any device to see it.</p><button type="button" class="cp-acct-out" data-signout>Sign out</button>`
+        : `<p><strong>Keep your wishlist on your phone and your computer.</strong> Sign in and it follows you. From Google we only receive your name, email and profile picture. <a href="privacy.html">Privacy</a></p>
+           <button type="button" class="cp-google" data-signin>${G_LOGO}<span>Sign in with Google</span></button>`;
+      const where = document.querySelector('.wish-head .nn-eyebrow, .wish-eyebrow');
+      if (where) where.textContent = u ? 'Saved to your account' : 'Saved in this browser';
+    }
+  }
+  FF.account = {
+    user: null,
+    async signIn() {
+      try {
+        const c = await sb();
+        const { error } = await c.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: location.origin + '/wishlist.html' } });
+        if (error) throw error;
+      } catch (e) { console.warn(e); alert('Sorry, sign-in is not available right now. Please try again in a moment.'); }
+    },
+    async signOut() { try { const c = await sb(); await c.auth.signOut({ scope: 'local' }); } catch (e) { console.warn(e); } }
+  };
+  function acctSet(user, ev) {
+    const was = FF.account.user;
+    FF.account.user = user || null;
+    acctDraw();
+    if (user && (!was || was.id !== user.id)) { FF.track('login', { method: 'Google' }); wlSync().catch(e => console.warn(e)); }
+    if (!user && ev === 'SIGNED_OUT') {                          // signed out: the list stays in the account, not on this device
+      let owned = false; try { owned = !!localStorage.getItem(OKEY); localStorage.removeItem(OKEY); if (owned) localStorage.removeItem(WKEY); } catch (_) {}
+      if (owned) { wlQuiet = true; document.dispatchEvent(new CustomEvent('ff-wish')); wlQuiet = false; }
+    }
+  }
+  function acctInit() {
+    if (!loginShown()) return;
+    acctDraw();
+    document.addEventListener('click', e => {
+      if (e.target.closest('[data-signin]')) { FF.account.signIn(); return; }
+      if (e.target.closest('[data-signout]')) { FF.account.signOut(); return; }
+      const b = e.target.closest('#cpAcctBtn'), m = FF.$('cpAcctMenu');
+      if (m) { const open = !!b && m.hidden; m.hidden = !open; const btn = FF.$('cpAcctBtn'); if (btn) btn.setAttribute('aria-expanded', String(open)); }
+    });
+    let back = false, has = false;
+    try { back = /[?&](code|error_description)=/.test(location.search); has = !!localStorage.getItem(`sb-${SB_REF}-auth-token`); } catch (_) {}
+    if (back || has) sb().then(c => c.auth.onAuthStateChange((ev, session) => setTimeout(() => acctSet(session && session.user, ev), 0))).catch(e => console.warn(e));
+  }
+
   // The address search engines should file a page under: always https://www.couchpotato.ae (the old onrender.com address serves the
   // same pages), with only the parameters that change what the page shows: category / room / search, product, mood board.
   // The listing page calls it again whenever it changes its own address. agents/ff_agents/sitemap.py writes the same form.
@@ -337,12 +453,13 @@
   function gtag() { window.dataLayer.push(arguments); }
   FF.track = (name, params) => { if (gaOn) gtag('event', name, params || {}); };
   function gaStart() {
-    if (gaOn || !GA_ID) return;
+    if (gaOn || !GA_ID || /^(localhost|127\.|\[::1\])/.test(location.hostname)) return;     // never count our own test pages
     gaOn = true; window['ga-disable-' + GA_ID] = false; window.dataLayer = window.dataLayer || [];
     if (!document.getElementById('cpGa')) {
       const s = document.createElement('script'); s.id = 'cpGa'; s.async = true; s.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(GA_ID);
       document.head.appendChild(s);
-      gtag('js', new Date()); gtag('config', GA_ID);
+      const here = new URL(location.href); ['code', 'state', 'error', 'error_code', 'error_description'].forEach(k => here.searchParams.delete(k));   // never the sign-in return code
+      gtag('js', new Date()); gtag('config', GA_ID, { page_location: here.href });
     }
   }
   function gaStop() {                                           // changed their mind: stop sending and drop Google's cookies
@@ -397,5 +514,6 @@
     }
     FF.headerInit();
     cookieInit();
+    acctInit();
   });
 })();
