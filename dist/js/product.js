@@ -112,7 +112,7 @@
           <p class="detail-price${orig > price ? ' on-sale' : ''}">${money(price)}${orig > price ? ` <span class="was-price">${money(orig)}</span><span class="pc-off">-${Math.round((orig - price) / orig * 100)}%</span>` : ''}</p>
           <div class="facts">${fact('Category', cat.l3)}${fact('Room', room)}${fact('Material', d.m)}${fact('Size', v && v.z)}${fact('Colour', (v && v.k) || d.k)}${fact('Dimensions', /\d{2}|\d\s*(cm|mm|in\b|inch|"|ft)|\d\s*[x×*]\s*\d/i.test(d.z || '') ? d.z : '')}${fact('Brand', d.b)}${fact('Style', d.y)}${d.t === 0 ? fact('Availability', 'Out of stock at last check') : v && v.n === 0 ? fact('Availability', 'This option was sold out at last check') : ''}</div>
           <p class="description">${esc(d.d || 'See the retailer website for full product information.')}</p>
-          <div class="detail-actions"><a class="retailer-link" href="${esc(FF.retailerURL(d.u, v && v.x))}" target="_blank" rel="noopener sponsored">View ${variants.length ? 'this option' : 'product'} at ${esc(store)} ↗</a>
+          <div class="detail-actions"><a class="retailer-link" data-store="${esc(store)}" data-pid="${esc(id)}" href="${esc(FF.retailerURL(d.u, v && v.x))}" target="_blank" rel="noopener sponsored">View ${variants.length ? 'this option' : 'product'} at ${esc(store)} ↗</a>
           <button class="wish-save" type="button" data-wish="${esc(id)}" aria-pressed="${FF.wishlist().has(id)}">♡ Save to a room</button></div>
         </div>
         <div class="similar-wrap" id="similarWrap"><h3>Similar pieces across stores</h3><p>Finding alternatives…</p></div>

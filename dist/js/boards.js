@@ -37,7 +37,7 @@
     <div class="mb-pop"><img referrerpolicy="no-referrer" loading="lazy" src="${esc(FF.fixImg(a.img))}" alt="">
       <strong>${esc(FF.cleanName(a.name))}</strong><span>${esc(a.store)} · ${esc(a.l3)}</span>
       <span class="mb-pp">${money(a.price)}${off(a) ? ` <b>-${off(a)}%</b> <s>${money(a.orig)}</s>` : ''}</span>
-      <span class="mb-links"><a href="product.html?id=${enc(a.id)}">Details</a>${a.url ? `<a href="${esc(a.url)}" target="_blank" rel="noopener nofollow sponsored">Shop at ${esc(a.store)} ↗</a>` : ''}</span></div></div>`;
+      <span class="mb-links"><a href="product.html?id=${enc(a.id)}">Details</a>${a.url ? `<a data-store="${esc(a.store)}" data-pid="${esc(a.id)}" href="${esc(a.url)}" target="_blank" rel="noopener nofollow sponsored">Shop at ${esc(a.store)} ↗</a>` : ''}</span></div></div>`;
 
   function hero() {
     const shown = board.anchors.filter(a => a.inStock);

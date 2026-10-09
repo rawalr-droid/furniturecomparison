@@ -174,6 +174,7 @@
       const w = FF.wish.load(), list = w.rooms[room], i = list.findIndex(x => x.id === id);
       if (i >= 0) list.splice(i, 1); else list.unshift({ ...(snap || {}), id, t: Date.now() });
       FF.wish.save(w);
+      if (i < 0) FF.track('add_to_wishlist', { item_id: id, room });
       return i < 0;
     },
     count() { const w = FF.wish.load(); return new Set(FF.ROOMS.flatMap(r => w.rooms[r].map(x => x.id))).size; }
@@ -309,6 +310,63 @@
     }).catch(() => {});
   };
 
+  // Google Analytics (GA4) behind a cookie notice. Nothing is loaded and no notice is shown while GA_ID is empty. With an ID, Google's
+  // script loads only after the visitor presses Accept; Decline (or a browser that sends the "do not sell or share" signal) loads nothing.
+  // Page views and searches (?q=) are counted by Google's own measurement; the two events sent from here are store_click (a click out
+  // to a store, on links that carry data-store) and add_to_wishlist.
+  const GA_ID = 'G-5SXZYP4BY2';
+  const CKEY = 'cp-cookies';                                    // 'yes' | 'no', kept in this browser
+  let gaOn = false;
+  function gtag() { window.dataLayer.push(arguments); }
+  FF.track = (name, params) => { if (gaOn) gtag('event', name, params || {}); };
+  function gaStart() {
+    if (gaOn || !GA_ID) return;
+    gaOn = true; window['ga-disable-' + GA_ID] = false; window.dataLayer = window.dataLayer || [];
+    if (!document.getElementById('cpGa')) {
+      const s = document.createElement('script'); s.id = 'cpGa'; s.async = true; s.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(GA_ID);
+      document.head.appendChild(s);
+      gtag('js', new Date()); gtag('config', GA_ID);
+    }
+  }
+  function gaStop() {                                           // changed their mind: stop sending and drop Google's cookies
+    gaOn = false; if (!GA_ID) return;
+    window['ga-disable-' + GA_ID] = true;
+    document.cookie.split(';').map(c => c.split('=')[0].trim()).filter(n => /^_ga/.test(n)).forEach(n => {
+      [location.hostname, '.' + location.hostname, '.' + location.hostname.split('.').slice(-2).join('.')].forEach(d => { document.cookie = `${n}=; Max-Age=0; path=/; domain=${d}`; });
+      document.cookie = `${n}=; Max-Age=0; path=/`;
+    });
+  }
+  const cookieChoice = () => { try { return localStorage.getItem(CKEY) || ''; } catch (_) { return ''; } };
+  function cookieAsk() {
+    let bar = FF.$('cpCookies');
+    if (!bar) {
+      bar = document.createElement('div'); bar.id = 'cpCookies'; bar.className = 'cp-cookies'; bar.setAttribute('role', 'region'); bar.setAttribute('aria-label', 'Cookies');
+      bar.innerHTML = '<p>We use Google Analytics cookies to see how the site is used, so we can make it better.</p>'
+        + '<div><button type="button" data-ck="no">Decline</button><button type="button" class="cp-ck-yes" data-ck="yes">Accept</button></div>';
+      bar.addEventListener('click', e => {
+        const b = e.target.closest('[data-ck]'); if (!b) return;
+        try { localStorage.setItem(CKEY, b.dataset.ck); } catch (_) {}
+        if (b.dataset.ck === 'yes') gaStart(); else gaStop();
+        bar.hidden = true;
+      });
+      document.body.appendChild(bar);
+    }
+    bar.hidden = false;
+  }
+  function cookieInit() {
+    if (!GA_ID) return;
+    const note = document.querySelector('.nn-footer-note');     // a way back to the choice, on every page
+    if (note) { note.insertAdjacentHTML('beforeend', ' <button type="button" class="cp-ck-link" id="cpCookieLink">Cookie settings</button>'); FF.$('cpCookieLink').addEventListener('click', cookieAsk); }
+    if (navigator.globalPrivacyControl) return;                 // the browser already said no on the visitor's behalf
+    const c = cookieChoice();
+    if (c === 'yes') gaStart(); else if (c !== 'no') cookieAsk();
+  }
+  document.addEventListener('click', e => {
+    const a = e.target.closest('a[data-store]'); if (!a || !gaOn) return;
+    let host = ''; try { host = new URL(a.href).hostname; } catch (_) {}
+    FF.track('store_click', { store: a.dataset.store, item_id: a.dataset.pid || '', link_domain: host });
+  });
+
   document.addEventListener('DOMContentLoaded', () => {
     const nav = FF.$('categoryNav');
     if (nav) Promise.all([FF.loadMeta(), FF.loadRooms()]).then(() => FF.renderNav(nav));
@@ -321,5 +379,6 @@
       document.addEventListener('keydown', e => { if (e.key === 'Escape') set(false); });
     }
     FF.headerInit();
+    cookieInit();
   });
 })();

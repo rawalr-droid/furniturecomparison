@@ -348,3 +348,14 @@ html body.cp .cp-catbtn .cp-caret { margin-left: 5px; font-size: 11px; }
   html body.cp .nn-actions { order: 2; }
   html body.cp .cp-nav { order: 1; }
 }
+
+/* ---------- cookie notice (only when analytics is switched on) ---------- */
+html body.cp .cp-cookies { position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 80; max-width: 720px; margin: 0 auto; display: flex; align-items: center; gap: 16px;
+  background: #fff; color: var(--cp-ink); border: 1px solid var(--cp-bd); border-radius: 12px !important; box-shadow: 0 12px 32px rgba(18, 19, 22, .16); padding: 14px 16px 14px 20px; font: 400 14px/1.45 var(--cp-sans); }
+html body.cp .cp-cookies[hidden] { display: none; }
+html body.cp .cp-cookies p { margin: 0; flex: 1 1 auto; }
+html body.cp .cp-cookies div { display: flex; gap: 8px; flex: none; }
+html body.cp .cp-cookies button { font: 600 14px var(--cp-sans); padding: 9px 18px; border-radius: 99px !important; border: 1px solid var(--cp-bd); background: #fff; color: var(--cp-ink); cursor: pointer; }
+html body.cp .cp-cookies .cp-ck-yes { background: var(--cp-ink); border-color: var(--cp-ink); color: #fff; }
+html body.cp .cp-ck-link { background: none; border: 0; padding: 0; font: inherit; color: inherit; text-decoration: underline; cursor: pointer; }
+@media (max-width: 600px) { html body.cp .cp-cookies { flex-direction: column; align-items: stretch; gap: 12px; padding: 16px; } html body.cp .cp-cookies div { justify-content: flex-end; } }
