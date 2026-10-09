@@ -310,6 +310,23 @@
     }).catch(() => {});
   };
 
+  // The address search engines should file a page under: always https://www.couchpotato.ae (the old onrender.com address serves the
+  // same pages), with only the parameters that change what the page shows: category / room / search, product, mood board.
+  // The listing page calls it again whenever it changes its own address. agents/ff_agents/sitemap.py writes the same form.
+  const SITE = 'https://www.couchpotato.ae';
+  FF.canonical = () => {
+    const src = new URLSearchParams(location.search), page = location.pathname.split('/').pop() || 'index.html', p = new URLSearchParams();
+    ({ 'browse.html': ['q', 'c', 'room'], 'product.html': ['id'], 'board.html': ['b'] }[page] || []).forEach(k => { if (src.get(k)) p.set(k, src.get(k)); });
+    const qs = p.toString().replace(/%2C/gi, ','), href = SITE + '/' + (page === 'index.html' ? '' : page) + (qs ? '?' + qs : '');
+    let l = document.querySelector('link[rel="canonical"]');
+    if (!l) { l = document.createElement('link'); l.rel = 'canonical'; document.head.appendChild(l); }
+    l.href = href;
+    let o = document.querySelector('meta[property="og:url"]');
+    if (!o) { o = document.createElement('meta'); o.setAttribute('property', 'og:url'); document.head.appendChild(o); }
+    o.content = href;
+  };
+  FF.canonical();
+
   // Google Analytics (GA4) behind a cookie notice. Nothing is loaded and no notice is shown while GA_ID is empty. With an ID, Google's
   // script loads only after the visitor presses Accept; Decline (or a browser that sends the "do not sell or share" signal) loads nothing.
   // Page views and searches (?q=) are counted by Google's own measurement; the two events sent from here are store_click (a click out

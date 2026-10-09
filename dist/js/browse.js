@@ -290,6 +290,7 @@
     if (state.sort !== 'featured') p.set('sort', state.sort);
     const qs = p.toString().replace(/%2C/gi, ',');
     history.replaceState(null, '', location.pathname + (qs ? '?' + qs : ''));
+    FF.canonical();
   }
   function syncControls() {
     if (state.cat && !FF.node(state.cat).l1) state.cat = '';
