@@ -392,3 +392,19 @@ html body.cp .cp-doc p, html body.cp .cp-doc li { margin: 0 0 10px; }
 html body.cp .cp-doc ul { padding-left: 20px; margin: 0 0 10px; }
 html body.cp .cp-doc a { color: var(--cp-ac); }
 html body.cp .cp-doc .cp-doc-date { color: var(--cp-mut); font-size: 14px; }
+/* product page photo: space between the card's border and the cream frame, and between the frame and the photo (owner, 2026-10-09) */
+html body.cp .product-detail .detail-gallery { margin: 20px; padding: 16px 16px 0; box-sizing: border-box; }
+html body.cp .product-detail .detail-gallery .detail-image { background: transparent !important; border-radius: 6px !important; }
+@media (max-width: 900px) { html body.cp .product-detail .detail-gallery { margin: 12px; padding: 12px 12px 0; } }
+/* phone header: logo, Menu, account and wishlist stay on one row */
+@media (max-width: 480px) {
+  html body.cp .nn-main { gap: 8px; padding: 12px 14px; }
+  html body.cp .nn-logo.cp-logo { font-size: 22px !important; }
+  html body.cp .cp-catbtn { padding: 7px 11px; }
+  html body.cp .nn-actions { gap: 6px; }
+  html body.cp .cp-nav { gap: 8px; }
+}
+@media (max-width: 350px) {
+  html body.cp .nn-main { padding: 12px 10px; }
+  html body.cp .nn-logo.cp-logo { font-size: 18px !important; }
+}
