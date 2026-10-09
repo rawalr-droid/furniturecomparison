@@ -299,7 +299,7 @@
       const stores = m.stores.filter(s => s.c > 0).length, total = Math.floor(m.total / 1000) * 1000;
       if (shop) shop.innerHTML = m.tree.map(l1 => `<a href="browse.html?c=${FF.enc(l1.s)}">${FF.esc(l1.n)}</a>`).join('');
       if (!util || util.dataset.static) return;
-      const msgs = [`One search across ${stores} UAE home stores`, `${total.toLocaleString()}+ products, prices refreshed nightly`, 'Buy direct from the retailer'];
+      const msgs = ['One search across UAE home stores', `${total.toLocaleString()}+ products, prices refreshed nightly`, 'Buy direct from the retailer'];
       let i = 0; util.textContent = msgs[0];
       if (!matchMedia('(prefers-reduced-motion: reduce)').matches) setInterval(() => { i = (i + 1) % msgs.length; util.textContent = msgs[i]; }, 6000);
     }).catch(() => {});
