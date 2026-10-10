@@ -429,3 +429,13 @@ html body.cp .cp-sim-head p { margin: 0; }
 html body.cp .cp-sim-sort { display: grid; gap: 4px; font: 600 12px var(--cp-sans); color: var(--cp-ink); }
 html body.cp .cp-sim-sort select { min-width: 200px; height: 44px; padding: 0 36px 0 18px; border: 1px solid var(--cp-bd); border-radius: 99px !important; background-color: #fff; font: 600 14px var(--cp-sans); color: var(--cp-ink); cursor: pointer; }
 @media (max-width: 600px) { html body.cp .cp-sim-sort, html body.cp .cp-sim-sort select { width: 100%; } }
+
+/* ---------- price filter: the shopper's own range ---------- */
+html body.cp .ff-own { padding: 12px 14px 10px; border-bottom: 1px solid var(--cp-bd); display: grid; gap: 8px; }
+html body.cp .ff-own > span { font: 600 12px var(--cp-sans); color: var(--cp-mut); }
+html body.cp .ff-own > div { display: flex; align-items: center; gap: 8px; }
+html body.cp .ff-own input { width: 78px; height: 38px; padding: 0 10px; border: 1px solid var(--cp-bd); border-radius: 8px !important; background: #fff; font: 600 14px var(--cp-sans); color: var(--cp-ink); -moz-appearance: textfield; }
+html body.cp .ff-own input::-webkit-outer-spin-button, html body.cp .ff-own input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+html body.cp .ff-own i { font: 400 13px var(--cp-sans); color: var(--cp-mut); font-style: normal; }
+html body.cp .ff-own .ff-go { height: 38px; padding: 0 16px; border-radius: 99px !important; font: 600 14px var(--cp-sans); cursor: pointer; }
+html body.cp .ff-body .ff-own { padding-left: 0; padding-right: 0; }

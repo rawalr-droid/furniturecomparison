@@ -74,7 +74,27 @@
   const edges = () => CFG.priceBands.slice(1).map(b => b[0]);
   const bandToken = b => `${b[0]}-${b[1] == null ? '' : b[1]}`;                                  // "1000-2499", "10000-"
   const bandRange = t => { const [lo, hi] = t.split('-'); return [Number(lo) || 0, hi === '' ? null : Number(hi) + 1]; };   // [from, below]
-  const bandLabel = t => { const [lo, hi] = t.split('-'); return hi === '' ? `AED ${num(lo)} and above` : Number(lo) === 0 ? `Under AED ${num(Number(hi) + 1)}` : `AED ${num(lo)} – ${num(hi)}`; };
+  const isBand = t => CFG.priceBands.some(b => bandToken(b) === t);                               // one of the ready-made ranges (else the shopper's own)
+  const bandLabel = t => {
+    const [lo, hi] = t.split('-');
+    if (hi === '') return `AED ${num(lo)} and above`;
+    if (Number(lo) === 0) return isBand(t) ? `Under AED ${num(Number(hi) + 1)}` : `Up to AED ${num(hi)}`;
+    return `AED ${num(lo)} – ${num(hi)}`;
+  };
+  // the shopper's own price range (owner, 2026-10-10): two boxes above the ready-made ranges; it is kept as one more "from-to" value
+  const ownPrice = () => state.price.find(v => !isBand(v)) || '';
+  function ownPriceHTML() {
+    const [lo, hi] = ownPrice() ? ownPrice().split('-') : ['', ''];
+    return `<div class="ff-own"><span>Your own range (AED)</span><div><input type="number" min="0" step="1" inputmode="numeric" placeholder="Min" aria-label="Lowest price in AED" data-pmin value="${Number(lo) ? esc(lo) : ''}">
+      <i>to</i><input type="number" min="0" step="1" inputmode="numeric" placeholder="Max" aria-label="Highest price in AED" data-pmax value="${esc(hi || '')}"><button type="button" class="ff-go" data-pgo>Go</button></div></div>`;
+  }
+  function setOwnPrice(box) {
+    const read = q => { const v = Math.floor(Number(box.querySelector(q).value)); return Number.isFinite(v) && v > 0 ? v : 0; };
+    let lo = read('[data-pmin]'), hi = read('[data-pmax]');
+    if (hi && lo > hi) [lo, hi] = [hi, lo];
+    state.price = lo || hi ? [`${lo}-${hi || ''}`] : state.price.filter(isBand);           // an own range replaces the ticked ones; empty boxes remove it
+    closeDrops(); go();
+  }
   const discLabel = d => `${d}% off or more`;
   const pct = r => Math.round((r.disc || 0) * 100);                                               // the % shown on the card
 
@@ -102,7 +122,7 @@
       const n = FF.node(state.cat), kids = n.l3 ? [] : n.l2 ? n.l2.ch : n.l1 ? n.l1.ch : FF.meta.tree, cnt = new Map(f.cat || []);
       o = kids.filter(c => cnt.get(c.n) > 0).map(c => ({ v: c.s, t: c.n, n: cnt.get(c.n) })).sort((a, b) => b.n - a.n);
     }
-    sel(k).filter(v => !o.some(x => x.v === v)).forEach(v => o.push({ v, t: k === 'price' ? bandLabel(v) : k === 'disc' ? discLabel(v) : v, n: 0 }));   // a ticked value always stays visible
+    sel(k).filter(v => !o.some(x => x.v === v) && !(k === 'price' && !isBand(v))).forEach(v => o.push({ v, t: k === 'price' ? bandLabel(v) : k === 'disc' ? discLabel(v) : v, n: 0 }));   // a ticked value always stays visible
     return o;
   }
   // a filter shows only when this page has data for it: at least 2 choices, and (size, room) at least half the products filled in
@@ -112,6 +132,7 @@
     if (sel(k).length) return true;
     const o = options(k);
     if (k === 'disc') return o.length >= 1;
+    if (k === 'price') return f.n > 1;                    // the own-range boxes are useful even when every product sits in one ready-made range
     if (o.length < 2) return false;
     if (k === 'size') return f.sized >= f.n * 0.5;
     if (k === 'room') return f.roomed >= f.n * 0.5;
@@ -248,19 +269,19 @@
   function renderBar() {
     const cfg = catCfg();
     const data = [...new Set([...cfg.bar, ...cfg.more])].filter(usable).map(k => [k, options(k)]);
-    const sig = JSON.stringify([data, cfg.sizeLabel]);
+    const sig = JSON.stringify([data, cfg.sizeLabel, ownPrice()]);
     if (sig !== barSig) {
       barSig = sig;
       const open = (document.querySelector('.ff-dd.open') || { dataset: {} }).dataset.k;
       const openAc = [...document.querySelectorAll('.ff-ac.open')].map(a => a.dataset.k);
       els.drops.innerHTML = data.slice(0, 4).map(([k, o]) => `<div class="ff-dd${k === open ? ' open' : ''}" data-k="${k}">
         <button type="button" class="ff-btn" aria-expanded="${k === open}"><span class="ff-t">${esc(label(k))}<i class="ff-n" hidden></i></span><span class="ff-caret" aria-hidden="true"></span></button>
-        <div class="ff-panel">${finder(k, o)}<div class="ff-opts">${optHTML(k, o)}</div>
+        <div class="ff-panel">${finder(k, o)}${k === 'price' ? ownPriceHTML() : ''}<div class="ff-opts">${optHTML(k, o)}</div>
         <div class="ff-pf"><button type="button" data-fclear="${k}">Clear</button><button type="button" class="ff-go" data-fclose>Apply</button></div></div></div>`).join('')
         + (data.length ? `<button type="button" class="ff-btn ff-more" id="ffMore"><span class="ff-t"><span class="ff-more-l">More filters</span><span class="ff-more-s">Filters</span><i class="ff-n" hidden></i></span><span class="ff-plus" aria-hidden="true">+</span></button>` : '');
       els.list.innerHTML = data.map(([k, o]) => `<div class="ff-ac${openAc.includes(k) ? ' open' : ''}" data-k="${k}">
         <button type="button" class="ff-ac-btn" aria-expanded="${openAc.includes(k)}"><span class="ff-t">${esc(label(k))}<i class="ff-n" hidden></i></span><span class="ff-pl" aria-hidden="true">${openAc.includes(k) ? '–' : '+'}</span></button>
-        <div class="ff-body">${finder(k, o)}<div class="ff-opts">${optHTML(k, o)}</div></div></div>`).join('');
+        <div class="ff-body">${finder(k, o)}${k === 'price' ? ownPriceHTML() : ''}<div class="ff-opts">${optHTML(k, o)}</div></div></div>`).join('');
     }
     syncChecks();
   }
@@ -449,7 +470,10 @@
     const q = e.target.value.trim().toLowerCase();
     e.target.closest('.ff-panel, .ff-body').querySelectorAll('.ff-opt').forEach(o => { o.hidden = !!q && !o.textContent.toLowerCase().includes(q); });
   });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeDrops(); drawer(false); } });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { closeDrops(); drawer(false); }
+    if (e.key === 'Enter' && e.target.matches && e.target.matches('[data-pmin], [data-pmax]')) { e.preventDefault(); setOwnPrice(e.target.closest('.ff-own')); }
+  });
 
   function goSearch(q) { state.q = q.trim(); if (state.q) { state.cat = ''; state.size = []; } /* the header search looks across everything */ go().then(() => $('browse').scrollIntoView({ behavior: 'smooth', block: 'start' })); }
   $('searchForm').addEventListener('submit', e => { e.preventDefault(); goSearch(els.search.value); });
@@ -499,6 +523,7 @@
 
     const dd = t.closest('.ff-dd > .ff-btn');
     if (dd) { const d = dd.parentElement, was = d.classList.contains('open'); closeDrops(); if (!was) { d.classList.add('open'); dd.setAttribute('aria-expanded', 'true'); } return; }
+    const pgo = t.closest('[data-pgo]'); if (pgo) return setOwnPrice(pgo.closest('.ff-own'));
     if (t.closest('[data-fclose]')) return closeDrops();
     const fc = t.closest('[data-fclear]'); if (fc) { closeDrops(); return clearOne(fc.dataset.fclear, ''); }
     if (t.closest('#ffMore')) return drawer(true);
