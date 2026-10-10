@@ -415,3 +415,11 @@ html body.cp .cp-about h2 { font: 700 20px/1.3 var(--cp-serif); color: var(--cp-
 html body.cp .cp-about p { margin: 0 0 8px; max-width: 900px; }
 html body.cp .cp-about a { color: var(--cp-ink); }
 html body.cp h1#resultCount { margin: 0; }
+
+/* ---------- product page: "See more items" under the similar pieces ---------- */
+html body.cp .cp-sim-more { display: grid; justify-items: center; gap: 10px; margin: 28px 0 8px; }
+html body.cp .cp-sim-more .load-more { margin: 0; }
+html body.cp .cp-sim-more .cp-hand { margin: 0; font-size: 22px; text-align: center; color: var(--cp-ink); text-transform: none !important; }
+html body.cp .cp-sim-more .cp-hand a { color: var(--cp-ac); font: 600 15px var(--cp-sans); margin-left: 6px; white-space: nowrap; }
+html body.cp .similar-cards .cp-sim-break { grid-column: 1 / -1; list-style: none; text-align: center; padding: 18px 12px; border-top: 1px dashed var(--cp-bd); border-bottom: 1px dashed var(--cp-bd); margin: 6px 0; }
+html body.cp .similar-cards .cp-sim-break .cp-hand { font-size: 22px; color: var(--cp-ink); text-transform: none !important; }

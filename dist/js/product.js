@@ -138,9 +138,51 @@
       } catch (e) { console.warn(e); }
       if (sim.length < 4) sim = rows.filter(r => r.c === d.c && r.img && !seenBase.has(FF.baseId(r.id)) && seenBase.add(FF.baseId(r.id))).map(r => ({ r, s: similarity(base, r) })).sort((a, b) => b.s - a.s).slice(0, 12).map(x => x.r);
       similarHTML = `<h3>Similar pieces across stores</h3><p>${sim.length} products with a similar look, size and price.</p>
-        <ul class="pc-grid similar-cards">${sim.map(FF.pcCard).join('')}</ul>`;
+        <ul class="pc-grid similar-cards" id="simGrid">${sim.map(FF.pcCard).join('')}</ul>
+        <div class="cp-sim-more"><button type="button" class="load-more" id="simMore">See more items</button><p class="cp-hand" id="simEnd" hidden></p></div>`;
       if (!sim.length) similarHTML = '<h3>Similar pieces across stores</h3><p>No close matches found yet.</p>';
       $('similarWrap').innerHTML = similarHTML;
+
+      // "See more items" (owner, 2026-10-10): after the ranked list, looser matches a dozen at a time, up to SIM_MAX in all. These
+      // are worked out here from the listing of the product's own group: same type first, then closest price and shared name
+      // words, at most 4 per store in a dozen. Halfway down a line says the matches are getting looser; the last one says we are out.
+      const SIM_MAX = 90, STEP = 12;
+      const shown = new Set([own, ...sim.map(r => FF.baseId(r.id))]);
+      let pool = null, count = sim.length, warned = false;
+      const more = $('simMore'), end = $('simEnd'), grid = $('simGrid');
+      const finish = () => {
+        more.hidden = true; end.hidden = false;
+        end.innerHTML = `That's the lot. Even we have run out of lookalikes. <a href="browse.html?c=${enc(l3.s)}">Browse all ${esc(l3.n.toLowerCase())} →</a>`;
+      };
+      if (more) more.addEventListener('click', async () => {
+        more.disabled = true;
+        try {
+          if (!pool) {
+            const all = await FF.loadShard(l2.f);
+            const me = all.find(r => r.id === id) || all.find(r => FF.baseId(r.id) === own) || {};      // this product's own size and colour
+            const size = String(me.size || '').toLowerCase(), colour = String(me.colour || d.k || '').toLowerCase();
+            const loose = r => similarity(base, r) + (size && String(r.size || '').toLowerCase() === size ? 5 : 0)
+              + (colour && String(r.colour || '').toLowerCase() === colour ? 2 : 0);
+            pool = all.filter(r => r.img && r.price > 0).map(r => ({ r, s: loose(r) })).sort((a, b) => b.s - a.s || (b.r.f || 0) - (a.r.f || 0));
+          }
+          const batch = [], perStore = {};
+          for (const x of pool) {
+            if (batch.length === Math.min(STEP, SIM_MAX - count)) break;
+            const b = FF.baseId(x.r.id);
+            if (shown.has(b) || (perStore[x.r.s] || 0) >= 4) continue;
+            shown.add(b); perStore[x.r.s] = (perStore[x.r.s] || 0) + 1; batch.push(x.r);
+          }
+          if (batch.length && !warned && count >= 48) {                 // the line in the middle
+            warned = true;
+            grid.insertAdjacentHTML('beforeend', '<li class="cp-sim-break"><span class="cp-hand">Still looking? Respect. We are now checking behind the sofa cushions, so from here the matches get a little looser.</span></li>');
+          }
+          grid.insertAdjacentHTML('beforeend', batch.map(FF.pcCard).join(''));
+          count += batch.length;
+          FF.track('see_more_similar', { item_id: own, shown: count });
+          if (!batch.length || batch.length < STEP || count >= SIM_MAX) finish();
+        } catch (e) { console.error(e); finish(); }
+        more.disabled = false;
+      });
     } catch (e) { console.error(e); $('similarWrap').innerHTML = ''; }
 
     root.addEventListener('click', e => {
