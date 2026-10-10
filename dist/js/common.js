@@ -437,7 +437,7 @@
     let href = SITE + '/' + (page === 'index.html' ? '' : page) + (qs ? '?' + qs : '');
     // categories and rooms have a readable page of their own (/c/<category>/, /room/<room>/, written nightly by static_pages.py)
     const slug = r => r.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-    if (/^\/(c|room)\/[a-z0-9\/-]+\/$/.test(location.pathname)) href = SITE + location.pathname;
+    if (/^\/(c|room)\/[a-z0-9\/-]+$/.test(location.pathname)) href = SITE + location.pathname.replace(/\/?$/, '/');      // with or without the last slash
     else if (page === 'browse.html' && !src.get('q')) {
       const c0 = src.get('c') || '', c = (window.FF_CAT_REDIRECTS || {})[c0] || c0, room = src.get('room') || '';
       const okC = /^[a-z0-9-]+(\/[a-z0-9-]+){0,2}$/.test(c), okR = /^[A-Za-z ]+$/.test(room);
