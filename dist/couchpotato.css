@@ -408,3 +408,10 @@ html body.cp .product-detail .detail-gallery .detail-image { background: transpa
   html body.cp .nn-main { padding: 12px 10px; }
   html body.cp .nn-logo.cp-logo { font-size: 18px !important; }
 }
+
+/* ---------- readable category / room pages: the short "about" text under the list ---------- */
+html body.cp .cp-about { max-width: 1280px; margin: 8px auto 56px; padding: 28px 24px 0; border-top: 1px solid var(--cp-bd); font: 400 14px/1.65 var(--cp-sans); color: var(--cp-mut); }
+html body.cp .cp-about h2 { font: 700 20px/1.3 var(--cp-serif); color: var(--cp-ink); margin: 0 0 8px; }
+html body.cp .cp-about p { margin: 0 0 8px; max-width: 900px; }
+html body.cp .cp-about a { color: var(--cp-ink); }
+html body.cp h1#resultCount { margin: 0; }

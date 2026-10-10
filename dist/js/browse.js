@@ -12,6 +12,14 @@
     sort: SORTS.includes(params.get('sort')) ? params.get('sort') : 'featured', shown: PAGE, compare: [],
     via: params.get('via') || ''          // the room page a shared category was opened from (curtains): only for the trail, it filters nothing
   };
+  // Readable pages for search engines (agents/ff_agents/static_pages.py): /c/<category>/ and /room/<room>/ are copies of this page
+  // that name their own category / room in window.FF_PAGE. While the visitor has chosen nothing else the address stays that clean
+  // path and the page keeps its own title; any other choice moves the address to browse.html?... as usual.
+  const HOME = window.FF_PAGE && window.FF_PAGE.path ? window.FF_PAGE : null;
+  const HOME_TITLE = document.title;
+  if (HOME && !['q', 'c', 'room'].some(k => params.has(k))) { state.cat = HOME.c || ''; state.room = HOME.room ? [HOME.room] : []; }
+  const atHome = () => !!HOME && !state.q.trim() && state.cat === (HOME.c || '') && state.room.join(',') === (HOME.room || '') && !state.via
+    && !state.store.length && !state.size.length && !state.price.length && !state.disc && !state.sale && state.sort === 'featured';
   const els = {
     grid: $('productGrid'), count: $('resultCount'), label: $('resultLabel'), status: $('loadStatus'), search: $('searchInput'),
     sort: $('sortSelect'), load: $('loadMore'), empty: $('emptyState'), active: $('activeFilters'), drops: $('ffDrops'), list: $('ffList'),
@@ -289,7 +297,7 @@
     if (state.sale) p.set('deals', '1');
     if (state.sort !== 'featured') p.set('sort', state.sort);
     const qs = p.toString().replace(/%2C/gi, ',');
-    history.replaceState(null, '', location.pathname + (qs ? '?' + qs : ''));
+    history.replaceState(null, '', HOME ? (atHome() ? HOME.path : '/browse.html' + (qs ? '?' + qs : '')) : location.pathname + (qs ? '?' + qs : ''));
     FF.canonical();
   }
   function syncControls() {
@@ -351,7 +359,7 @@
       label = room ? `<a href="index.html#rooms">Shop by room</a> › <span>${esc(room)}</span>` : state.sale ? 'Everything on sale' : 'All products'; title = room || 'Browse';
     }
     els.label.innerHTML = label;
-    document.title = `${title} | couchpotato.ae`;
+    document.title = atHome() ? HOME_TITLE : `${title} | couchpotato.ae`;
     // the heading is the page's name; the count sits under it as the one handwritten line (brand book section 9)
     const heading = state.q ? `Results for “${state.q}”` : isFurn() ? (node.l3 ? node.l3.n : oneRoom() ? oneRoom() + ' furniture' : node.l1.n)
       : crumbs.length ? crumbs[crumbs.length - 1].n : room ? room : state.sale ? 'Top deals' : 'All products';

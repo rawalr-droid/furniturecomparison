@@ -298,7 +298,7 @@
     const util = FF.$('announce'), promo = FF.$('promoBar'), shop = FF.$('footerShop');
     FF.loadMeta().then(m => {
       const stores = m.stores.filter(s => s.c > 0).length, total = Math.floor(m.total / 1000) * 1000;
-      if (shop) shop.innerHTML = m.tree.map(l1 => `<a href="browse.html?c=${FF.enc(l1.s)}">${FF.esc(l1.n)}</a>`).join('');
+      if (shop) shop.innerHTML = m.tree.map(l1 => `<a href="/c/${FF.esc(l1.s)}/">${FF.esc(l1.n)}</a>`).join('');
       if (!util || util.dataset.static) return;
       const msgs = ['One search across UAE home stores', `${total.toLocaleString()}+ products, prices refreshed nightly`, 'Buy direct from the retailer'];
       let i = 0; util.textContent = msgs[0];
@@ -433,7 +433,18 @@
   FF.canonical = () => {
     const src = new URLSearchParams(location.search), page = location.pathname.split('/').pop() || 'index.html', p = new URLSearchParams();
     ({ 'browse.html': ['q', 'c', 'room'], 'product.html': ['id'], 'board.html': ['b'] }[page] || []).forEach(k => { if (src.get(k)) p.set(k, src.get(k)); });
-    const qs = p.toString().replace(/%2C/gi, ','), href = SITE + '/' + (page === 'index.html' ? '' : page) + (qs ? '?' + qs : '');
+    const qs = p.toString().replace(/%2C/gi, ',');
+    let href = SITE + '/' + (page === 'index.html' ? '' : page) + (qs ? '?' + qs : '');
+    // categories and rooms have a readable page of their own (/c/<category>/, /room/<room>/, written nightly by static_pages.py)
+    const slug = r => r.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    if (/^\/(c|room)\/[a-z0-9\/-]+\/$/.test(location.pathname)) href = SITE + location.pathname;
+    else if (page === 'browse.html' && !src.get('q')) {
+      const c0 = src.get('c') || '', c = (window.FF_CAT_REDIRECTS || {})[c0] || c0, room = src.get('room') || '';
+      const okC = /^[a-z0-9-]+(\/[a-z0-9-]+){0,2}$/.test(c), okR = /^[A-Za-z ]+$/.test(room);
+      if (okC && c === 'furniture' && okR) href = SITE + '/room/' + slug(room) + '/furniture/';
+      else if (okC) href = SITE + '/c/' + c + '/';
+      else if (!c && okR) href = SITE + '/room/' + slug(room) + '/';
+    }
     let l = document.querySelector('link[rel="canonical"]');
     if (!l) { l = document.createElement('link'); l.rel = 'canonical'; document.head.appendChild(l); }
     l.href = href;
