@@ -137,52 +137,65 @@
         sim = (lists[id] || lists[own] || []).map(x => FF.byId.get(x)).filter(r => r && r.img);
       } catch (e) { console.warn(e); }
       if (sim.length < 4) sim = rows.filter(r => r.c === d.c && r.img && !seenBase.has(FF.baseId(r.id)) && seenBase.add(FF.baseId(r.id))).map(r => ({ r, s: similarity(base, r) })).sort((a, b) => b.s - a.s).slice(0, 12).map(x => x.r);
-      similarHTML = `<h3>Similar pieces across stores</h3><p>${sim.length} products with a similar look, size and price.</p>
+      similarHTML = `<div class="cp-sim-head"><div><h3>Similar pieces across stores</h3><p>${sim.length} products with a similar look, size and price.</p></div>
+          <label class="cp-sim-sort"><span>Sort by</span><select id="simSort"><option value="similar">Most similar</option><option value="low">Price: low to high</option>
+            <option value="high">Price: high to low</option><option value="disc">Biggest discount</option></select></label></div>
         <ul class="pc-grid similar-cards" id="simGrid">${sim.map(FF.pcCard).join('')}</ul>
         <div class="cp-sim-more"><button type="button" class="load-more" id="simMore">See more items</button><p class="cp-hand" id="simEnd" hidden></p></div>`;
       if (!sim.length) similarHTML = '<h3>Similar pieces across stores</h3><p>No close matches found yet.</p>';
       $('similarWrap').innerHTML = similarHTML;
 
-      // "See more items" (owner, 2026-10-10): after the ranked list, looser matches a dozen at a time, up to SIM_MAX in all. These
-      // are worked out here from the listing of the product's own group: same type first, then closest price and shared name
-      // words, at most 4 per store in a dozen. Halfway down a line says the matches are getting looser; the last one says we are out.
+      // "See more items" + "Sort by" (owner, 2026-10-10). The list is the ranked dozen followed by looser matches, up to SIM_MAX
+      // in all; a dozen more appear per click. The looser ones are worked out here from the listing of the product's own group:
+      // same type first, then same size and colour, closest price and shared name words, at most 4 per store in a dozen.
+      // Sorting by price or discount orders that whole list (so "cheapest first" really is the cheapest of the similar pieces).
+      // In "Most similar" order a line halfway down says the matches are getting looser; the last line says we are out.
       const SIM_MAX = 90, STEP = 12;
-      const shown = new Set([own, ...sim.map(r => FF.baseId(r.id))]);
-      let pool = null, count = sim.length, warned = false;
-      const more = $('simMore'), end = $('simEnd'), grid = $('simGrid');
-      const finish = () => {
-        more.hidden = true; end.hidden = false;
-        end.innerHTML = `That's the lot. Even we have run out of lookalikes. <a href="browse.html?c=${enc(l3.s)}">Browse all ${esc(l3.n.toLowerCase())} →</a>`;
-      };
-      if (more) more.addEventListener('click', async () => {
-        more.disabled = true;
-        try {
-          if (!pool) {
-            const all = await FF.loadShard(l2.f);
-            const me = all.find(r => r.id === id) || all.find(r => FF.baseId(r.id) === own) || {};      // this product's own size and colour
-            const size = String(me.size || '').toLowerCase(), colour = String(me.colour || d.k || '').toLowerCase();
-            const loose = r => similarity(base, r) + (size && String(r.size || '').toLowerCase() === size ? 5 : 0)
-              + (colour && String(r.colour || '').toLowerCase() === colour ? 2 : 0);
-            pool = all.filter(r => r.img && r.price > 0).map(r => ({ r, s: loose(r) })).sort((a, b) => b.s - a.s || (b.r.f || 0) - (a.r.f || 0));
-          }
-          const batch = [], perStore = {};
+      const more = $('simMore'), end = $('simEnd'), grid = $('simGrid'), sortBy = $('simSort');
+      let list = sim.slice(), full = false, visible = sim.length;
+      const off = r => (r.orig > r.price ? (r.orig - r.price) / r.orig : 0);
+      const ORDER = { low: (x, y) => x.price - y.price, high: (x, y) => y.price - x.price, disc: (x, y) => off(y) - off(x) || x.price - y.price };
+      async function fill() {                                           // add the looser matches behind the ranked ones, once
+        if (full) return;
+        const all = await FF.loadShard(l2.f);
+        const me = all.find(r => r.id === id) || all.find(r => FF.baseId(r.id) === own) || {};      // this product's own size and colour
+        const size = String(me.size || '').toLowerCase(), colour = String(me.colour || d.k || '').toLowerCase();
+        const loose = r => similarity(base, r) + (size && String(r.size || '').toLowerCase() === size ? 5 : 0)
+          + (colour && String(r.colour || '').toLowerCase() === colour ? 2 : 0);
+        const pool = all.filter(r => r.img && r.price > 0).map(r => ({ r, s: loose(r) })).sort((x, y) => y.s - x.s || (y.r.f || 0) - (x.r.f || 0));
+        const shown = new Set([own, ...list.map(r => FF.baseId(r.id))]);
+        while (list.length < SIM_MAX) {
+          const perStore = {}, batch = [];
           for (const x of pool) {
-            if (batch.length === Math.min(STEP, SIM_MAX - count)) break;
-            const b = FF.baseId(x.r.id);
-            if (shown.has(b) || (perStore[x.r.s] || 0) >= 4) continue;
-            shown.add(b); perStore[x.r.s] = (perStore[x.r.s] || 0) + 1; batch.push(x.r);
+            if (batch.length === Math.min(STEP, SIM_MAX - list.length)) break;
+            const k = FF.baseId(x.r.id);
+            if (shown.has(k) || (perStore[x.r.s] || 0) >= 4) continue;
+            shown.add(k); perStore[x.r.s] = (perStore[x.r.s] || 0) + 1; batch.push(x.r);
           }
-          if (batch.length && !warned && count >= 48) {                 // the line in the middle
-            warned = true;
-            grid.insertAdjacentHTML('beforeend', '<li class="cp-sim-break"><span class="cp-hand">Still looking? Respect. We are now checking behind the sofa cushions, so from here the matches get a little looser.</span></li>');
-          }
-          grid.insertAdjacentHTML('beforeend', batch.map(FF.pcCard).join(''));
-          count += batch.length;
-          FF.track('see_more_similar', { item_id: own, shown: count });
-          if (!batch.length || batch.length < STEP || count >= SIM_MAX) finish();
-        } catch (e) { console.error(e); finish(); }
-        more.disabled = false;
-      });
+          if (!batch.length) break;
+          list = list.concat(batch);
+        }
+        full = true;
+      }
+      function draw() {
+        const mode = sortBy.value, rows = (ORDER[mode] ? list.slice().sort(ORDER[mode]) : list).slice(0, visible);
+        let html = rows.map(FF.pcCard);
+        if (mode === 'similar' && rows.length > 48) html.splice(48, 0, '<li class="cp-sim-break"><span class="cp-hand">Still looking? Respect. We are now checking behind the sofa cushions, so from here the matches get a little looser.</span></li>');
+        grid.innerHTML = html.join('');
+        const done = full && visible >= list.length;
+        more.hidden = done; end.hidden = !done;
+        if (done) end.innerHTML = `That's the lot. Even we have run out of lookalikes. <a href="browse.html?c=${enc(l3.s)}">Browse all ${esc(l3.n.toLowerCase())} →</a>`;
+      }
+      const busy = async job => { more.disabled = sortBy.disabled = true; try { await job(); } catch (e) { console.error(e); } more.disabled = sortBy.disabled = false; };
+      if (more) more.addEventListener('click', () => busy(async () => {
+        await fill(); visible = Math.min(list.length, visible + STEP); draw();
+        FF.track('see_more_similar', { item_id: own, shown: visible });
+      }));
+      if (sortBy) sortBy.addEventListener('change', () => busy(async () => {
+        if (sortBy.value !== 'similar') await fill();
+        draw();
+        FF.track('sort_similar', { item_id: own, sort: sortBy.value });
+      }));
     } catch (e) { console.error(e); $('similarWrap').innerHTML = ''; }
 
     root.addEventListener('click', e => {

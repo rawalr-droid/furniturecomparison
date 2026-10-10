@@ -423,3 +423,9 @@ html body.cp .cp-sim-more .cp-hand { margin: 0; font-size: 22px; text-align: cen
 html body.cp .cp-sim-more .cp-hand a { color: var(--cp-ac); font: 600 15px var(--cp-sans); margin-left: 6px; white-space: nowrap; }
 html body.cp .similar-cards .cp-sim-break { grid-column: 1 / -1; list-style: none; text-align: center; padding: 18px 12px; border-top: 1px dashed var(--cp-bd); border-bottom: 1px dashed var(--cp-bd); margin: 6px 0; }
 html body.cp .similar-cards .cp-sim-break .cp-hand { font-size: 22px; color: var(--cp-ink); text-transform: none !important; }
+html body.cp .cp-sim-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px 24px; flex-wrap: wrap; margin-bottom: 18px; }
+html body.cp .cp-sim-head h3 { margin: 0 0 6px; }
+html body.cp .cp-sim-head p { margin: 0; }
+html body.cp .cp-sim-sort { display: grid; gap: 4px; font: 600 12px var(--cp-sans); color: var(--cp-ink); }
+html body.cp .cp-sim-sort select { min-width: 200px; height: 44px; padding: 0 36px 0 18px; border: 1px solid var(--cp-bd); border-radius: 99px !important; background-color: #fff; font: 600 14px var(--cp-sans); color: var(--cp-ink); cursor: pointer; }
+@media (max-width: 600px) { html body.cp .cp-sim-sort, html body.cp .cp-sim-sort select { width: 100%; } }
