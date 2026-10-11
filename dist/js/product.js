@@ -58,8 +58,17 @@
     }
     const oq = Number(new URLSearchParams(location.search).get('o'));      // the card's own option (e.g. the 3 Seater, not a cushion)
     if (new URLSearchParams(location.search).has('o') && variants[oq] && variants[oq].p) current = oq;
+    // nobody asked for a particular option and the one we would open on is sold out: open on the cheapest one that is in stock
+    if (!want.length && !new URLSearchParams(location.search).has('o') && variants[current] && variants[current].n === 0) {
+      const ok = variants.map((v, i) => ({ v, i })).filter(x => x.v.p && x.v.n !== 0).sort((a, b) => a.v.p - b.v.p)[0];
+      if (ok) current = ok.i;
+    }
     const priced = variants.filter(v => v.p);
-    const sizes = [...new Set(priced.map(v => v.z).filter(Boolean))];
+    // sizes small to large, like the listing filter: beds by name, seats by number (sets last), the rest by area
+    const BED = ['Single', 'Double', 'Queen', 'King', 'Super King'];
+    const sizeRank = z => { const b = BED.indexOf(z); if (b >= 0) return b; const set = /\+/.test(z), n = (z.match(/\d+(\.\d+)?/g) || []).map(Number);
+      return /seater|set/i.test(z) ? 100 + (set ? 1000 + n.reduce((a, x) => a + x, 0) : n[0] || 0) : 10000 + (n.length > 1 ? n[0] * n[1] : (n[0] || 0) * (n[0] || 0)); };
+    const sizes = [...new Set(priced.map(v => v.z).filter(Boolean))].sort((a, b) => sizeRank(a) - sizeRank(b) || a.localeCompare(b));
     const colours = [...new Set(priced.map(v => v.k).filter(Boolean))];
     const combos = new Set(priced.map(v => (v.z || '') + '|' + (v.k || ''))).size;
     const otherOptions = priced.length > combos;                  // e.g. storage / chaise side: still pick from the full option list
@@ -99,21 +108,24 @@
       const pickers = group('Size', sizes, v && v.z, 'size', z => minP(inSize(z)), z => soldOut(inSize(z)))
         + group('Colour', colours, v && v.k, 'colour', k => minP(inColour(k)), k => soldOut(inColour(k)));
       const chips = variants.map((x, i) => `<button class="variant-chip ${i === current ? 'active' : ''} ${x.n === 0 ? 'sold-out' : ''}" data-variant-index="${i}" type="button">${esc(x.t)}${x.n === 0 ? '<small>Sold out</small>' : x.p ? `<small>${money(x.p)}</small>` : ''}</button>`).join('');
+      const gone = d.t === 0 ? 'Out of stock at the last check' : v && v.n === 0 ? 'This option was sold out at the last check' : '';
+      const actions = `<div class="detail-actions"><a class="retailer-link" data-store="${esc(store)}" data-pid="${esc(id)}" href="${esc(FF.retailerURL(d.u, v && v.x))}" target="_blank" rel="noopener sponsored">${gone ? 'Check' : 'View'} ${variants.length ? 'this option' : 'product'} at ${esc(store)} ↗</a>
+          <button class="wish-save" type="button" data-wish="${esc(id)}" aria-pressed="${FF.wishlist().has(id)}">♡ Save to a room</button></div>`;
       root.innerHTML = `<div class="product-detail">
         <div class="detail-gallery">
-          ${main ? `<img referrerpolicy="no-referrer" id="detailMainImage" class="detail-image" src="${esc(main)}" alt="${esc(d.n)}" onerror="FF.imgErr(this)">` : '<div class="image-fallback">Image unavailable</div>'}
+          ${main ? `<img referrerpolicy="no-referrer" id="detailMainImage" class="detail-image" src="${esc(main)}" alt="${esc(FF.cleanName(d.n))}" onerror="FF.imgErr(this)">` : '<div class="image-fallback">Image unavailable</div>'}
           ${images.length > 1 ? `<button class="gallery-arrow gallery-prev" data-image-step="-1" aria-label="Previous image">‹</button><button class="gallery-arrow gallery-next" data-image-step="1" aria-label="Next image">›</button><div class="detail-thumbnails">${thumbs}</div>` : ''}
         </div>
         <div class="detail-copy">
           <div class="store">${esc(store)}</div>
           <nav class="crumbs" aria-label="Category">${crumbs}</nav>
-          <h2>${esc(d.n)}</h2>
-          ${pickers}${variants.some(x => x.t) && (!pickers || otherOptions) ? `<p class="selected-variant"><span>Option</span>${esc(v.t)} <small>${current + 1} of ${variants.length}</small></p><div class="chip-row">${chips}</div>` : ''}
+          <h1>${esc(FF.cleanName(d.n))}</h1>
           <p class="detail-price${orig > price ? ' on-sale' : ''}">${money(price)}${orig > price ? ` <span class="was-price">${money(orig)}</span><span class="pc-off">-${Math.round((orig - price) / orig * 100)}%</span>` : ''}</p>
-          <div class="facts">${fact('Category', cat.l3)}${fact('Room', room)}${fact('Material', d.m)}${fact('Size', v && v.z)}${fact('Colour', (v && v.k) || d.k)}${fact('Dimensions', /\d{2}|\d\s*(cm|mm|in\b|inch|"|ft)|\d\s*[x×*]\s*\d/i.test(d.z || '') ? d.z : '')}${fact('Brand', d.b)}${fact('Style', d.y)}${d.t === 0 ? fact('Availability', 'Out of stock at last check') : v && v.n === 0 ? fact('Availability', 'This option was sold out at last check') : ''}</div>
+          ${gone ? `<p class="cp-oos">${gone}</p>` : ''}
+          ${actions}
+          ${pickers}${variants.some(x => x.t) && (!pickers || otherOptions) ? `<p class="selected-variant"><span>Option</span>${esc(v.t)} <small>${current + 1} of ${variants.length}</small></p><div class="chip-row">${chips}</div>` : ''}
+          <div class="facts">${fact('Category', cat.l3)}${fact('Room', room)}${fact('Material', d.m)}${fact('Size', v && v.z)}${fact('Colour', (v && v.k) || d.k)}${fact('Dimensions', /\d{2}|\d\s*(cm|mm|in\b|inch|"|ft)|\d\s*[x×*]\s*\d/i.test(d.z || '') ? d.z : '')}${fact('Brand', d.b)}${fact('Style', d.y)}</div>
           <p class="description">${esc(d.d || 'See the retailer website for full product information.')}</p>
-          <div class="detail-actions"><a class="retailer-link" data-store="${esc(store)}" data-pid="${esc(id)}" href="${esc(FF.retailerURL(d.u, v && v.x))}" target="_blank" rel="noopener sponsored">View ${variants.length ? 'this option' : 'product'} at ${esc(store)} ↗</a>
-          <button class="wish-save" type="button" data-wish="${esc(id)}" aria-pressed="${FF.wishlist().has(id)}">♡ Save to a room</button></div>
         </div>
         <div class="similar-wrap" id="similarWrap"><h3>Similar pieces across stores</h3><p>Finding alternatives…</p></div>
       </div>`;
@@ -121,7 +133,9 @@
     }
 
     let similarHTML = '';
-    document.title = d.n + ' | couchpotato.ae';
+    document.title = FF.cleanName(d.n) + ' | couchpotato.ae';
+    const md = document.querySelector('meta[name="description"]');
+    if (md) md.content = `${FF.cleanName(d.n)} from ${store}, ${money(d.p)}. Compare it with similar pieces from UAE home stores.`;
     paint();
 
     // similar items: precomputed nightly from photo + description + price + category + size + colour (data/s/, built by
@@ -137,7 +151,7 @@
         sim = (lists[id] || lists[own] || []).map(x => FF.byId.get(x)).filter(r => r && r.img);
       } catch (e) { console.warn(e); }
       if (sim.length < 4) sim = rows.filter(r => r.c === d.c && r.img && !seenBase.has(FF.baseId(r.id)) && seenBase.add(FF.baseId(r.id))).map(r => ({ r, s: similarity(base, r) })).sort((a, b) => b.s - a.s).slice(0, 12).map(x => x.r);
-      similarHTML = `<div class="cp-sim-head"><div><h3>Similar pieces across stores</h3><p>${sim.length} products with a similar look, size and price.</p></div>
+      similarHTML = `<div class="cp-sim-head"><div><h3>Similar pieces across stores</h3><p id="simCount">${sim.length} pieces with a similar look, size and price.</p></div>
           <label class="cp-sim-sort"><span>Sort by</span><select id="simSort"><option value="similar">Most similar</option><option value="low">Price: low to high</option>
             <option value="high">Price: high to low</option><option value="disc">Biggest discount</option></select></label></div>
         <ul class="pc-grid similar-cards" id="simGrid">${sim.map(FF.pcCard).join('')}</ul>
@@ -182,6 +196,8 @@
         let html = rows.map(FF.pcCard);
         if (mode === 'similar' && rows.length > 48) html.splice(48, 0, '<li class="cp-sim-break"><span class="cp-hand">Still looking? Respect. We are now checking behind the sofa cushions, so from here the matches get a little looser.</span></li>');
         grid.innerHTML = html.join('');
+        $('simCount').textContent = rows.length <= sim.length && mode === 'similar' ? `${sim.length} pieces with a similar look, size and price.`
+          : mode === 'similar' ? `Showing ${rows.length} pieces. The first ${sim.length} are the closest matches.` : `Showing ${rows.length} similar pieces, sorted your way.`;
         const done = full && visible >= list.length;
         more.hidden = done; end.hidden = !done;
         if (done) end.innerHTML = `That's the lot. Even we have run out of lookalikes. <a href="browse.html?c=${enc(l3.s)}">Browse all ${esc(l3.n.toLowerCase())} →</a>`;

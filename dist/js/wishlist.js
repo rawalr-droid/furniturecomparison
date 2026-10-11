@@ -46,7 +46,7 @@
           <span class="pc-name" title="${esc(it.name || '')}">${esc(it.name || it.id)}</span><p class="pc-price"><span class="pc-price-was">No longer listed</span></p>
           <button class="wish-remove" type="button" data-remove="${esc(it.id)}" data-room="${esc(room)}">Remove</button></div></li>`;
         sum += c.price; was += c.orig > c.price ? c.orig : c.price;
-        const html = FF.pcCard({ id: it.id, name: c.name, store: c.store, img: c.img, price: c.price, orig: c.orig, size: it.size, colours: it.colours, room });
+        const html = FF.pcCard({ id: it.id, name: c.name, store: c.store, img: c.img, price: c.price, orig: c.orig, size: it.size, colours: it.colours, room, out: c.out });
         const drop = it.price && c.price < it.price ? `<p class="wish-drop">↓ ${money(it.price - c.price)} since you saved it</p>` : '';
         const out = c.out ? '<p class="wish-drop wish-out">Out of stock at last check</p>' : '';
         return html.replace('</div>\n    </li>', `${drop}${out}</div>\n    </li>`);

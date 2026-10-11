@@ -439,3 +439,57 @@ html body.cp .ff-own input::-webkit-outer-spin-button, html body.cp .ff-own inpu
 html body.cp .ff-own i { font: 400 13px var(--cp-sans); color: var(--cp-mut); font-style: normal; }
 html body.cp .ff-own .ff-go { height: 38px; padding: 0 16px; border-radius: 99px !important; font: 600 14px var(--cp-sans); cursor: pointer; }
 html body.cp .ff-body .ff-own { padding-left: 0; padding-right: 0; }
+
+/* ================= QC batch, 11 Oct 2026 ================= */
+/* out of stock: one tag on every card, photo a little faded */
+html body.cp .pc-card .pc-out { position: absolute; left: 10px; top: 10px; z-index: 3; background: var(--cp-ink); color: #fff; font: 700 11px/1 var(--cp-sans); letter-spacing: .02em; padding: 6px 8px; border-radius: 4px !important; }
+html body.cp .pc-card.is-out .pc-media img { opacity: .55; }
+html body.cp .pc-card.is-out .pc-price-now { color: var(--cp-mut) !important; }
+html body.cp .cp-pinned .pc-card.is-out .pc-badge { display: none; }
+/* product page: stock note beside the price, the store button straight after it */
+html body.cp .cp-oos { display: inline-block; margin: 2px 0 0; background: var(--cp-ink); color: #fff; font: 700 12px/1 var(--cp-sans); padding: 7px 10px; border-radius: 4px !important; }
+html body.cp .detail-copy h1 { font: 700 clamp(28px, 3vw, 40px)/1.1 var(--cp-serif) !important; letter-spacing: -.02em; margin: 0 0 10px; color: var(--cp-ink); }
+html body.cp .detail-copy .detail-actions { margin: 18px 0 22px; }
+/* wishlist: the notes under a card were written for the old dark card and could not be read on white */
+html body.cp .pc-card .wish-drop { color: #1E7A46 !important; font-weight: 600; }
+html body.cp .pc-card .wish-out { color: var(--cp-ac) !important; font-weight: 600; }
+html body.cp .wish-remove { border: 1px solid var(--cp-bd) !important; background: #fff !important; color: var(--cp-ink) !important; }
+/* header: "Sign in" is a proper button and sits last, at the far right */
+html body.cp .cp-acct[data-signin] { background: var(--cp-ink); color: #fff; height: 40px; padding: 0 18px; border-radius: 99px !important; }
+html body.cp .cp-acct[data-signin]:hover { background: #2A2C33; }
+html body.cp .cp-acct[data-signin]:hover .cp-acct-t { text-decoration: none; }
+html body.cp .nn-actions { gap: 16px; }
+@media (max-width: 900px) {
+  html body.cp .cp-acct[data-signin] { width: 40px; height: 40px; padding: 0; justify-content: center; }
+  html body.cp .cp-acct[data-signin] .cp-acct-o { display: inline-grid; background: none; border: 0; color: #fff; width: auto; height: auto; }
+  html body.cp .cp-acct-i { width: 40px; height: 40px; }
+  html body.cp .nn-actions { gap: 8px; }
+}
+/* phone menu: the header's own links (hidden on a phone) at the top of the panel */
+html body.cp #categoryNav .cp-menu-links { display: none; }
+@media (max-width: 900px) {
+  html body.cp #categoryNav .cp-menu-links { display: flex; flex-wrap: wrap; gap: 8px; grid-column: 1 / -1; padding-bottom: 14px; border-bottom: 1px solid var(--cp-bd); }
+  html body.cp #categoryNav .cp-menu-links a { border: 1px solid var(--cp-bd); border-radius: 99px !important; padding: 8px 14px !important; font: 600 14px var(--cp-sans) !important; color: var(--cp-ink) !important; text-decoration: none; }
+}
+/* footer note: its links stay in the sentence */
+html body.cp .nn-footer-note a, html body.cp .nn-footer-note .cp-ck-link { display: inline !important; padding: 0 !important; }
+
+/* ---------- after the QC pass of 12 Oct ---------- */
+/* phones 351-374 px wide (360 is the commonest Android width): keep logo, Menu, heart and account on one row */
+@media (max-width: 374px) {
+  html body.cp .nn-main { padding: 12px 10px; }
+  html body.cp .nn-logo.cp-logo { font-size: 19px !important; }
+}
+@media (max-width: 350px) { html body.cp .nn-logo.cp-logo { font-size: 17px !important; } }
+/* 901-1100 px: "Sign in" becomes the round icon so the search box keeps its room */
+@media (min-width: 901px) and (max-width: 1100px) {
+  html body.cp .cp-acct[data-signin] { width: 40px; height: 40px; padding: 0; justify-content: center; }
+  html body.cp .cp-acct[data-signin] .cp-acct-t { display: none; }
+  html body.cp .cp-acct[data-signin] .cp-acct-o { display: inline-grid; background: none; border: 0; color: #fff; width: auto; height: auto; }
+}
+html body.cp .nn-search { min-width: 96px; }
+/* the filter panel's title could not be read (dark on dark) */
+html body.cp .ff-drawer h2, html body.cp .ff-drawer h2 button { color: #fff !important; }
+/* "All categories" panel: its text no longer touches the window edge */
+@media (min-width: 901px) { html body.cp .cp-cats.open #categoryNav.cp-catmenu { padding: 26px max(24px, calc((100% - 1192px) / 2)) 30px !important; } }
+html body.cp .detail-copy .option-group:first-of-type { margin-top: 4px; }

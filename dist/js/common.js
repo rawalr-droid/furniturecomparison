@@ -100,7 +100,7 @@
     const x = at || {};
     return {
       id, name, s, c, price, orig, img, opts, store: FF.stores[s], room: room >= 0 ? FF.meta.rooms[room] : '',
-      size: x.z || '', colour: x.k || '', colours: x.c || 0, moreColours: x.m || 0, from: at ? !!x.f : opts > 1, q: x.q,
+      size: x.z || '', colour: x.k || '', colours: x.c || 0, moreColours: x.m || 0, from: at ? !!x.f : opts > 1, q: x.q, out: a[11] === 1,
       save: orig > price ? orig - price : 0, disc: orig > price ? (orig - price) / orig : 0, f: a[10] != null ? a[10] : (orig > price ? (orig - price) / orig : 0) * 2 + (img ? 1 : 0) - 1e7, l1: cat.l1, l2: cat.l2, l3: cat.l3,
       nameL: name.toLowerCase(), catL: cat.text, storeL: FF.stores[s].toLowerCase(), pri: FF.l1Order.get(cat.l1)
     };
@@ -198,8 +198,10 @@
     // the photo's address for the blurred backdrop (theme2.css .pc-media.has-bars), safe inside url('...') in a style attribute
     const bg = o.img ? ` style="--pc-bg:url('${FF.esc(String(o.img).replace(/[\\'()\s]/g, c => '%' + c.charCodeAt(0).toString(16).padStart(2, '0')))}')"` : '';
     const disc = o.disc || (o.orig > o.price ? (o.orig - o.price) / o.orig : 0);
-    return `<li class="pc-card${disc ? ' on-sale' : ''}" data-product-id="${FF.esc(o.id)}">
+    const out = o.out === true || o.out === 1 || o.inStock === false;        // the store had none at the last check (owner, 2026-10-11: say so on the card)
+    return `<li class="pc-card${disc ? ' on-sale' : ''}${out ? ' is-out' : ''}" data-product-id="${FF.esc(o.id)}">
       <div class="pc-media"${bg}>
+        ${out ? '<span class="pc-out">Out of stock</span>' : ''}
         ${disc ? `<span class="pc-badge">-${Math.round(disc * 100)}%</span>` : ''}
         <button class="pc-wishlist" type="button" data-wish="${FF.esc(o.id)}" aria-pressed="${fav}" aria-label="${fav ? 'Saved to your wishlist' : 'Save to a room'}">${HEART}</button>
         ${img}
@@ -373,7 +375,7 @@
     const acts = document.querySelector('.nn-actions');
     if (acts) {
       let box = FF.$('cpAcctBox');
-      if (!box) { box = document.createElement('div'); box.id = 'cpAcctBox'; box.className = 'cp-acct-box'; acts.insertBefore(box, acts.firstChild); }
+      if (!box) { box = document.createElement('div'); box.id = 'cpAcctBox'; box.className = 'cp-acct-box'; acts.appendChild(box); }
       box.innerHTML = u
         ? `<button type="button" class="cp-acct" id="cpAcctBtn" aria-expanded="false" aria-controls="cpAcctMenu"><span class="cp-acct-i" aria-hidden="true">${FF.esc(first.slice(0, 1).toUpperCase())}</span><span class="cp-acct-t">Hi, ${FF.esc(first)}</span></button>
            <div class="cp-acct-menu" id="cpAcctMenu" hidden><p>${FF.esc(u.email || '')}</p><a href="wishlist.html">My wishlist</a><button type="button" data-signout>Sign out</button></div>`
@@ -432,7 +434,7 @@
   const SITE = 'https://www.couchpotato.ae';
   FF.canonical = () => {
     const src = new URLSearchParams(location.search), page = location.pathname.split('/').pop() || 'index.html', p = new URLSearchParams();
-    ({ 'browse.html': ['q', 'c', 'room'], 'product.html': ['id'], 'board.html': ['b'] }[page] || []).forEach(k => { if (src.get(k)) p.set(k, src.get(k)); });
+    ({ 'browse.html': ['q', 'c', 'room', 'deals'], 'product.html': ['id'], 'board.html': ['b'] }[page] || []).forEach(k => { if (src.get(k)) p.set(k, src.get(k)); });
     const qs = p.toString().replace(/%2C/gi, ',');
     let href = SITE + '/' + (page === 'index.html' ? '' : page) + (qs ? '?' + qs : '');
     // categories and rooms have a readable page of their own (/c/<category>/, /room/<room>/, written nightly by static_pages.py)
@@ -514,7 +516,11 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     const nav = FF.$('categoryNav');
-    if (nav) Promise.all([FF.loadMeta(), FF.loadRooms()]).then(() => FF.renderNav(nav));
+    if (nav) Promise.all([FF.loadMeta(), FF.loadRooms()]).then(() => {
+      FF.renderNav(nav);
+      // on a phone the header's own links are hidden, so the menu panel carries them
+      nav.insertAdjacentHTML('afterbegin', '<div class="cp-menu-links"><a href="index.html#rooms">Rooms</a><a href="moodboards.html">Moods</a><a href="browse.html?deals=1">Top deals</a><a href="wishlist.html">Wishlist</a></div>');
+    });
     // "All categories" in the header: a panel with every department and what is inside it
     const catBtn = FF.$('cpCatBtn');
     if (catBtn) {

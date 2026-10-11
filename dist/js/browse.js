@@ -180,7 +180,7 @@
     for (const k of loaded) {
       for (const r of FF.shardRows[k]) {
         if (n.l3 && r.c !== n.l3.i) continue;
-        if (state.sale && !(r.disc > 0)) continue;
+        if (state.sale && !(r.disc > 0 && r.disc < 0.805)) continue;      // never above 80%: almost always a wrong original price
         if (ts.length) { const sc = score(r, ts, phrase); if (sc < 0) continue; r._s = sc; } else r._s = 0;
         // the row is in this page's scope: count it for the filter bar before the tick boxes narrow the list
         const p = pct(r), kid = !n.l1 ? r.l1 : !n.l2 ? r.l2 : !n.l3 ? r.l3 : '';
@@ -202,7 +202,7 @@
     const by = {
       'price-low': (a, b) => a.price - b.price,
       'price-high': (a, b) => b.price - a.price,
-      discount: (a, b) => b.disc - a.disc || saved(b) - saved(a),
+      discount: (a, b) => (b.disc < 0.805 ? b.disc : 0) - (a.disc < 0.805 ? a.disc : 0) || saved(b) - saved(a),
       saving: (a, b) => saved(b) - saved(a) || b.disc - a.disc,
       name: (a, b) => a.nameL.localeCompare(b.nameL),
       featured: ts.length ? (a, b) => b._s - a._s || a.pri - b.pri || b.f - a.f : (a, b) => a.pri - b.pri || b.f - a.f
@@ -377,7 +377,7 @@
     } else if (crumbs.length) {
       label = `${start} › ${trail}`; title = crumbs[crumbs.length - 1].n + (room ? ', ' + room : '');
     } else {
-      label = room ? `<a href="index.html#rooms">Shop by room</a> › <span>${esc(room)}</span>` : state.sale ? 'Everything on sale' : 'All products'; title = room || 'Browse';
+      label = room ? `<a href="index.html#rooms">Shop by room</a> › <span>${esc(room)}</span>` : state.sale ? 'Everything on sale' : 'All products'; title = room || (state.sale ? 'Top deals' : 'Browse');
     }
     els.label.innerHTML = label;
     document.title = atHome() ? HOME_TITLE : `${title} | couchpotato.ae`;
