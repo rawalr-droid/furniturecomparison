@@ -493,3 +493,5 @@ html body.cp .ff-drawer h2, html body.cp .ff-drawer h2 button { color: #fff !imp
 /* "All categories" panel: its text no longer touches the window edge */
 @media (min-width: 901px) { html body.cp .cp-cats.open #categoryNav.cp-catmenu { padding: 26px max(24px, calc((100% - 1192px) / 2)) 30px !important; } }
 html body.cp .detail-copy .option-group:first-of-type { margin-top: 4px; }
+/* measurements of a set come one piece per line */
+html body.cp .facts .fact { white-space: pre-line; }
