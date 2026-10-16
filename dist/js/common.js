@@ -506,7 +506,7 @@
     if (note) { note.insertAdjacentHTML('beforeend', ' <button type="button" class="cp-ck-link" id="cpCookieLink">Cookie settings</button>'); FF.$('cpCookieLink').addEventListener('click', cookieAsk); }
     if (navigator.globalPrivacyControl) return;                 // the browser already said no on the visitor's behalf
     const c = cookieChoice();
-    if (c === 'yes') gaStart(); else if (c !== 'no') cookieAsk();
+    if (c !== 'no') gaStart();                                  // owner 16 Oct: no notice; counting is on unless the visitor opts out via "Cookie settings"
   }
   document.addEventListener('click', e => {
     const a = e.target.closest('a[data-store]'); if (!a || !gaOn) return;
