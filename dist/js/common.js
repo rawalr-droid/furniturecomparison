@@ -197,7 +197,8 @@
     const img = o.img ? `<img referrerpolicy="no-referrer" src="${FF.esc(o.img)}" alt="${name}" loading="lazy" onload="FF.imgFit(this)" onerror="FF.imgErr(this)">` : '<div class="image-fallback">Image unavailable</div>';
     // the photo's address for the blurred backdrop (theme2.css .pc-media.has-bars), safe inside url('...') in a style attribute
     const bg = o.img ? ` style="--pc-bg:url('${FF.esc(String(o.img).replace(/[\\'()\s]/g, c => '%' + c.charCodeAt(0).toString(16).padStart(2, '0')))}')"` : '';
-    const disc = o.disc || (o.orig > o.price ? (o.orig - o.price) / o.orig : 0);
+    let disc = o.disc || (o.orig > o.price ? (o.orig - o.price) / o.orig : 0);
+    if (!(o.price > 0) || disc > 0.805) disc = 0;                      // QC 2026-10-17: never show a discount above 80% (wrong was-price) or on a zero price
     const out = o.out === true || o.out === 1 || o.inStock === false;        // the store had none at the last check (owner, 2026-10-11: say so on the card)
     return `<li class="pc-card${disc ? ' on-sale' : ''}${out ? ' is-out' : ''}" data-product-id="${FF.esc(o.id)}">
       <div class="pc-media"${bg}>

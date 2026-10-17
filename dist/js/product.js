@@ -94,6 +94,7 @@
 
     function paint() {
       const { v, price, orig } = view();
+      const shownOff = price > 0 && orig > price && (orig - price) / orig <= 0.805;      // QC 2026-10-17: hide a was-price implying more than 80% off
       FF._snap.set(id, { name: d.n, store, img: FF.fixImg((v && v.i) || d.i), price, orig, size: (v && v.z) || '', colours: 0, from: false, room });
       const main = v && v.i && imgIndex === -1 ? v.i : images[imgIndex] || '';
       const thumbs = images.map((src, i) => `<button class="variant-thumb image-thumb ${i === imgIndex ? 'active' : ''}" data-image-index="${i}" type="button" aria-label="View image ${i + 1} of ${images.length}"><img referrerpolicy="no-referrer" src="${esc(src)}" alt="" loading="lazy" onerror="FF.imgErr(this)"><span>${i + 1}</span></button>`).join('');
@@ -120,7 +121,7 @@
           <div class="store">${esc(store)}</div>
           <nav class="crumbs" aria-label="Category">${crumbs}</nav>
           <h1>${esc(FF.cleanName(d.n))}</h1>
-          <p class="detail-price${orig > price ? ' on-sale' : ''}">${money(price)}${orig > price ? ` <span class="was-price">${money(orig)}</span><span class="pc-off">-${Math.round((orig - price) / orig * 100)}%</span>` : ''}</p>
+          <p class="detail-price${shownOff ? ' on-sale' : ''}">${money(price)}${shownOff ? ` <span class="was-price">${money(orig)}</span><span class="pc-off">-${Math.round((orig - price) / orig * 100)}%</span>` : ''}</p>
           ${gone ? `<p class="cp-oos">${gone}</p>` : ''}
           ${actions}
           ${pickers}${variants.some(x => x.t) && (!pickers || otherOptions) ? `<p class="selected-variant"><span>Option</span>${esc(v.t)} <small>${current + 1} of ${variants.length}</small></p><div class="chip-row">${chips}</div>` : ''}
@@ -167,7 +168,7 @@
       const SIM_MAX = 90, STEP = 12;
       const more = $('simMore'), end = $('simEnd'), grid = $('simGrid'), sortBy = $('simSort');
       let list = sim.slice(), full = false, visible = sim.length;
-      const off = r => (r.orig > r.price ? (r.orig - r.price) / r.orig : 0);
+      const off = r => (r.price > 0 && r.orig > r.price && (r.orig - r.price) / r.orig <= 0.805 ? (r.orig - r.price) / r.orig : 0);   // same 80% cap as browse
       const ORDER = { low: (x, y) => x.price - y.price, high: (x, y) => y.price - x.price, disc: (x, y) => off(y) - off(x) || x.price - y.price };
       async function fill() {                                           // add the looser matches behind the ranked ones, once
         if (full) return;
