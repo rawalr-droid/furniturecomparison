@@ -54,3 +54,6 @@
 - Card photo framing (trim blank borders) + code names: planned, `agents/state/plans/card_framing_and_names_PLAN.md`; in-stock default option: `instock_default_option_PLAN.md`.
 - Canonical/sitemap -> couchpotato.ae once the owner connects the domain in Render.
 - Product pages are script-only (not readable by search engines); Search Console/Bing not set up.
+
+## Lessons (updated at each weekly close; keep under 25 lines, replace stale ones)
+- (none yet)
