@@ -461,7 +461,7 @@
   // script loads only after the visitor presses Accept; Decline (or a browser that sends the "do not sell or share" signal) loads nothing.
   // Page views and searches (?q=) are counted by Google's own measurement; the two events sent from here are store_click (a click out
   // to a store, on links that carry data-store) and add_to_wishlist.
-  const GA_ID = 'G-5SXZYP4BY2';
+  const GA_ID = 'G-T20F7EM8VL';
   const CKEY = 'cp-cookies';                                    // 'yes' | 'no', kept in this browser
   let gaOn = false;
   function gtag() { window.dataLayer.push(arguments); }
