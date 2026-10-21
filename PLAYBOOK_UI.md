@@ -12,7 +12,7 @@
 
 ## 2. Design rules (CouchPotato_Brand_Guidelines.md, repo root)
 - Name: wordmark `couchpotato` (Fraunces 800, #EE5A0B) + `.ae` (#121316), lowercase; logo orange ONLY for the wordmark.
-- Base: cream #F4EDE0 bg, white surfaces, ink #121316, muted #6C707A; one terracotta accent for money; mood colours only in Shop-by-mood.
+- Base: cream #FAF6F0 bg (lightened 21 Oct from #F4EDE0), white surfaces, ink #121316, muted #6C707A; one terracotta accent for money; mood colours only in Shop-by-mood.
 - Type: Fraunces only for logo, page title, section titles. Plus Jakarta Sans for everything else (all prices/numbers sans). No handwriting font (Caveat removed 21 Oct); small captions use `.cp-note` (Plus Jakarta Sans). No timing phrases ("last night", "tonight", "nightly", "at last check") in user-facing text; sold-out reads "Out of Stock". `font-display: swap`.
 - Photos always in a cream frame; non-square photos get a blurred backdrop (`.pc-media.has-bars::before`, theme2.css).
 - Decoration only on the homepage; product grid stays calm. Never imply data we do not have (brand book s.10). Header full width, 88px (72 phone).

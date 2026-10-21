@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Search furniture across UAE stores, compare prices and discover the best deals." />
+  <meta name="description" content="Compare furniture and home prices across UAE stores. Find a piece, then buy it from the store." />
   <title>couchpotato.ae | Top UAE home stores, one search</title>
   <meta property="og:site_name" content="couchpotato.ae" />
   <link rel="canonical" href="https://www.couchpotato.ae/" />
   <meta property="og:url" content="https://www.couchpotato.ae/" />
   <meta property="og:type" content="website" />
   <meta property="og:title" content="couchpotato.ae | Top UAE home stores, one search" />
-  <meta property="og:description" content="Search furniture across UAE stores, compare prices and discover the best deals." />
+  <meta property="og:description" content="Compare furniture and home prices across UAE stores. Find a piece, then buy it from the store." />
   <meta property="og:image" content="https://www.couchpotato.ae/scenes/living_japandi_photo.jpg" />
   <meta name="application-name" content="couchpotato.ae" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -27,7 +27,7 @@
   <link rel="stylesheet" href="banner.css?v=20260927" />
   <link rel="stylesheet" href="nordic.css?v=20261004f2" />
   <link rel="stylesheet" href="theme2.css?v=20261008n1" />
-  <link rel="stylesheet" href="couchpotato.css?v=20261021a1" />
+  <link rel="stylesheet" href="couchpotato.css?v=20261021b2" />
   <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","name":"couchpotato.ae","alternateName":"couchpotato","url":"https://www.couchpotato.ae/"},{"@type":"Organization","name":"couchpotato.ae","url":"https://www.couchpotato.ae/","logo":"https://www.couchpotato.ae/favicon-192.png","email":"hello@couchpotato.ae"}]}</script>
 </head>
 <body class="t2 t2-home cp">
@@ -47,21 +47,26 @@
   <a class="nn-promo" id="promoBar" href="browse.html?deals=1">Biggest price drops ›</a>
 
   <main>
-    <section class="cp-hero" id="hero" aria-label="A Japandi living room made of real products">
-      <h1 class="visually-hidden">couchpotato.ae: top UAE home stores, one search</h1>
-      <img class="cp-hero-img" id="heroImg" src="scenes/living_japandi_photo.jpg" alt="Japandi living room" width="1672" height="941">
-      <p class="cp-rib" id="heroRibbon"></p>
-      <div class="cp-hero-in">
-        <p class="cp-hero-h" aria-hidden="true">Top UAE home stores. One search.</p>
-        <p class="cp-hero-p">Every piece in this room is a real product from a UAE store. Tap the dots for the price.</p>
-        <a class="cp-btn" href="board.html?b=japandi">Shop this room &nbsp;→</a>
-      </div>
-      <div class="cp-dots" id="heroDots"></div>
-      <a class="cp-tot" id="heroTotal" href="board.html?b=japandi" hidden></a>
-      <div class="cp-pills"><div class="cp-pl" id="heroPills"></div></div>
-    </section>
-
     <div class="cp-w">
+      <section class="cp-intro" aria-label="What couchpotato.ae does">
+        <div class="cp-il">
+          <p class="cp-eyebrow"><b></b><span id="introEy">UAE home stores, one place</span></p>
+          <h1 class="cp-ih">Compare furniture and home prices across <em>UAE stores</em></h1>
+          <p class="cp-isub">couchpotato.ae searches the UAE's home stores in one place. Find a piece, then buy it from the store itself.</p>
+          <form class="cp-isb" action="browse.html" role="search"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><input name="q" type="search" placeholder="Search sofas, dining tables, rugs…" aria-label="Search furniture"><button type="submit">Search</button></form>
+          <div class="cp-ichips" id="introChips" role="group" aria-label="See prices for"></div>
+        </div>
+        <div class="cp-ir"><div class="cp-cmp" id="cmp" aria-live="polite"></div></div>
+      </section>
+
+      <section class="cp-how" id="how" aria-label="How it works">
+        <div><i class="cp-hn">1</i><div class="cp-hv cp-v1"><span class="cp-pill"><svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>grey sofa</span><em style="left:9%;top:16%">Danube Home</em><em style="right:8%;top:24%">Pan Home</em><em style="left:14%;bottom:14%">Home Centre</em><em style="right:11%;bottom:12%">The Home</em></div><h3>Search every store at once</h3><p>One search covers the UAE's home stores, so you skip the tab-hopping.</p></div>
+        <div><i class="cp-hn">2</i><div class="cp-hv cp-v2"><div><u style="width:46%" class="lo"></u><b>1,799</b></div><div><u style="width:66%"></u><b>2,499</b></div><div><u style="width:78%"></u><b>2,899</b></div><div><u style="width:92%"></u><b>3,350</b></div></div><h3>Compare price and details</h3><p>Sizes, colours and the store's own offers, lined up side by side.</p></div>
+        <div><i class="cp-hn">3</i><div class="cp-hv cp-v3"><div class="cp-vc"><b>Orla 3-seater</b><small>Pan Home</small><span>View at Pan Home ↗</span></div></div><h3>Buy from the store</h3><p>We don't sell anything. We send you to the retailer to finish your order.</p></div>
+      </section>
+
+      <section class="cp-stores" aria-label="Stores we compare"><small>Stores we compare</small><div class="cp-sw"><div class="cp-smq" id="storeMq"></div></div></section>
+
       <section class="cp-sec" id="rooms">
         <h2 class="cp-h2">Shop by room</h2>
         <div class="cp-rooms" id="roomRow"></div>
@@ -89,11 +94,6 @@
         <p class="cp-more"><button type="button" class="cp-btn cp-btn-line" id="dealsAll" hidden>See all deals</button></p>
       </section>
 
-      <section class="cp-how" id="how">
-        <div><span>1</span><h3>Search the top stores at once</h3><p>Skip the tab-hopping. UAE home and furniture stores, side by side.</p></div>
-        <div><span>2</span><h3>Compare the details</h3><p>Prices, sizes, colours and the store's own offers.</p></div>
-        <div><span>3</span><h3>Buy from the retailer</h3><p>We send you straight to the store to finish the purchase.</p></div>
-      </section>
     </div>
   </main>
 
@@ -109,6 +109,6 @@
   <script src="js/home-tiles.js?v=20261012a1"></script>
   <script src="js/db-config.js?v=20261004t1"></script>
   <script src="js/common.js?v=20261021a1" data-v="20261006f"></script>
-  <script src="js/home.js?v=20261021a1"></script>
+  <script src="js/home.js?v=20261021b3"></script>
 </body>
 </html>

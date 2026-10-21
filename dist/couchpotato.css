@@ -6,7 +6,7 @@
    Rollback: bash agents/rollback_couchpotato.sh
    ========================================================================== */
 :root {
-  --cp-bg: #F4EDE0; --cp-surface: #FFFFFF; --cp-ink: #121316; --cp-mut: #6C707A; --cp-bd: #E0D5C0; --cp-fr: #F6F2EA; --cp-ac: #C23115; --cp-logo: #EE5A0B;
+  --cp-bg: #FAF6F0; --cp-surface: #FFFFFF; --cp-ink: #121316; --cp-mut: #6C707A; --cp-bd: #E0D5C0; --cp-fr: #F6F2EA; --cp-ac: #C23115; --cp-logo: #EE5A0B;
   --cp-serif: "Fraunces", Georgia, serif; --cp-sans: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   /* the Theme v2 tokens, re-pointed so every rule that reads them takes the new palette */
   --cran: var(--cp-ink); --beige: var(--cp-bg); --plum: var(--cp-ink); --taupe: var(--cp-mut); --ivory: var(--cp-surface);
@@ -169,11 +169,6 @@ html body.cp .cp-mcap span { font-size: 13px; color: var(--cp-mut); }
 html body.cp .cp-mcap em { font: 700 13px var(--cp-sans); font-style: normal; color: var(--cp-ac); margin-top: 4px; }
 
 /* ---------- homepage: how it works ---------- */
-html body.cp .cp-how { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; margin-top: 64px; }
-html body.cp .cp-how > div { background: #fff; border: 1px solid var(--cp-bd); border-radius: 8px !important; padding: 24px; }
-html body.cp .cp-how span { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50% !important; background: var(--cp-ink); color: #fff; font: 700 14px var(--cp-sans); margin-bottom: 12px; }
-html body.cp .cp-how h3 { font-size: 16px; margin: 0 0 6px; }
-html body.cp .cp-how p { color: var(--cp-mut); font-size: 14px; margin: 0; }
 html body.cp .cp-more { text-align: center; margin: 28px 0 0; }
 
 /* ---------- the product card: straight white card, cream photo frame, terracotta for the price only ---------- */
@@ -281,7 +276,6 @@ html body.cp .nn-footer-note { border-top-color: #2E3037; color: #B9BCC4; }
   html body.cp .cp-mood-v { min-height: 320px; order: -1; }
   html body.cp .cp-mood-t { padding: 28px 22px; }
   html body.cp .cp-mood-h { font-size: 34px !important; }
-  html body.cp .cp-how { grid-template-columns: 1fr; }
   html body.cp .cp-pinned .pc-card, html body.cp .cp-pinned .pc-card:hover { transform: none; }
   html body.cp .cp-h2 { font-size: 22px; }
   html body.cp .pc-grid { gap: 12px; }
@@ -495,3 +489,67 @@ html body.cp .ff-drawer h2, html body.cp .ff-drawer h2 button { color: #fff !imp
 html body.cp .detail-copy .option-group:first-of-type { margin-top: 4px; }
 /* measurements of a set come one piece per line */
 html body.cp .facts .fact { white-space: pre-line; }
+
+/* ---------- homepage intro (21 Oct): what we do, live price comparison, how it works, stores. Lighter cream page (#FAF6F0). ---------- */
+html body.cp .cp-intro { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, .95fr); gap: 56px; align-items: center; padding: 56px 0 8px; }
+html body.cp .cp-eyebrow { display: inline-flex; align-items: center; gap: 8px; margin: 0; font: 700 12px var(--cp-sans); letter-spacing: .06em; text-transform: uppercase; color: var(--cp-mut); }
+html body.cp .cp-eyebrow b { width: 7px; height: 7px; border-radius: 50%; background: #2E9E5B; }
+html body.cp .cp-ih { font: 800 clamp(36px, 4.4vw, 62px)/1.04 var(--cp-serif) !important; letter-spacing: -.015em; margin: 16px 0 18px; color: var(--cp-ink); }
+html body.cp .cp-ih em { font-style: normal; color: var(--cp-ac); }
+html body.cp .cp-isub { font-size: 17px; line-height: 1.55; color: var(--cp-mut); margin: 0 0 26px; max-width: 520px; }
+html body.cp .cp-isb { display: flex; align-items: center; gap: 10px; background: #fff; border: 1px solid var(--cp-bd); border-radius: 999px !important; padding: 7px 7px 7px 20px; max-width: 540px; box-shadow: 0 0 0 5px rgba(194, 49, 21, .07); color: var(--cp-mut); }
+html body.cp .cp-isb input { flex: 1; min-width: 0; border: 0 !important; background: transparent !important; box-shadow: none !important; font: 600 16px var(--cp-sans); color: var(--cp-ink); height: 40px; outline: none; padding: 0; }
+html body.cp .cp-isb button { background: var(--cp-ac); color: #fff; border: 0; font: 700 14px var(--cp-sans); padding: 0 26px; height: 42px; border-radius: 999px !important; cursor: pointer; }
+html body.cp .cp-ichips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+html body.cp .cp-ichips button { font: 600 13px var(--cp-sans); background: transparent; border: 1px solid var(--cp-bd); color: var(--cp-ink); padding: 7px 15px; border-radius: 999px !important; cursor: pointer; }
+html body.cp .cp-ichips button:hover { border-color: var(--cp-ink); }
+html body.cp .cp-ichips button[aria-pressed="true"] { background: var(--cp-ink); border-color: var(--cp-ink); color: #fff; }
+html body.cp .cp-cmp { background: #fff; border-radius: 20px !important; overflow: hidden; box-shadow: 0 30px 60px -32px rgba(18, 19, 22, .4); min-height: 120px; }
+html body.cp .cp-ch { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 18px 22px 14px; border-bottom: 1px solid #F0E8DA; }
+html body.cp .cp-ch b { font-size: 15px; } html body.cp .cp-ch span { font-size: 12px; color: var(--cp-mut); }
+html body.cp .cp-cr { display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 12px 22px; border-bottom: 1px solid #F6F0E4; color: inherit; text-decoration: none; opacity: 0; transform: translateY(8px); animation: cpIn .4s forwards; }
+html body.cp .cp-cr:hover { background: #FBF7EF; }
+@keyframes cpIn { to { opacity: 1; transform: none; } }
+html body.cp .cp-cph { width: 56px; height: 56px; border-radius: 10px !important; background: var(--cp-fr); overflow: hidden; display: block; }
+html body.cp .cp-cph img { width: 100%; height: 100%; object-fit: contain; display: block; }
+html body.cp .cp-cm { min-width: 0; display: block; }
+html body.cp .cp-cn { display: block; font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+html body.cp .cp-cs { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--cp-mut); margin-top: 2px; }
+html body.cp .cp-cs i { font: 700 10px var(--cp-sans); font-style: normal; letter-spacing: .04em; text-transform: uppercase; background: var(--cp-ac); color: #fff; border-radius: 4px !important; padding: 2px 6px; }
+html body.cp .cp-cb { display: block; height: 5px; border-radius: 3px !important; background: #F0E8DA; margin-top: 8px; position: relative; }
+html body.cp .cp-cb u { position: absolute; inset: 0 auto 0 0; border-radius: 3px !important; background: #CDBFA6; }
+html body.cp .cp-cr.best .cp-cb u { background: var(--cp-ac); }
+html body.cp .cp-cp { text-align: right; font-size: 16px; font-weight: 700; white-space: nowrap; }
+html body.cp .cp-cp small { display: block; font-size: 12px; font-weight: 600; color: var(--cp-mut); }
+html body.cp .cp-cr.best .cp-cp { color: var(--cp-ac); }
+html body.cp .cp-cf { margin: 0; padding: 12px 22px; background: #FBF7EF; font-size: 12px; color: var(--cp-mut); }
+/* how it works: three illustrated cards */
+html body.cp .cp-how { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; margin: 64px 0 0; }
+html body.cp .cp-how > div { position: relative; background: #fff; border: 1px solid #EFE6D6; border-radius: 22px !important; padding: 22px 22px 24px; }
+html body.cp .cp-hn { position: absolute; top: -14px; left: 20px; width: 30px; height: 30px; border-radius: 50% !important; background: var(--cp-ac); color: #fff; font: 800 14px var(--cp-sans); font-style: normal; display: grid; place-items: center; box-shadow: 0 0 0 5px var(--cp-bg); }
+html body.cp .cp-hv { position: relative; height: 128px; border-radius: 14px !important; background: var(--cp-bg); display: flex; align-items: center; justify-content: center; margin-bottom: 20px; overflow: hidden; }
+html body.cp .cp-how h3 { font: 700 19px/1.2 var(--cp-sans); margin: 0 0 6px; }
+html body.cp .cp-how p { color: var(--cp-mut); font-size: 14px; line-height: 1.55; margin: 0; }
+html body.cp .cp-pill { display: inline-flex; align-items: center; gap: 8px; background: #fff; border-radius: 999px !important; padding: 8px 14px; font: 600 12px var(--cp-sans); box-shadow: 0 6px 16px -8px rgba(18, 19, 22, .3); }
+html body.cp .cp-v1 em { position: absolute; font: 700 10px var(--cp-sans); font-style: normal; background: #fff; border: 1px solid var(--cp-bd); border-radius: 999px !important; padding: 3px 8px; }
+html body.cp .cp-v2 { flex-direction: column; justify-content: center; gap: 9px; padding: 0 14%; align-items: stretch; }
+html body.cp .cp-v2 > div { display: flex; align-items: center; gap: 8px; flex-direction: row-reverse; justify-content: flex-end; }
+html body.cp .cp-v2 u { height: 8px; border-radius: 4px !important; background: #D9CCB4; display: block; }
+html body.cp .cp-v2 u.lo { background: var(--cp-ac); }
+html body.cp .cp-v2 b { font: 700 10px var(--cp-sans); color: var(--cp-mut); width: 34px; }
+html body.cp .cp-v3 .cp-vc { background: #fff; border-radius: 12px !important; padding: 12px 14px; width: 74%; box-shadow: 0 8px 20px -10px rgba(18, 19, 22, .35); }
+html body.cp .cp-vc b { display: block; font-size: 13px; } html body.cp .cp-vc small { display: block; font-size: 11px; color: var(--cp-mut); margin-bottom: 10px; }
+html body.cp .cp-vc span { display: block; background: var(--cp-ac); color: #fff; font: 700 11px var(--cp-sans); text-align: center; border-radius: 999px !important; padding: 7px 0; }
+/* stores strip */
+html body.cp .cp-stores { margin: 72px 0 0; text-align: center; }
+html body.cp .cp-stores small { display: block; font: 700 12px var(--cp-sans); letter-spacing: .06em; text-transform: uppercase; color: var(--cp-mut); margin-bottom: 18px; }
+html body.cp .cp-sw { overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
+html body.cp .cp-smq { display: flex; gap: 12px; width: max-content; animation: cpMq 60s linear infinite; }
+html body.cp .cp-smq span { background: #fff; border: 1px solid #EFE6D6; border-radius: 999px !important; padding: 12px 24px; font: 700 15px var(--cp-sans); white-space: nowrap; }
+@keyframes cpMq { to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) { html body.cp .cp-smq { animation: none; } html body.cp .cp-cr { animation-duration: .01s; } }
+@media (max-width: 980px) {
+  html body.cp .cp-intro { grid-template-columns: 1fr; gap: 32px; padding-top: 32px; }
+  html body.cp .cp-how { grid-template-columns: 1fr; gap: 28px; }
+}
+@media (max-width: 560px) { html body.cp .cp-ih { font-size: 34px !important; } html body.cp .cp-isub { font-size: 15px; } html body.cp .cp-isb button { padding: 0 18px; } }

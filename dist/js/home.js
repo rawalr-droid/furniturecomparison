@@ -7,55 +7,55 @@
   const num = n => Number(n).toLocaleString('en-AE');
   const off = d => (d.orig > d.price ? Math.round((d.orig - d.price) / d.orig * 100) : 0);
 
-  // ------------------------------------------------------------------ hero: ribbon, shortcut pills
-  const PILLS = [['Sofas', 'furniture/sofas-seating/sofas', 'Living Room'], ['Beds', 'furniture/bedroom/beds', 'Bedroom'],
-    ['Dining tables', 'furniture/dining-room/dining-tables', 'Dining Room'], ['Coffee tables', 'furniture/living-room/coffee-tables', 'Living Room'],
-    ['Armchairs', 'furniture/sofas-seating/armchairs-accent-chairs', 'Living Room'], ['Wardrobes', 'furniture/bedroom/wardrobes', 'Bedroom']];
+  // ------------------------------------------------------------------ intro: eyebrow, store strip, live price comparison
   let storeCount = 0;
   FF.loadMeta().then(m => {
-    storeCount = m.stores.filter(s => s.c > 0).length;                // only stores that have products on the site
-    $('heroRibbon').textContent = `${num(m.total)} products`;
-    $('heroPills').innerHTML = '<a href="browse.html">All</a>' + PILLS.filter(p => FF.node(p[1]).l3)
-      .map(([t, c, room]) => `<a href="browse.html?c=${enc(c)}&amp;room=${enc(room)}">${esc(t)}</a>`).join('');
+    const live = m.stores.filter(s => s.c > 0);                       // only stores that have products on the site
+    storeCount = live.length;
+    $('introEy').textContent = `${storeCount} UAE home stores, one place`;
+    const names = live.slice().sort((a, b) => b.c - a.c).map(s => `<span>${esc(s.n)}</span>`).join('');
+    $('storeMq').innerHTML = names + names;                           // twice, so the strip loops without a gap
     moodCopy();
   }).catch(() => {});
 
-  // ------------------------------------------------------------------ hero: the Japandi room's real products as numbered dots
-  // The photo fills the hero (object-fit: cover), so a dot's place is worked out from the photo's own size and the crop.
-  const heroImg = $('heroImg'), dotsEl = $('heroDots');
-  function placeDots() {
-    const W = heroImg.clientWidth, H = heroImg.clientHeight, w = heroImg.naturalWidth, h = heroImg.naturalHeight;
-    if (!W || !w) return;
-    const s = Math.max(W / w, H / h), pos = getComputedStyle(heroImg).objectPosition.split(' ').map(v => parseFloat(v) / 100);
-    const x0 = (W - w * s) * (isNaN(pos[0]) ? .5 : pos[0]), y0 = (H - h * s) * (isNaN(pos[1]) ? .5 : pos[1]);
-    const box = heroImg.getBoundingClientRect();                      // the headline, line and button: a dot never sits on top of them
-    const words = [...document.querySelectorAll('#hero .cp-hero-in > *')].map(e => e.getBoundingClientRect()).filter(r => r.width);
-    dotsEl.querySelectorAll('.cp-dot').forEach(d => {
-      const x = x0 + d.dataset.x / 100 * w * s, y = y0 + d.dataset.y / 100 * h * s;
-      d.style.left = x + 'px'; d.style.top = y + 'px';
-      d.hidden = x < 16 || x > W - 16 || y < 56 || y > H - 70        // off the visible part of the photo, or under the ribbon / pills
-        || words.some(r => x + box.left > r.left - 18 && x + box.left < r.right + 18 && y + box.top > r.top - 18 && y + box.top < r.bottom + 18);
-      d.classList.toggle('left', x > W * .7); d.classList.toggle('below', y < H * .5);
-    });
+  // Each chip compares one kind of piece: the lowest price at each store, from the published category files (real products, in stock).
+  const CMP = [
+    { t: 'Sofa', title: '3-seater sofa', shard: 'furniture--sofas-seating', yes: /\b(3|three)[ -]?seat(er|s)?\b/i, no: /cover|throw|cushion|pillow|slipcover|leg|bed\b/i },
+    { t: 'Dining table', title: 'dining table', shard: 'furniture--dining-room', yes: /dining table/i, no: /chair|bench|set of|with \d? ?chairs|cover|runner|mat\b/i },
+    { t: 'Rug', title: 'rug', shard: 'rugs-carpets--rugs', yes: /\brug\b/i, no: /pad|gripper|underlay|cleaner/i },
+    { t: 'Bed frame', title: 'bed', shard: 'furniture--bedroom', yes: /\bbed( frame)?\b/i, no: /bedside|side ?table|linen|sheet|bench|mattress|cover|cushion|pillow|set\b|runner|lamp/i }
+  ];
+  const cmpEl = $('cmp'), chipEl = $('introChips');
+  const cache = {};
+  chipEl.innerHTML = CMP.map((c, i) => `<button type="button" data-i="${i}" aria-pressed="false">${esc(c.t)}</button>`).join('');
+  function rowsFor(c) {
+    return cache[c.shard] || (cache[c.shard] = FF.loadMeta().then(() => FF.loadShard(c.shard)).then(raw => {
+      const all = raw.filter(r => r.price > 0 && !r.out && r.img && c.yes.test(r.name) && !c.no.test(r.name));
+      const sorted = all.map(r => r.price).sort((a, b) => a - b), floor = (sorted[Math.floor(sorted.length / 2)] || 0) * 0.3;   // drop accessories priced far below the typical piece
+      const best = new Map();
+      all.filter(r => r.price >= floor).forEach(r => { const o = best.get(r.s); if (!o || r.price < o.price) best.set(r.s, r); });
+      return [...best.values()].sort((a, b) => a.price - b.price).slice(0, 5);
+    }));
   }
-  FF.fetchJSON('data/boards/japandi.json').then(b => {
-    const shown = (b.anchors || []).filter(a => a.inStock);
-    dotsEl.innerHTML = shown.map((a, i) => `<div class="cp-dot" data-x="${a.x}" data-y="${a.y}">
-      <button type="button" aria-label="${esc(a.name)} from ${esc(a.store)}, ${money(a.price)}">${i + 1}</button>
-      <div class="cp-pop"><img referrerpolicy="no-referrer" loading="lazy" src="${esc(FF.fixImg(a.img))}" alt="" onerror="this.remove()">
-        <strong>${esc(FF.cleanName(a.name))}</strong><span>${esc(a.store)} · ${esc(a.l3)}</span>
-        <span class="cp-pp">${money(a.price)}${off(a) ? ` <s>${money(a.orig)}</s>` : ''}</span>
-        <span class="cp-pl2"><a href="product.html?id=${enc(a.id)}">Details</a>${a.url ? `<a data-store="${esc(a.store)}" data-pid="${esc(a.id)}" href="${esc(a.url)}" target="_blank" rel="noopener nofollow sponsored">View at ${esc(a.store)} ↗</a>` : ''}</span></div></div>`).join('');
-    const tot = $('heroTotal');
-    tot.innerHTML = `${esc(b.name)} living room · <b>${money(b.total)}</b> · ${shown.length} pieces`; tot.hidden = false;
-    if (heroImg.complete) placeDots(); else heroImg.addEventListener('load', placeDots);
-    window.addEventListener('resize', placeDots);
-  }).catch(() => {});
-  document.addEventListener('click', e => {                           // a tap opens one dot's card and closes the others
-    const b = e.target.closest('.cp-dot > button');
-    document.querySelectorAll('.cp-dot.open').forEach(d => { if (!b || d !== b.parentElement) d.classList.remove('open'); });
-    if (b) b.parentElement.classList.toggle('open');
-  });
+  let token = 0;
+  function showCmp(i) {
+    const c = CMP[i], mine = ++token;
+    [...chipEl.children].forEach((b, k) => b.setAttribute('aria-pressed', k === i));
+    rowsFor(c).then(rows => {
+      if (mine !== token) return;
+      if (rows.length < 2) { cmpEl.innerHTML = ''; return; }
+      const min = rows[0].price, max = rows[rows.length - 1].price;
+      cmpEl.innerHTML = `<div class="cp-ch"><b>Lowest price at each store: ${esc(c.title)}</b><span>${rows.length} stores · ${money(min)} to ${money(max)}</span></div>` + rows.map((r, k) => {
+        const w = Math.round(30 + 70 * (r.price - min) / (max - min || 1));
+        return `<a class="cp-cr${k ? '' : ' best'}" href="product.html?id=${enc(r.id)}" style="animation-delay:${k * 70}ms">
+          <span class="cp-cph"><img referrerpolicy="no-referrer" loading="lazy" src="${esc(r.img)}" alt="" onerror="this.remove()"></span>
+          <span class="cp-cm"><span class="cp-cn">${esc(r.name)}</span><span class="cp-cs">${esc(r.store)}${k ? '' : ' <i>Lowest</i>'}</span><span class="cp-cb"><u style="width:${w}%"></u></span></span>
+          <span class="cp-cp">${money(r.price)}${k && r.price - min >= 1 ? `<small>+${money(r.price - min)}</small>` : ''}</span></a>`;
+      }).join('') + '<p class="cp-cf">Prices come from each store\'s website and can change.</p>';
+    }).catch(() => { if (mine === token) cmpEl.innerHTML = ''; });
+  }
+  chipEl.addEventListener('click', e => { const b = e.target.closest('button'); if (b) showCmp(Number(b.dataset.i)); });
+  showCmp(0);
 
   // ------------------------------------------------------------------ Shop by room: 8 photo cards (photos chosen in js/home-tiles.js)
   const ROOMS = ['Living Room', 'Bedroom', 'Dining Room', 'Home Office', 'Kids Room', 'Kitchen', 'Bathroom', 'Outdoor'];
