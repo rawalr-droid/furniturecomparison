@@ -1,13 +1,13 @@
 /* ==========================================================================
    couchpotato.ae (brand book CouchPotato_Brand_Guidelines.md, owner-approved 2026-10-09). Loaded LAST on every page, after theme2.css.
    Cream + charcoal base, terracotta for money only, logo orange for the wordmark only, Fraunces for the logo and titles,
-   Plus Jakarta Sans for everything else (prices too), one Caveat line under a title.
+   Plus Jakarta Sans for everything else (prices too), one quiet sans line under a title.
    A skin over the existing layers: every rule starts "html body.cp" so it wins over nordic.css / theme2.css without touching them.
    Rollback: bash agents/rollback_couchpotato.sh
    ========================================================================== */
 :root {
   --cp-bg: #F4EDE0; --cp-surface: #FFFFFF; --cp-ink: #121316; --cp-mut: #6C707A; --cp-bd: #E0D5C0; --cp-fr: #F6F2EA; --cp-ac: #C23115; --cp-logo: #EE5A0B;
-  --cp-serif: "Fraunces", Georgia, serif; --cp-sans: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif; --cp-hand: "Caveat", cursive;
+  --cp-serif: "Fraunces", Georgia, serif; --cp-sans: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   /* the Theme v2 tokens, re-pointed so every rule that reads them takes the new palette */
   --cran: var(--cp-ink); --beige: var(--cp-bg); --plum: var(--cp-ink); --taupe: var(--cp-mut); --ivory: var(--cp-surface);
   --hair: var(--cp-bd); --r: 8px;
@@ -29,7 +29,7 @@ html body.cp ::selection { background: var(--cp-ink); color: #fff; }
 html body.cp :is(.pc-card, .t2-tile, .wish-pop, .compare-dialog, .empty-state, .product-detail, .detail-media, .detail-gallery img, .wish-empty, .ff-panel, .ff-ac) { border-radius: 8px !important; }
 html body.cp :is(.nn-search, .nn-search input, .ff-s input, .ff-s) { border-radius: 6px !important; }
 html body.cp .cp-w { max-width: 1240px; margin: 0 auto; padding: 0 24px; }
-html body.cp .cp-hand { font: 700 20px/1.2 var(--cp-hand) !important; color: var(--cp-mut); margin: 2px 0 18px; }
+html body.cp .cp-note { font: 600 15px/1.4 var(--cp-sans) !important; color: var(--cp-mut); margin: 2px 0 18px; }
 html body.cp .cp-h2 { font-size: 26px; line-height: 1.2; margin: 0 0 2px; }
 html body.cp .cp-sec { margin-top: 56px; }
 html body.cp .cp-btn { display: inline-block; width: fit-content; background: var(--cp-ac); color: #fff !important; font: 600 14px var(--cp-sans); padding: 13px 22px; border: 0;
@@ -144,7 +144,7 @@ html body.cp .cp-mood-t { padding: 52px 48px; display: flex; flex-direction: col
 html body.cp .cp-ey { font: 700 11px var(--cp-sans); letter-spacing: .12em; text-transform: uppercase; }
 html body.cp .cp-mood-h { font: 700 clamp(34px, 3.6vw, 48px)/1.1 var(--cp-serif) !important; letter-spacing: -.02em; margin: 0; }
 html body.cp .cp-mood-t p { font-size: 15px; max-width: 420px; margin: 0; }
-html body.cp .cp-mood-t .cp-hand { margin: 0; }
+html body.cp .cp-mood-t .cp-note { margin: 0; }
 html body.cp .cp-mchips { display: flex; flex-wrap: wrap; gap: 8px; margin: 2px 0 8px; }
 html body.cp .cp-mchip { display: inline-flex; align-items: center; gap: 7px; border: 1px solid; border-radius: 99px !important; padding: 8px 14px; font: 600 13px var(--cp-sans); cursor: pointer; min-height: 40px; }
 html body.cp .cp-mchip i { width: 11px; height: 11px; border-radius: 50% !important; border: 1px solid rgba(0, 0, 0, .25); }
@@ -306,7 +306,7 @@ html body.cp .detail-price { display: flex; align-items: baseline; gap: 10px; co
 html body.cp .detail-price.on-sale { color: var(--cp-ac) !important; }
 html body.cp .detail-price .was-price { color: var(--cp-mut) !important; font: 400 14px var(--cp-sans) !important; text-decoration: line-through; }
 html body.cp .detail-price .pc-off { margin-left: 0; font-size: 12px; align-self: center; }
-html body.cp .detail-copy .cp-hand { margin: 2px 0 14px; }
+html body.cp .detail-copy .cp-note { margin: 2px 0 14px; }
 html body.cp .retailer-link { background: var(--cp-ac) !important; color: #fff !important; border: 0 !important; border-radius: 6px !important; font: 600 15px var(--cp-sans) !important; }
 html body.cp .retailer-link:hover { background: #A62911 !important; }
 html body.cp .wish-save { background: #fff !important; border: 1px solid var(--cp-bd) !important; color: var(--cp-ink) !important; border-radius: 6px !important; font: 600 14px var(--cp-sans) !important; }
@@ -335,7 +335,7 @@ html body.cp .t2-tl b { font-family: var(--cp-sans) !important; font-weight: 700
 html body.cp .t2-tl > span { background: #fff !important; color: var(--cp-ink) !important; border-radius: 99px !important; font: 600 13px var(--cp-sans) !important; }
 
 /* small fixes after the first full pass */
-html body.cp .cp-hand, html body.cp p.cp-hand { text-transform: none !important; letter-spacing: 0 !important; }
+html body.cp .cp-note, html body.cp p.cp-note { text-transform: none !important; letter-spacing: 0 !important; }
 html body.cp .product-detail { border-radius: 8px !important; }
 html body.cp :is(.wish-empty .btn-dark, .wish-empty .nn-btn, .wish-empty a.cta, .empty .nn-btn, #emptyReset, .empty-state button) { background: var(--cp-ac) !important; color: #fff !important; border: 0 !important; border-radius: 99px !important; }
 html body.cp .wish-eyebrow, html body.cp .nn-eyebrow { color: var(--cp-mut) !important; font: 700 11px var(--cp-sans) !important; letter-spacing: .12em; }
@@ -419,10 +419,10 @@ html body.cp h1#resultCount { margin: 0; }
 /* ---------- product page: "See more items" under the similar pieces ---------- */
 html body.cp .cp-sim-more { display: grid; justify-items: center; gap: 10px; margin: 28px 0 8px; }
 html body.cp .cp-sim-more .load-more { margin: 0; }
-html body.cp .cp-sim-more .cp-hand { margin: 0; font-size: 22px; text-align: center; color: var(--cp-ink); text-transform: none !important; }
-html body.cp .cp-sim-more .cp-hand a { color: var(--cp-ac); font: 600 15px var(--cp-sans); margin-left: 6px; white-space: nowrap; }
+html body.cp .cp-sim-more .cp-note { margin: 0; font-size: 15px; text-align: center; color: var(--cp-ink); text-transform: none !important; }
+html body.cp .cp-sim-more .cp-note a { color: var(--cp-ac); font: 600 15px var(--cp-sans); margin-left: 6px; white-space: nowrap; }
 html body.cp .similar-cards .cp-sim-break { grid-column: 1 / -1; list-style: none; text-align: center; padding: 18px 12px; border-top: 1px dashed var(--cp-bd); border-bottom: 1px dashed var(--cp-bd); margin: 6px 0; }
-html body.cp .similar-cards .cp-sim-break .cp-hand { font-size: 22px; color: var(--cp-ink); text-transform: none !important; }
+html body.cp .similar-cards .cp-sim-break .cp-note { font-size: 15px; color: var(--cp-ink); text-transform: none !important; }
 html body.cp .cp-sim-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px 24px; flex-wrap: wrap; margin-bottom: 18px; }
 html body.cp .cp-sim-head h3 { margin: 0 0 6px; }
 html body.cp .cp-sim-head p { margin: 0; }

@@ -1,5 +1,7 @@
 # PLAYBOOK_UI: couchpotato.ae front end (written 2026-10-17)
 
+**Standing rule (owner, 2026-10-21): for ANY request in this chat, first invoke the `frontend-design` skill (Skill tool) and apply it. Brand rules in section 2 win on conflict.**
+
 ## 1. Source of truth
 - LIVE = `final-website/dist/` (Render static site, publish dir `dist`, no build step; `render.yaml`). Repo is pushed by the agents, not by hand.
 - WORKING COPY for big UI changes = `couchpotato_build/dist/` (its `data` is a symlink to live data: never write data through it). As of 16 Oct the pages match in size; diffs are the nightly-generated `c/` pages and data stamps.
@@ -11,7 +13,7 @@
 ## 2. Design rules (CouchPotato_Brand_Guidelines.md, repo root)
 - Name: wordmark `couchpotato` (Fraunces 800, #EE5A0B) + `.ae` (#121316), lowercase; logo orange ONLY for the wordmark.
 - Base: cream #F4EDE0 bg, white surfaces, ink #121316, muted #6C707A; one terracotta accent for money; mood colours only in Shop-by-mood.
-- Type: Fraunces only for logo, page title, section titles. Plus Jakarta Sans for everything else (all prices/numbers sans). Caveat for one handwriting line per page. `font-display: swap`.
+- Type: Fraunces only for logo, page title, section titles. Plus Jakarta Sans for everything else (all prices/numbers sans). No handwriting font (Caveat removed 21 Oct); small captions use `.cp-note` (Plus Jakarta Sans). No timing phrases ("last night", "tonight", "nightly", "at last check") in user-facing text; sold-out reads "Out of Stock". `font-display: swap`.
 - Photos always in a cream frame; non-square photos get a blurred backdrop (`.pc-media.has-bars::before`, theme2.css).
 - Decoration only on the homepage; product grid stays calm. Never imply data we do not have (brand book s.10). Header full width, 88px (72 phone).
 - Check every change at 1440, 1024, 768, 390px with console and network clean.

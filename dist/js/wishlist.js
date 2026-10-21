@@ -22,7 +22,7 @@
     const rooms = FF.ROOMS.filter(r => w.rooms[r].length);
     const total = FF.wish.count();
     $('wishSummary').textContent = total
-      ? `${total} product${total > 1 ? 's' : ''} across ${rooms.length} room${rooms.length > 1 ? 's' : ''}. Prices update every night.`
+      ? `${total} product${total > 1 ? 's' : ''} across ${rooms.length} room${rooms.length > 1 ? 's' : ''}.`
       : 'Nothing saved yet. Tap the ♡ on any product and pick a room.';
     const tabs = ['All rooms', ...FF.ROOMS];
     if (!tabs.includes(active)) active = 'All rooms';
@@ -48,7 +48,7 @@
         sum += c.price; was += c.orig > c.price ? c.orig : c.price;
         const html = FF.pcCard({ id: it.id, name: c.name, store: c.store, img: c.img, price: c.price, orig: c.orig, size: it.size, colours: it.colours, room, out: c.out });
         const drop = it.price && c.price < it.price ? `<p class="wish-drop">↓ ${money(it.price - c.price)} since you saved it</p>` : '';
-        const out = c.out ? '<p class="wish-drop wish-out">Out of stock at last check</p>' : '';
+        const out = c.out ? '<p class="wish-drop wish-out">Out of Stock</p>' : '';
         return html.replace('</div>\n    </li>', `${drop}${out}</div>\n    </li>`);
       }).join('');
       const save = was > sum ? ` · you'd save ${money(was - sum)}` : '';

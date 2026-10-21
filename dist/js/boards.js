@@ -47,7 +47,7 @@
       <div class="mb-copy"><p class="mb-eyebrow">Mood board</p><h1>${esc(board.name)}</h1><p class="mb-line">${esc(board.line)}</p>
         ${board.about ? `<p class="mb-about">${esc(board.about)}</p>` : ''}
         <p class="mb-total">The whole look: <strong>${money(board.total)}</strong> · ${shown.length} pieces</p>
-        <p class="mb-note">Hover or tap the dots for tonight's price. Room image is an illustration; products shown as sold.</p>
+        <p class="mb-note">Hover or tap the dots for the price. Room image is an illustration; products shown as sold.</p>
         <a class="t2-pill" href="#mbFeed">Shop this style ↓</a></div>`;
     els.look.innerHTML = shown.map(card).join('');
     $('mbFeedTitle').textContent = `More ${board.name} pieces`;

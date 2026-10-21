@@ -15,7 +15,7 @@
   <meta name="application-name" content="couchpotato.ae" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800&family=Plus+Jakarta+Sans:wght@400;600;700&family=Caveat:wght@700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
   <link rel="icon" href="/favicon.ico" sizes="48x48" />
   <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png" />
   <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png" />
@@ -27,7 +27,7 @@
   <link rel="stylesheet" href="banner.css?v=20260927" />
   <link rel="stylesheet" href="nordic.css?v=20261004f2" />
   <link rel="stylesheet" href="theme2.css?v=20261008n1" />
-  <link rel="stylesheet" href="couchpotato.css?v=20261012a1" />
+  <link rel="stylesheet" href="couchpotato.css?v=20261021a1" />
   <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","name":"couchpotato.ae","alternateName":"couchpotato","url":"https://www.couchpotato.ae/"},{"@type":"Organization","name":"couchpotato.ae","url":"https://www.couchpotato.ae/","logo":"https://www.couchpotato.ae/favicon-192.png","email":"hello@couchpotato.ae"}]}</script>
 </head>
 <body class="t2 t2-home cp">
@@ -44,16 +44,16 @@
       <div class="nn-actions"><a class="nn-heart" href="wishlist.html" aria-label="Wishlist"><span class="cp-wl">Wishlist</span><svg viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg><span class="nn-bubble" data-wish-count></span></a></div>
     </div>
   </header>
-  <a class="nn-promo" id="promoBar" href="browse.html?deals=1">Tonight's biggest drops ›</a>
+  <a class="nn-promo" id="promoBar" href="browse.html?deals=1">Biggest price drops ›</a>
 
   <main>
     <section class="cp-hero" id="hero" aria-label="A Japandi living room made of real products">
       <h1 class="visually-hidden">couchpotato.ae: top UAE home stores, one search</h1>
       <img class="cp-hero-img" id="heroImg" src="scenes/living_japandi_photo.jpg" alt="Japandi living room" width="1672" height="941">
-      <p class="cp-rib" id="heroRibbon">Prices checked every night</p>
+      <p class="cp-rib" id="heroRibbon"></p>
       <div class="cp-hero-in">
         <p class="cp-hero-h" aria-hidden="true">Top UAE home stores. One search.</p>
-        <p class="cp-hero-p">Every piece in this room is a real product from a UAE store. Tap the dots for tonight's price.</p>
+        <p class="cp-hero-p">Every piece in this room is a real product from a UAE store. Tap the dots for the price.</p>
         <a class="cp-btn" href="board.html?b=japandi">Shop this room &nbsp;→</a>
       </div>
       <div class="cp-dots" id="heroDots"></div>
@@ -64,7 +64,6 @@
     <div class="cp-w">
       <section class="cp-sec" id="rooms">
         <h2 class="cp-h2">Shop by room</h2>
-        <p class="cp-hand">start with the room you're fixing up</p>
         <div class="cp-rooms" id="roomRow"></div>
       </section>
 
@@ -72,8 +71,7 @@
         <div class="cp-mood-t">
           <span class="cp-ey">Shop by mood</span>
           <h2 class="cp-mood-h">Find your style, then make it yours.</h2>
-          <p id="moodCopy">We've pulled together the most-loved home styles from UAE stores. Pick the one that feels like you. Every piece is real and priced tonight.</p>
-          <p class="cp-hand">tap a mood to peek inside</p>
+          <p id="moodCopy">We've pulled together the most-loved home styles from UAE stores. Pick the one that feels like you. Every piece is real and priced.</p>
           <div class="cp-mchips" id="moodChips" role="group" aria-label="Moods"></div>
           <a class="cp-bigbtn" href="moodboards.html">Explore all moods &nbsp;→</a>
         </div>
@@ -85,7 +83,6 @@
 
       <section class="cp-sec" id="deals">
         <h2 class="cp-h2">Top deals</h2>
-        <p class="cp-hand">real price cuts from UAE stores</p>
         <div class="t2-chips" id="dealChips" aria-label="Filter the deals" hidden></div>
         <ul class="pc-grid cp-pinned" id="dealGrid"></ul>
         <div class="empty" id="empty" hidden><p>Deals are being refreshed. Try the full catalogue while we update them.</p><a class="nn-btn" href="browse.html">Browse all products</a></div>
@@ -94,7 +91,7 @@
 
       <section class="cp-how" id="how">
         <div><span>1</span><h3>Search the top stores at once</h3><p>Skip the tab-hopping. UAE home and furniture stores, side by side.</p></div>
-        <div><span>2</span><h3>Compare the details</h3><p>Prices, sizes, colours and the store's own offers, checked every night.</p></div>
+        <div><span>2</span><h3>Compare the details</h3><p>Prices, sizes, colours and the store's own offers.</p></div>
         <div><span>3</span><h3>Buy from the retailer</h3><p>We send you straight to the store to finish the purchase.</p></div>
       </section>
     </div>
@@ -102,7 +99,7 @@
 
   <footer class="nn-footer">
     <div class="nn-footer-cols">
-      <div><a class="nn-logo cp-logo" href="index.html">couchpotato<i>.ae</i></a><p>One search. Top UAE home stores. Prices refreshed nightly.</p></div>
+      <div><a class="nn-logo cp-logo" href="index.html">couchpotato<i>.ae</i></a><p>One search. Top UAE home stores.</p></div>
       <div><h4>Shop</h4><div id="footerShop"><a href="/c/furniture/">Furniture</a><a href="/c/home-decor/">Home Decor</a><a href="/c/lighting/">Lighting</a><a href="/c/rugs-carpets/">Rugs &amp; Carpets</a><a href="/c/soft-furnishings/">Soft Furnishings</a><a href="/c/bed-bath/">Bed &amp; Bath</a><a href="/c/kitchen-dining/">Kitchen &amp; Dining</a><a href="/c/storage-organisation/">Storage &amp; Organisation</a><a href="/c/outdoor-garden/">Outdoor &amp; Garden</a></div></div>
       <div><h4>Rooms</h4><a href="/room/living-room/">Living Room</a><a href="/room/bedroom/">Bedroom</a><a href="/room/dining-room/">Dining Room</a><a href="/room/home-office/">Home Office</a><a href="/room/kids-room/">Kids Room</a><a href="/room/entryway/">Entryway</a><a href="/room/bathroom/">Bathroom</a><a href="/room/kitchen/">Kitchen</a><a href="/room/outdoor/">Outdoor</a></div>
       <div><h4>About</h4><a href="index.html#how">How it works</a><a href="browse.html">All products</a><a href="moodboards.html">Mood boards</a><a href="wishlist.html">Wishlist</a></div>
@@ -111,7 +108,7 @@
   </footer>
   <script src="js/home-tiles.js?v=20261012a1"></script>
   <script src="js/db-config.js?v=20261004t1"></script>
-  <script src="js/common.js?v=20261019a1" data-v="20261006f"></script>
-  <script src="js/home.js?v=20261012a1"></script>
+  <script src="js/common.js?v=20261021a1" data-v="20261006f"></script>
+  <script src="js/home.js?v=20261021a1"></script>
 </body>
 </html>

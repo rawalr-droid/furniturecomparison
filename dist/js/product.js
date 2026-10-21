@@ -109,7 +109,7 @@
       const pickers = group('Size', sizes, v && v.z, 'size', z => minP(inSize(z)), z => soldOut(inSize(z)))
         + group('Colour', colours, v && v.k, 'colour', k => minP(inColour(k)), k => soldOut(inColour(k)));
       const chips = variants.map((x, i) => `<button class="variant-chip ${i === current ? 'active' : ''} ${x.n === 0 ? 'sold-out' : ''}" data-variant-index="${i}" type="button">${esc(x.t)}${x.n === 0 ? '<small>Sold out</small>' : x.p ? `<small>${money(x.p)}</small>` : ''}</button>`).join('');
-      const gone = d.t === 0 ? 'Out of stock at the last check' : v && v.n === 0 ? 'This option was sold out at the last check' : '';
+      const gone = d.t === 0 ? 'Out of Stock' : v && v.n === 0 ? 'This option is out of stock' : '';
       const actions = `<div class="detail-actions"><a class="retailer-link" data-store="${esc(store)}" data-pid="${esc(id)}" href="${esc(FF.retailerURL(d.u, v && v.x))}" target="_blank" rel="noopener sponsored">${gone ? 'Check' : 'View'} ${variants.length ? 'this option' : 'product'} at ${esc(store)} ↗</a>
           <button class="wish-save" type="button" data-wish="${esc(id)}" aria-pressed="${FF.wishlist().has(id)}">♡ Save to a room</button></div>`;
       root.innerHTML = `<div class="product-detail">
@@ -156,7 +156,7 @@
           <label class="cp-sim-sort"><span>Sort by</span><select id="simSort"><option value="similar">Most similar</option><option value="low">Price: low to high</option>
             <option value="high">Price: high to low</option><option value="disc">Biggest discount</option></select></label></div>
         <ul class="pc-grid similar-cards" id="simGrid">${sim.map(FF.pcCard).join('')}</ul>
-        <div class="cp-sim-more"><button type="button" class="load-more" id="simMore">See more items</button><p class="cp-hand" id="simEnd" hidden></p></div>`;
+        <div class="cp-sim-more"><button type="button" class="load-more" id="simMore">See more items</button><p class="cp-note" id="simEnd" hidden></p></div>`;
       if (!sim.length) similarHTML = '<h3>Similar pieces across stores</h3><p>No close matches found yet.</p>';
       $('similarWrap').innerHTML = similarHTML;
 
@@ -195,7 +195,7 @@
       function draw() {
         const mode = sortBy.value, rows = (ORDER[mode] ? list.slice().sort(ORDER[mode]) : list).slice(0, visible);
         let html = rows.map(FF.pcCard);
-        if (mode === 'similar' && rows.length > 48) html.splice(48, 0, '<li class="cp-sim-break"><span class="cp-hand">Still looking? Respect. We are now checking behind the sofa cushions, so from here the matches get a little looser.</span></li>');
+        if (mode === 'similar' && rows.length > 48) html.splice(48, 0, '<li class="cp-sim-break"><span class="cp-note">Closest matches end here. The items below are looser matches.</span></li>');
         grid.innerHTML = html.join('');
         $('simCount').textContent = rows.length <= sim.length && mode === 'similar' ? `${sim.length} pieces with a similar look, size and price.`
           : mode === 'similar' ? `Showing ${rows.length} pieces. The first ${sim.length} are the closest matches.` : `Showing ${rows.length} similar pieces, sorted your way.`;

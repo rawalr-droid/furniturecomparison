@@ -303,13 +303,13 @@
       const stores = m.stores.filter(s => s.c > 0).length, total = Math.floor(m.total / 1000) * 1000;
       if (shop) shop.innerHTML = m.tree.map(l1 => `<a href="/c/${FF.esc(l1.s)}/">${FF.esc(l1.n)}</a>`).join('');
       if (!util || util.dataset.static) return;
-      const msgs = ['One search across UAE home stores', `${total.toLocaleString()}+ products, prices refreshed nightly`, 'Buy direct from the retailer'];
+      const msgs = ['One search across UAE home stores', `${total.toLocaleString()}+ products from UAE home stores`, 'Buy direct from the retailer'];
       let i = 0; util.textContent = msgs[0];
       if (!matchMedia('(prefers-reduced-motion: reduce)').matches) setInterval(() => { i = (i + 1) % msgs.length; util.textContent = msgs[i]; }, 6000);
     }).catch(() => {});
     if (promo) FF.fetchJSON('data/home.json').then(h => {       // deals already skip discounts above 80% (inflated was-prices)
       const max = Math.max(0, ...(h.deals || []).map(d => d.o > d.p ? Math.round((d.o - d.p) / d.o * 100) : 0));
-      promo.textContent = max ? `Tonight's biggest drops, up to ${max}% off ›` : "Tonight's deals ›";
+      promo.textContent = max ? `Biggest price drops, up to ${max}% off ›` : "Latest deals ›";
     }).catch(() => {});
   };
 
