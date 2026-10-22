@@ -11,10 +11,10 @@
 - Cache busting: every page links assets as `file?v=<tag>`; bump the tag in ALL pages (index, browse, product, wishlist, board, moodboards) whenever a css/js file changes.
 
 ## 2. Design rules (CouchPotato_Brand_Guidelines.md, repo root)
-- Name: wordmark `couchpotato` (Fraunces 800, #EE5A0B) + `.ae` (#121316), lowercase; logo orange ONLY for the wordmark.
-- Base: cream #FAF6F0 bg (lightened 21 Oct from #F4EDE0), white surfaces, ink #121316, muted #6C707A; one terracotta accent for money; mood colours only in Shop-by-mood.
-- Type: Fraunces only for logo, page title, section titles. Plus Jakarta Sans for everything else (all prices/numbers sans). No handwriting font (Caveat removed 21 Oct); small captions use `.cp-note` (Plus Jakarta Sans). No timing phrases ("last night", "tonight", "nightly", "at last check") in user-facing text; sold-out reads "Out of Stock". `font-display: swap`.
-- Photos always in a cream frame; non-square photos get a blurred backdrop (`.pc-media.has-bars::before`, theme2.css).
+- Name: wordmark `COUCHPOTATO` + small `.AE` below, uppercase, tracked, ink (#111) (orange/Fraunces wordmark retired 22 Oct 2026).
+- Base (E look, 22 Oct 2026): white page, soft grey #F4F4F2 tiles/frames, rules #E6E6E6, ink #111, muted #6B6B6B; accent #C23115 for money/sale only; primary buttons ink, sharp corners (2px); black price-cuts bar under the header; light footer. Plan: agents/state/plans/homepage_redesign_E_D_PLAN.md.
+- Type: Inter Tight only (300 for big display lines, 500 for titles, 400-600 UI; prices sans). No serif, no handwriting font. `.cp-note` for small captions. No timing phrases ("last night", "tonight", "nightly", "at last check"); sold-out reads "Out of Stock".
+- Photos always in a soft grey frame; non-square photos get a blurred backdrop (`.pc-media.has-bars::before`, theme2.css).
 - Decoration only on the homepage; product grid stays calm. Never imply data we do not have (brand book s.10). Header full width, 88px (72 phone).
 - Check every change at 1440, 1024, 768, 390px with console and network clean.
 - DO NOT RENAME (breaks saved data/scripts): localStorage `ff-wishlist-rooms`/`ff-wishlist`, `FF.` namespace, `ff_agents`, `ffb` classes and `<!-- ffb:start/end -->` markers, data file names, rollback scripts.
@@ -49,6 +49,9 @@
 - Supabase (Mumbai) mirror via `db_sync.py` (nightly). Browse, search and product pages read DB functions (`browse_cards`/`browse_v2`, `browse_facets`, `cards_by_ids`, `product_detail`) through `FF.db` (6 s timeout, 1 retry); on failure they fall back to the `data/` files. Homepage and wishlist read files (+ `cards_by_ids`).
 - Any new filter/feature must work in BOTH paths; SQL lives in `agents/ff_agents/db_api.sql` (install: `python3 -m ff_agents.db_sync api`). DB near free limit (~453/500 MB): new `cards` columns need trimming or Pro.
 - Accounts: Supabase Auth Google + table `wishlists` (RLS, own row only); vendored `js/vendor/supabase-2.117.3.js`. Never print `agents/.env` values.
+
+## 7b. Homepage (22 Oct 2026)
+- Order: room hero (js/home.js: board scenes data/boards/<mood>.json; dots = anchors; panel = the piece + similar pieces at other stores from product_detail RPC, fallback data/s + shard), How it works, Shop by room, Shop by mood, Top deals, stores strip. Piece chips in the panel are the way to pick a piece on phones (dots hidden).
 
 ## 8. Open UI items
 - Adaptive filters phase 2b: colour family, material, storage, shape (needs nightly build step + DB columns + `browse_v2` args; clean bad prices first, max AED 38M in Beds). Phase 2a is live (spec PRD s.5.9).

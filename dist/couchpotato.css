@@ -1,7 +1,6 @@
 /* ==========================================================================
    couchpotato.ae (brand book CouchPotato_Brand_Guidelines.md, owner-approved 2026-10-09). Loaded LAST on every page, after theme2.css.
-   Cream + charcoal base, terracotta for money only, logo orange for the wordmark only, Fraunces for the logo and titles,
-   Plus Jakarta Sans for everything else (prices too), one quiet sans line under a title.
+   (22 Oct 2026: the "E look" block at the end of this file supersedes the cream palette, Fraunces/Plus Jakarta and the orange wordmark: white page, Inter Tight, uppercase wordmark, accent #C23115 for money only.)
    A skin over the existing layers: every rule starts "html body.cp" so it wins over nordic.css / theme2.css without touching them.
    Rollback: bash agents/rollback_couchpotato.sh
    ========================================================================== */
@@ -490,66 +489,132 @@ html body.cp .detail-copy .option-group:first-of-type { margin-top: 4px; }
 /* measurements of a set come one piece per line */
 html body.cp .facts .fact { white-space: pre-line; }
 
-/* ---------- homepage intro (21 Oct): what we do, live price comparison, how it works, stores. Lighter cream page (#FAF6F0). ---------- */
-html body.cp .cp-intro { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, .95fr); gap: 56px; align-items: center; padding: 56px 0 8px; }
-html body.cp .cp-eyebrow { display: inline-flex; align-items: center; gap: 8px; margin: 0; font: 700 12px var(--cp-sans); letter-spacing: .06em; text-transform: uppercase; color: var(--cp-mut); }
-html body.cp .cp-eyebrow b { width: 7px; height: 7px; border-radius: 50%; background: #2E9E5B; }
-html body.cp .cp-ih { font: 800 clamp(36px, 4.4vw, 62px)/1.04 var(--cp-serif) !important; letter-spacing: -.015em; margin: 16px 0 18px; color: var(--cp-ink); }
-html body.cp .cp-ih em { font-style: normal; color: var(--cp-ac); }
-html body.cp .cp-isub { font-size: 17px; line-height: 1.55; color: var(--cp-mut); margin: 0 0 26px; max-width: 520px; }
-html body.cp .cp-isb { display: flex; align-items: center; gap: 10px; background: #fff; border: 1px solid var(--cp-bd); border-radius: 999px !important; padding: 7px 7px 7px 20px; max-width: 540px; box-shadow: 0 0 0 5px rgba(194, 49, 21, .07); color: var(--cp-mut); }
-html body.cp .cp-isb input { flex: 1; min-width: 0; border: 0 !important; background: transparent !important; box-shadow: none !important; font: 600 16px var(--cp-sans); color: var(--cp-ink); height: 40px; outline: none; padding: 0; }
-html body.cp .cp-isb button { background: var(--cp-ac); color: #fff; border: 0; font: 700 14px var(--cp-sans); padding: 0 26px; height: 42px; border-radius: 999px !important; cursor: pointer; }
-html body.cp .cp-ichips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
-html body.cp .cp-ichips button { font: 600 13px var(--cp-sans); background: transparent; border: 1px solid var(--cp-bd); color: var(--cp-ink); padding: 7px 15px; border-radius: 999px !important; cursor: pointer; }
-html body.cp .cp-ichips button:hover { border-color: var(--cp-ink); }
-html body.cp .cp-ichips button[aria-pressed="true"] { background: var(--cp-ink); border-color: var(--cp-ink); color: #fff; }
-html body.cp .cp-cmp { background: #fff; border-radius: 20px !important; overflow: hidden; box-shadow: 0 30px 60px -32px rgba(18, 19, 22, .4); min-height: 120px; }
-html body.cp .cp-ch { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 18px 22px 14px; border-bottom: 1px solid #F0E8DA; }
-html body.cp .cp-ch b { font-size: 15px; } html body.cp .cp-ch span { font-size: 12px; color: var(--cp-mut); }
-html body.cp .cp-cr { display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 12px 22px; border-bottom: 1px solid #F6F0E4; color: inherit; text-decoration: none; opacity: 0; transform: translateY(8px); animation: cpIn .4s forwards; }
-html body.cp .cp-cr:hover { background: #FBF7EF; }
-@keyframes cpIn { to { opacity: 1; transform: none; } }
-html body.cp .cp-cph { width: 56px; height: 56px; border-radius: 10px !important; background: var(--cp-fr); overflow: hidden; display: block; }
-html body.cp .cp-cph img { width: 100%; height: 100%; object-fit: contain; display: block; }
-html body.cp .cp-cm { min-width: 0; display: block; }
-html body.cp .cp-cn { display: block; font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-html body.cp .cp-cs { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--cp-mut); margin-top: 2px; }
-html body.cp .cp-cs i { font: 700 10px var(--cp-sans); font-style: normal; letter-spacing: .04em; text-transform: uppercase; background: var(--cp-ac); color: #fff; border-radius: 4px !important; padding: 2px 6px; }
-html body.cp .cp-cb { display: block; height: 5px; border-radius: 3px !important; background: #F0E8DA; margin-top: 8px; position: relative; }
-html body.cp .cp-cb u { position: absolute; inset: 0 auto 0 0; border-radius: 3px !important; background: #CDBFA6; }
-html body.cp .cp-cr.best .cp-cb u { background: var(--cp-ac); }
-html body.cp .cp-cp { text-align: right; font-size: 16px; font-weight: 700; white-space: nowrap; }
-html body.cp .cp-cp small { display: block; font-size: 12px; font-weight: 600; color: var(--cp-mut); }
-html body.cp .cp-cr.best .cp-cp { color: var(--cp-ac); }
-html body.cp .cp-cf { margin: 0; padding: 12px 22px; background: #FBF7EF; font-size: 12px; color: var(--cp-mut); }
-/* how it works: three illustrated cards */
-html body.cp .cp-how { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; margin: 64px 0 0; }
-html body.cp .cp-how > div { position: relative; background: #fff; border: 1px solid #EFE6D6; border-radius: 22px !important; padding: 22px 22px 24px; }
-html body.cp .cp-hn { position: absolute; top: -14px; left: 20px; width: 30px; height: 30px; border-radius: 50% !important; background: var(--cp-ac); color: #fff; font: 800 14px var(--cp-sans); font-style: normal; display: grid; place-items: center; box-shadow: 0 0 0 5px var(--cp-bg); }
-html body.cp .cp-hv { position: relative; height: 128px; border-radius: 14px !important; background: var(--cp-bg); display: flex; align-items: center; justify-content: center; margin-bottom: 20px; overflow: hidden; }
-html body.cp .cp-how h3 { font: 700 19px/1.2 var(--cp-sans); margin: 0 0 6px; }
-html body.cp .cp-how p { color: var(--cp-mut); font-size: 14px; line-height: 1.55; margin: 0; }
-html body.cp .cp-pill { display: inline-flex; align-items: center; gap: 8px; background: #fff; border-radius: 999px !important; padding: 8px 14px; font: 600 12px var(--cp-sans); box-shadow: 0 6px 16px -8px rgba(18, 19, 22, .3); }
-html body.cp .cp-v1 em { position: absolute; font: 700 10px var(--cp-sans); font-style: normal; background: #fff; border: 1px solid var(--cp-bd); border-radius: 999px !important; padding: 3px 8px; }
-html body.cp .cp-v2 { flex-direction: column; justify-content: center; gap: 9px; padding: 0 14%; align-items: stretch; }
-html body.cp .cp-v2 > div { display: flex; align-items: center; gap: 8px; flex-direction: row-reverse; justify-content: flex-end; }
-html body.cp .cp-v2 u { height: 8px; border-radius: 4px !important; background: #D9CCB4; display: block; }
-html body.cp .cp-v2 u.lo { background: var(--cp-ac); }
-html body.cp .cp-v2 b { font: 700 10px var(--cp-sans); color: var(--cp-mut); width: 34px; }
-html body.cp .cp-v3 .cp-vc { background: #fff; border-radius: 12px !important; padding: 12px 14px; width: 74%; box-shadow: 0 8px 20px -10px rgba(18, 19, 22, .35); }
-html body.cp .cp-vc b { display: block; font-size: 13px; } html body.cp .cp-vc small { display: block; font-size: 11px; color: var(--cp-mut); margin-bottom: 10px; }
-html body.cp .cp-vc span { display: block; background: var(--cp-ac); color: #fff; font: 700 11px var(--cp-sans); text-align: center; border-radius: 999px !important; padding: 7px 0; }
-/* stores strip */
-html body.cp .cp-stores { margin: 72px 0 0; text-align: center; }
-html body.cp .cp-stores small { display: block; font: 700 12px var(--cp-sans); letter-spacing: .06em; text-transform: uppercase; color: var(--cp-mut); margin-bottom: 18px; }
-html body.cp .cp-sw { overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
-html body.cp .cp-smq { display: flex; gap: 12px; width: max-content; animation: cpMq 60s linear infinite; }
-html body.cp .cp-smq span { background: #fff; border: 1px solid #EFE6D6; border-radius: 999px !important; padding: 12px 24px; font: 700 15px var(--cp-sans); white-space: nowrap; }
-@keyframes cpMq { to { transform: translateX(-50%); } }
-@media (prefers-reduced-motion: reduce) { html body.cp .cp-smq { animation: none; } html body.cp .cp-cr { animation-duration: .01s; } }
-@media (max-width: 980px) {
-  html body.cp .cp-intro { grid-template-columns: 1fr; gap: 32px; padding-top: 32px; }
-  html body.cp .cp-how { grid-template-columns: 1fr; gap: 28px; }
+
+/* ---------- E look (22 Oct 2026): white page, Inter Tight, thin rules, sharp cards, price-cuts bar, light footer. Plan: agents/state/plans/homepage_redesign_E_D_PLAN.md ---------- */
+:root { --cp-bg: #FFFFFF; --cp-surface: #FFFFFF; --cp-ink: #111111; --cp-mut: #6B6B6B; --cp-bd: #E6E6E6; --cp-fr: #F4F4F2; --cp-ac: #C23115;
+  --cp-serif: "Inter Tight", system-ui, -apple-system, "Segoe UI", sans-serif; --cp-sans: "Inter Tight", system-ui, -apple-system, "Segoe UI", sans-serif; --r: 2px; --pc-radius: 2px; }
+html body.cp.t2-home, html body.cp.cp-dots-bg { background: #fff !important; }
+html body.cp :is(h1, h2, .nn-h, .cp-h2):not(svg) { font-weight: 500 !important; letter-spacing: -.02em; }
+html body.cp h1 { font-weight: 500 !important; letter-spacing: -.025em; }
+html body.cp h3, html body.cp h4 { font-weight: 600 !important; }
+html body.cp :is(.pc-card, .t2-tile, .wish-pop, .compare-dialog, .empty-state, .product-detail, .detail-media, .detail-gallery img, .wish-empty, .ff-panel, .ff-ac, .cp-room, .cp-mood, .pc-media, .pc-card .pc-media) { border-radius: 2px !important; }
+html body.cp :is(.cp-btn, .nn-btn, .t2-pill, .mb-more, #mbMore, .wish-empty .btn-dark, .wish-empty .nn-btn, .wish-empty a.cta, .empty .nn-btn, #emptyReset, .empty-state button, .cp-bigbtn) { background: var(--cp-ink) !important; color: #fff !important; border-radius: 2px !important; font-weight: 500; }
+html body.cp :is(.cp-btn, .nn-btn, .t2-pill):hover { background: #000 !important; }
+html body.cp .cp-btn-line { background: #fff !important; color: var(--cp-ink) !important; border: 1px solid var(--cp-ink) !important; }
+/* utility + price-cuts bars (shown again) */
+html body.cp .nn-utility { display: block !important; background: var(--cp-fr) !important; color: #333 !important; font-size: 12.5px; text-align: left; padding: 9px max(24px, 40px); letter-spacing: 0; }
+html body.cp .nn-promo { display: block !important; background: #111 !important; color: #fff !important; text-align: center; padding: 14px 16px; font: 500 15px var(--cp-sans); text-decoration: none; }
+/* wordmark */
+html body.cp .nn-logo.cp-logo { font: 600 22px/1 var(--cp-sans) !important; color: var(--cp-ink) !important; letter-spacing: .14em !important; text-transform: uppercase !important; }
+html body.cp .nn-logo.cp-logo i { display: block; font-size: 10px; letter-spacing: .42em; font-weight: 500; margin-top: 4px; color: #444; text-transform: uppercase; }
+html body.cp .nn-footer .nn-logo.cp-logo { color: var(--cp-ink) !important; font-size: 22px !important; }
+html body.cp .nn-footer .nn-logo.cp-logo i { color: #444 !important; }
+/* header: logo, centred pill search, icons; links in a row underneath */
+@media (min-width: 901px) {
+  html body.cp .nn-main { flex-wrap: wrap; height: auto; padding: 16px 40px 0; gap: 0 32px; }
+  html body.cp .nn-logo.cp-logo { order: 1; }
+  html body.cp .nn-search, html body.cp.t2-home .nn-search { order: 2; flex: 1 1 0; max-width: 520px; height: 46px; margin: 0 auto; background: var(--cp-fr); border: 0; border-radius: 999px !important; }
+  html body.cp .nn-actions { order: 3; }
+  html body.cp .cp-nav { order: 4; flex: 0 0 100%; justify-content: center; margin: 0; padding: 8px 0 14px; gap: 34px; }
+  html body.cp .cp-nav > a, html body.cp .cp-catbtn { font-size: 15.5px; font-weight: 500; }
 }
-@media (max-width: 560px) { html body.cp .cp-ih { font-size: 34px !important; } html body.cp .cp-isub { font-size: 15px; } html body.cp .cp-isb button { padding: 0 18px; } }
+html body.cp .cp-nav > a[href*="deals"] { color: #B3261E !important; }
+html body.cp .nn-header { border-bottom: 1px solid var(--cp-bd); }
+/* footer: light */
+html body.cp .nn-footer { background: var(--cp-fr) !important; color: #444 !important; }
+html body.cp .nn-footer h4 { color: var(--cp-ink) !important; }
+html body.cp .nn-footer a:not(.cp-logo) { color: #444 !important; }
+html body.cp .nn-footer a:not(.cp-logo):hover { color: #000 !important; }
+html body.cp .nn-footer-note { border-top-color: #DADAD6; color: #555; }
+/* ---------- homepage: room hero ---------- */
+html body.cp .rh { position: relative; height: 700px; overflow: hidden; background: #2a211a; color: #fff; }
+html body.cp .rp { position: absolute; inset: 0; }
+html body.cp .rp img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 1s; }
+html body.cp .rp img.on { opacity: 1; }
+html body.cp .rs { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(0,0,0,.55), rgba(0,0,0,.18) 45%, rgba(0,0,0,0) 65%), linear-gradient(0deg, rgba(0,0,0,.45), rgba(0,0,0,0) 35%); }
+html body.cp .rc { position: absolute; z-index: 4; left: 40px; bottom: 112px; max-width: 560px; }
+html body.cp .rc small { font-size: 13px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; opacity: .92; }
+html body.cp .rc h1 { color: #fff !important; font-weight: 300 !important; font-size: 58px; line-height: 1.03; letter-spacing: -.025em; margin: 10px 0 14px; }
+html body.cp .rc p { margin: 0 0 22px; font-size: 17px; opacity: .92; max-width: 420px; color: #fff; }
+html body.cp .rc .cp-btn { background: #fff !important; color: #111 !important; padding: 14px 26px; }
+html body.cp .dt { position: absolute; z-index: 3; width: 28px; height: 28px; margin: -14px 0 0 -14px; border-radius: 50% !important; background: rgba(255,255,255,.94) !important; color: #111 !important; font: 600 12px var(--cp-sans); display: grid; place-items: center; border: 0; cursor: pointer; box-shadow: 0 4px 14px rgba(0,0,0,.3); padding: 0; }
+html body.cp .dt::after { content: ""; position: absolute; inset: -7px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,.8); animation: cpPl 2.4s ease-out infinite; }
+html body.cp .dt.sel { background: #111 !important; color: #fff !important; }
+@keyframes cpPl { 0% { transform: scale(.7); opacity: 1; } 100% { transform: scale(1.5); opacity: 0; } }
+html body.cp .pn { position: absolute; z-index: 5; right: 40px; top: 36px; width: 400px; background: #fff; color: #111; box-shadow: 0 30px 60px -28px rgba(0,0,0,.6); max-height: calc(100% - 72px); overflow: auto; }
+html body.cp .pn .h { padding: 18px 24px 12px; border-bottom: 1px solid #111; }
+html body.cp .pn .h small { display: block; font-size: 12px; color: #777; margin-bottom: 2px; }
+html body.cp .pn .h b { font-size: 22px; font-weight: 500; letter-spacing: -.01em; }
+html body.cp .pn .hero2 { display: grid; grid-template-columns: 120px 1fr; gap: 16px; padding: 16px 24px; background: #f9f9f8; border-bottom: 1px solid #eee; }
+html body.cp .pn .hero2 img { width: 120px; height: 120px; object-fit: cover; background: #fff; }
+html body.cp .pn .s { font-size: 12px; color: #777; }
+html body.cp .pn .n2 { font-size: 16px; font-weight: 500; line-height: 1.25; margin: 2px 0 6px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+html body.cp .pn .p2 { font-size: 20px; font-weight: 600; }
+html body.cp .pn .p2 s { font-size: 13px; color: #777; margin-left: 8px; font-weight: 400; }
+html body.cp .pn .vb { display: inline-block; margin-top: 8px; background: #111; color: #fff !important; font-size: 13px; font-weight: 500; padding: 8px 14px; text-decoration: none; }
+html body.cp .pn .sh2 { display: flex; justify-content: space-between; padding: 14px 24px 8px; font-size: 13px; color: #777; }
+html body.cp .pn .sh2 b { color: #111; font-weight: 600; font-size: 14px; }
+html body.cp .pn .r { display: grid; grid-template-columns: 48px minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 9px 24px; border-top: 1px solid #eee; color: inherit; text-decoration: none; }
+html body.cp .pn .r:hover { background: #fafafa; }
+html body.cp .pn .r img { width: 48px; height: 48px; object-fit: cover; background: #f4f4f2; }
+html body.cp .pn .r .n { font-size: 14px; font-weight: 500; line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+html body.cp .pn .r .p { font-weight: 600; font-size: 16px; text-align: right; white-space: nowrap; }
+html body.cp .pn .r .p i { display: block; font-style: normal; font-size: 11.5px; color: #777; font-weight: 600; }
+html body.cp .pn .r .p i.dn { color: #1d7a46; }
+html body.cp .pn .f { padding: 13px 24px; font-size: 12.5px; color: #777; background: #f9f9f8; border-top: 1px solid #eee; }
+html body.cp .sw2 { position: absolute; z-index: 6; left: 40px; right: 40px; bottom: 24px; display: flex; gap: 8px; flex-wrap: wrap; }
+html body.cp .sw2 button { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,.16); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,.3); color: #fff; font: 500 14px var(--cp-sans); padding: 6px 16px 6px 6px; cursor: pointer; border-radius: 0; }
+html body.cp .sw2 button img { width: 40px; height: 40px; object-fit: cover; }
+html body.cp .sw2 button.on { background: #fff; color: #111; border-color: #fff; }
+/* sections under the hero */
+html body.cp .cp-sec > .cp-h2, html body.cp .cp-how-t { text-align: center; font: 600 12.5px var(--cp-sans) !important; letter-spacing: .14em; text-transform: uppercase; margin: 0 0 30px; }
+html body.cp .cp-how { margin: 72px 0 0; }
+html body.cp .cp-room { border: 0; }
+html body.cp .cp-mood { border-radius: 0 !important; }
+html body.cp .cp-stores { margin: 72px 0 0; text-align: center; }
+html body.cp .cp-stores small { display: block; font: 600 12.5px var(--cp-sans); letter-spacing: .14em; text-transform: uppercase; margin-bottom: 26px; }
+html body.cp .cp-slist { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+html body.cp .cp-slist span { border: 1px solid var(--cp-bd); padding: 11px 22px; font: 500 15px var(--cp-sans); border-radius: 999px; }
+@media (max-width: 900px) {
+  html body.cp .rh { height: auto; min-height: 560px; display: flex; flex-direction: column; }
+  html body.cp .rp { height: 360px; bottom: auto; } html body.cp .rs { height: 360px; bottom: auto; }
+  html body.cp .rc { position: relative; left: auto; bottom: auto; padding: 200px 20px 16px; z-index: 4; }
+  html body.cp .rc h1 { font-size: 36px; }
+  html body.cp .pn { position: relative; z-index: 5; right: auto; top: auto; width: auto; margin: 0 16px 16px; max-height: none; }
+  html body.cp .sw2 { position: relative; left: auto; right: auto; bottom: auto; padding: 0 16px 20px; }
+  html body.cp .dt { display: none; }
+}
+/* how it works: three ruled columns */
+html body.cp .cp-how { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; border-top: 1px solid var(--cp-ink); }
+html body.cp .cp-how > div { padding: 30px 36px 0 0; background: none; border: 0; position: static; }
+html body.cp .cp-how > div + div { padding-left: 36px; border-left: 1px solid var(--cp-bd); }
+html body.cp .cp-how .cp-hn { font: 300 34px/1 var(--cp-sans); font-style: normal; display: block; }
+html body.cp .cp-how h3 { font: 500 20px/1.2 var(--cp-sans) !important; margin: 12px 0 8px; }
+html body.cp .cp-how p { margin: 0; font-size: 16px; color: #555; line-height: 1.5; }
+@media (max-width: 900px) { html body.cp .cp-how { grid-template-columns: 1fr; } html body.cp .cp-how > div { padding: 24px 0 0; } html body.cp .cp-how > div + div { padding-left: 0; border-left: 0; border-top: 1px solid var(--cp-bd); margin-top: 24px; } }
+/* top deals: plain cards (no tape, tilt or paper shadow) */
+html body.cp .cp-pinned { gap: 28px 20px; padding-top: 0; }
+html body.cp .cp-pinned .pc-card { transform: none !important; box-shadow: none !important; padding: 0; background: transparent; overflow: hidden !important; }
+html body.cp .cp-pinned .pc-card:hover { transform: none !important; box-shadow: none !important; }
+html body.cp .cp-pinned .pc-card::before { display: none !important; }
+html body.cp .cp-pinned .pc-badge { left: 12px !important; top: 12px !important; transform: none !important; background: #fff !important; color: #111 !important; border-radius: 999px !important; padding: 4px 10px !important; font-weight: 600; box-shadow: none !important; }
+html body.cp .cp-pinned .pc-ribbon, html body.cp .cp-pinned .pc-body { padding-left: 0 !important; padding-right: 0 !important; }
+
+html body.cp .pn .pcs { display: flex; gap: 6px; overflow-x: auto; padding: 10px 24px 12px; border-bottom: 1px solid #eee; scrollbar-width: none; }
+html body.cp .pn .pcs::-webkit-scrollbar { display: none; }
+html body.cp .pn .pcs button { flex: none; font: 500 12.5px var(--cp-sans); background: #fff; color: #111; border: 1px solid #ddd; padding: 5px 11px; border-radius: 999px; cursor: pointer; white-space: nowrap; }
+html body.cp .pn .pcs button[aria-pressed="true"] { background: #111; color: #fff; border-color: #111; }
+/* phones: one-row header, photo behind the headline */
+@media (max-width: 900px) {
+  html body.cp .nn-logo.cp-logo { font-size: 17px !important; letter-spacing: .1em !important; }
+  html body.cp .nn-logo.cp-logo i { font-size: 8px; letter-spacing: .4em; margin-top: 3px; }
+  html body.cp .nn-utility { padding: 8px 16px; font-size: 12px; }
+  html body.cp .nn-promo { padding: 12px 16px; font-size: 14px; }
+  html body.cp .rp, html body.cp .rs { height: 520px; }
+  html body.cp .rs { background: linear-gradient(0deg, rgba(0,0,0,.62), rgba(0,0,0,.1) 60%, rgba(0,0,0,.25)); }
+  html body.cp .rc { padding: 330px 20px 22px; }
+  html body.cp .rc p { display: none; }
+  html body.cp .rc .cp-btn { padding: 13px 22px; }
+}
+/* the open "All categories" menu sits above the sticky filter bar */
+html body.cp .nn-header { z-index: 80; }

@@ -7,55 +7,87 @@
   const num = n => Number(n).toLocaleString('en-AE');
   const off = d => (d.orig > d.price ? Math.round((d.orig - d.price) / d.orig * 100) : 0);
 
-  // ------------------------------------------------------------------ intro: eyebrow, store strip, live price comparison
+  // ------------------------------------------------------------------ hero: a room photo with its real pieces as dots
+  // Tap a dot: "the piece in this room" (the product the room scene was built from) and similar pieces at OTHER stores
+  // (the same similar-items lists the product pages use: database first, the published files as the fallback).
   let storeCount = 0;
   FF.loadMeta().then(m => {
     const live = m.stores.filter(s => s.c > 0);                       // only stores that have products on the site
     storeCount = live.length;
-    $('introEy').textContent = `${storeCount} UAE home stores, one place`;
-    const names = live.slice().sort((a, b) => b.c - a.c).map(s => `<span>${esc(s.n)}</span>`).join('');
-    $('storeMq').innerHTML = names + names;                           // twice, so the strip loops without a gap
+    $('storeList').innerHTML = live.slice().sort((a, b) => b.c - a.c).map(s => `<span>${esc(s.n)}</span>`).join('');
     moodCopy();
   }).catch(() => {});
 
-  // Each chip compares one kind of piece: the lowest price at each store, from the published category files (real products, in stock).
-  const CMP = [
-    { t: 'Sofa', title: '3-seater sofa', shard: 'furniture--sofas-seating', yes: /\b(3|three)[ -]?seat(er|s)?\b/i, no: /cover|throw|cushion|pillow|slipcover|leg|bed\b/i },
-    { t: 'Dining table', title: 'dining table', shard: 'furniture--dining-room', yes: /dining table/i, no: /chair|bench|set of|with \d? ?chairs|cover|runner|mat\b/i },
-    { t: 'Rug', title: 'rug', shard: 'rugs-carpets--rugs', yes: /\brug\b/i, no: /pad|gripper|underlay|cleaner/i },
-    { t: 'Bed frame', title: 'bed', shard: 'furniture--bedroom', yes: /\bbed( frame)?\b/i, no: /bedside|side ?table|linen|sheet|bench|mattress|cover|cushion|pillow|set\b|runner|lamp/i }
-  ];
-  const cmpEl = $('cmp'), chipEl = $('introChips');
-  const cache = {};
-  chipEl.innerHTML = CMP.map((c, i) => `<button type="button" data-i="${i}" aria-pressed="false">${esc(c.t)}</button>`).join('');
-  function rowsFor(c) {
-    return cache[c.shard] || (cache[c.shard] = FF.loadMeta().then(() => FF.loadShard(c.shard)).then(raw => {
-      const all = raw.filter(r => r.price > 0 && !r.out && r.img && c.yes.test(r.name) && !c.no.test(r.name));
-      const sorted = all.map(r => r.price).sort((a, b) => a - b), floor = (sorted[Math.floor(sorted.length / 2)] || 0) * 0.3;   // drop accessories priced far below the typical piece
-      const best = new Map();
-      all.filter(r => r.price >= floor).forEach(r => { const o = best.get(r.s); if (!o || r.price < o.price) best.set(r.s, r); });
-      return [...best.values()].sort((a, b) => a.price - b.price).slice(0, 5);
-    }));
+  const HERO_ROOMS = ['japandi', 'scandinavian', 'boucle', 'earthy'];
+  const SLOT = { sofa: ['Sofa', 'furniture--sofas-seating'], chair: ['Armchair', 'furniture--sofas-seating'], coffee_table: ['Coffee table', 'furniture--living-room'],
+    side_table: ['Side table', 'furniture--living-room'], floor_lamp: ['Floor lamp', 'lighting--lamps'], rug: ['Rug', 'rugs-carpets--rugs'], plant: ['Plant', 'home-decor--plants-flowers'] };
+  const rh = $('rh'), rp = $('rp'), rd = $('rd'), pn = $('pn'), sw2 = $('sw2');
+  let scenes = [], cur = 0, sel = 0, token = 0;
+  const simCache = {};
+  const norm = r => ({ id: r.id, name: r.name || r.n, store: r.store || (FF.stores && FF.stores[r.s]) || '', price: r.price != null ? r.price : r.p, orig: r.orig != null ? r.orig : r.o, img: FF.fixImg(r.img || r.i), out: !!r.out });
+  function similarFor(a) {
+    return simCache[a.id] || (simCache[a.id] = (async () => {
+      let rows = [];
+      if (FF.db.on) { try { const r = await FF.db.rpc('product_detail', { p_id: a.id }, 4000, 1); rows = (r && r.similar || []).map(norm); } catch (e) { FF.db.fail(e); } }
+      if (rows.length < 2) {
+        await FF.loadMeta();
+        const lists = await FF.fetchJSON('data/s/' + String(FF.fnv(a.id) % 256).padStart(3, '0') + '.json.gz');
+        await FF.loadShard(SLOT[a.slot][1]);
+        rows = (lists[a.id] || []).map(id => FF.byId.get(id)).filter(Boolean).map(norm);
+      }
+      const seen = new Set([a.store]), out = [];
+      for (const r of rows) { if (!r.img || r.out || !(r.price > 0) || seen.has(r.store)) continue; seen.add(r.store); out.push(r); if (out.length === 4) break; }
+      return out;
+    })());
   }
-  let token = 0;
-  function showCmp(i) {
-    const c = CMP[i], mine = ++token;
-    [...chipEl.children].forEach((b, k) => b.setAttribute('aria-pressed', k === i));
-    rowsFor(c).then(rows => {
+  pn.addEventListener('click', e => { const b = e.target.closest('.pcs button'); if (b) { sel = Number(b.dataset.i); renderPanel(); placeDots(); } });
+  const link = id => 'product.html?id=' + enc(id);
+  function renderPanel() {
+    const a = scenes[cur].anchors[sel], mine = ++token, label = SLOT[a.slot] ? SLOT[a.slot][0] : a.slot;
+    const hp = a.orig > a.price ? Math.round((a.orig - a.price) / a.orig * 100) : 0;
+    const chips = `<div class="pcs" role="group" aria-label="Pieces in this room">${scenes[cur].anchors.map((x, i) => `<button type="button" data-i="${i}" aria-pressed="${i === sel}">${i + 1} ${esc((SLOT[x.slot] || [x.slot])[0])}</button>`).join('')}</div>`;
+    const head = `<div class="h"><small>The piece in this room</small><b>${esc(label)}</b></div>${chips}
+      <div class="hero2"><img referrerpolicy="no-referrer" src="${esc(FF.fixImg(a.img))}" alt=""><div style="min-width:0"><div class="s">${esc(a.store)}</div><div class="n2">${esc(a.name)}</div>
+        <div class="p2">${money(a.price)}${hp ? `<s>${money(a.orig)}</s>` : ''}</div><a class="vb" href="${link(a.id)}">View this piece</a></div></div>`;
+    pn.innerHTML = head + '<div class="sh2"><b>Similar pieces at other stores</b><span>looking…</span></div>';
+    similarFor(a).then(sim => {
       if (mine !== token) return;
-      if (rows.length < 2) { cmpEl.innerHTML = ''; return; }
-      const min = rows[0].price, max = rows[rows.length - 1].price;
-      cmpEl.innerHTML = `<div class="cp-ch"><b>Lowest price at each store: ${esc(c.title)}</b><span>${rows.length} stores · ${money(min)} to ${money(max)}</span></div>` + rows.map((r, k) => {
-        const w = Math.round(30 + 70 * (r.price - min) / (max - min || 1));
-        return `<a class="cp-cr${k ? '' : ' best'}" href="product.html?id=${enc(r.id)}" style="animation-delay:${k * 70}ms">
-          <span class="cp-cph"><img referrerpolicy="no-referrer" loading="lazy" src="${esc(r.img)}" alt="" onerror="this.remove()"></span>
-          <span class="cp-cm"><span class="cp-cn">${esc(r.name)}</span><span class="cp-cs">${esc(r.store)}${k ? '' : ' <i>Lowest</i>'}</span><span class="cp-cb"><u style="width:${w}%"></u></span></span>
-          <span class="cp-cp">${money(r.price)}${k && r.price - min >= 1 ? `<small>+${money(r.price - min)}</small>` : ''}</span></a>`;
-      }).join('') + '<p class="cp-cf">Prices come from each store\'s website and can change.</p>';
-    }).catch(() => { if (mine === token) cmpEl.innerHTML = ''; });
+      const rowsHtml = sim.map(c => { const d = c.price - a.price;
+        const t = d < 0 ? `<i class="dn">${money(-d)} less</i>` : d > 0 ? `<i>+${money(d)}</i>` : '<i>Same price</i>';
+        return `<a class="r" href="${link(c.id)}"><img loading="lazy" referrerpolicy="no-referrer" src="${esc(c.img)}" alt="" onerror="this.remove()"><span style="min-width:0"><span class="s">${esc(c.store)}</span><span class="n">${esc(c.name)}</span></span><span class="p">${money(c.price)}${t}</span></a>`; }).join('');
+      pn.innerHTML = head + (sim.length ? `<div class="sh2"><b>Similar pieces at other stores</b><span>${sim.length} ${sim.length === 1 ? 'match' : 'matches'}</span></div>${rowsHtml}` : '<div class="sh2"><b>No close matches at other stores yet</b></div>') + '<div class="f">Prices come from each store\'s website and can change.</div>';
+      placeDots();
+    }).catch(() => { if (mine === token) pn.innerHTML = head + '<div class="f">Similar pieces are unavailable right now.</div>'; });
   }
-  chipEl.addEventListener('click', e => { const b = e.target.closest('button'); if (b) showCmp(Number(b.dataset.i)); });
-  showCmp(0);
+  function placeDots() {
+    const b = scenes[cur]; if (!b) return;
+    const W = rh.clientWidth, H = rh.clientHeight, k = Math.max(W / b.w, H / b.h), ox = (W - b.w * k) / 2, oy = (H - b.h * k) / 2, hr = rh.getBoundingClientRect();
+    const blocked = [document.querySelector('.rc'), pn].map(e => { const r = e.getBoundingClientRect(); return [r.left - hr.left - 20, r.top - hr.top - 20, r.right - hr.left + 20, r.bottom - hr.top + 20]; });
+    rd.innerHTML = '';
+    b.anchors.forEach((a, i) => {
+      const x = ox + a.x / 100 * b.w * k, y = oy + a.y / 100 * b.h * k;
+      if (x < 30 || x > W - 30 || y < 30 || y > H - 90 || blocked.some(r => x > r[0] && x < r[2] && y > r[1] && y < r[3])) return;
+      const d = document.createElement('button'); d.type = 'button'; d.className = 'dt' + (i === sel ? ' sel' : ''); d.textContent = i + 1;
+      d.style.left = x + 'px'; d.style.top = y + 'px'; d.setAttribute('aria-label', (SLOT[a.slot] || [a.slot])[0]);
+      d.addEventListener('click', () => { sel = i; renderPanel(); placeDots(); }); rd.appendChild(d);
+    });
+  }
+  function showScene() {
+    [...rp.children].forEach((im, i) => im.classList.toggle('on', i === cur));
+    [...sw2.children].forEach((bt, i) => { bt.classList.toggle('on', i === cur); bt.setAttribute('aria-pressed', i === cur); });
+    renderPanel(); placeDots();
+  }
+  Promise.all(HERO_ROOMS.map(k => FF.fetchJSON('data/boards/' + k + '.json').catch(() => null))).then(list => {
+    scenes = list.filter(b => b && b.anchors && b.anchors.length);
+    if (!scenes.length) { rh.hidden = true; return; }
+    scenes.forEach((b, i) => {
+      const im = new Image(); im.alt = ''; im.src = b.image; im.addEventListener('load', placeDots); rp.appendChild(im);
+      const bt = document.createElement('button'); bt.type = 'button'; bt.innerHTML = `<img src="${esc(b.image)}" alt="">${esc(b.name)}`;
+      bt.addEventListener('click', () => { cur = i; sel = 0; showScene(); }); sw2.appendChild(bt);
+    });
+    showScene();
+    window.addEventListener('resize', placeDots);
+  });
 
   // ------------------------------------------------------------------ Shop by room: 8 photo cards (photos chosen in js/home-tiles.js)
   const ROOMS = ['Living Room', 'Bedroom', 'Dining Room', 'Home Office', 'Kids Room', 'Kitchen', 'Bathroom', 'Outdoor'];

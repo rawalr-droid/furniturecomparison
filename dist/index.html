@@ -15,7 +15,7 @@
   <meta name="application-name" content="couchpotato.ae" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="icon" href="/favicon.ico" sizes="48x48" />
   <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png" />
   <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png" />
@@ -27,7 +27,7 @@
   <link rel="stylesheet" href="banner.css?v=20260927" />
   <link rel="stylesheet" href="nordic.css?v=20261004f2" />
   <link rel="stylesheet" href="theme2.css?v=20261008n1" />
-  <link rel="stylesheet" href="couchpotato.css?v=20261021b2" />
+  <link rel="stylesheet" href="couchpotato.css?v=20261022a5" />
   <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","name":"couchpotato.ae","alternateName":"couchpotato","url":"https://www.couchpotato.ae/"},{"@type":"Organization","name":"couchpotato.ae","url":"https://www.couchpotato.ae/","logo":"https://www.couchpotato.ae/favicon-192.png","email":"hello@couchpotato.ae"}]}</script>
 </head>
 <body class="t2 t2-home cp">
@@ -47,25 +47,18 @@
   <a class="nn-promo" id="promoBar" href="browse.html?deals=1">Biggest price drops ›</a>
 
   <main>
+    <section class="rh" id="rh" aria-label="Shop the room">
+      <div class="rp" id="rp"></div><div class="rs"></div><div id="rd"></div>
+      <div class="rc"><small>Shop the room</small><h1>Furnish a room, compare every store</h1><p>Tap a dot to see the piece, then similar pieces at other UAE stores.</p><a class="cp-btn" href="browse.html">Search all products</a></div>
+      <div class="pn" id="pn" aria-live="polite"></div><div class="sw2" id="sw2" role="group" aria-label="Choose a room"></div>
+    </section>
+
     <div class="cp-w">
-      <section class="cp-intro" aria-label="What couchpotato.ae does">
-        <div class="cp-il">
-          <p class="cp-eyebrow"><b></b><span id="introEy">UAE home stores, one place</span></p>
-          <h1 class="cp-ih">Compare furniture and home prices across <em>UAE stores</em></h1>
-          <p class="cp-isub">couchpotato.ae searches the UAE's home stores in one place. Find a piece, then buy it from the store itself.</p>
-          <form class="cp-isb" action="browse.html" role="search"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><input name="q" type="search" placeholder="Search sofas, dining tables, rugs…" aria-label="Search furniture"><button type="submit">Search</button></form>
-          <div class="cp-ichips" id="introChips" role="group" aria-label="See prices for"></div>
-        </div>
-        <div class="cp-ir"><div class="cp-cmp" id="cmp" aria-live="polite"></div></div>
-      </section>
-
       <section class="cp-how" id="how" aria-label="How it works">
-        <div><i class="cp-hn">1</i><div class="cp-hv cp-v1"><span class="cp-pill"><svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>grey sofa</span><em style="left:9%;top:16%">Danube Home</em><em style="right:8%;top:24%">Pan Home</em><em style="left:14%;bottom:14%">Home Centre</em><em style="right:11%;bottom:12%">The Home</em></div><h3>Search every store at once</h3><p>One search covers the UAE's home stores, so you skip the tab-hopping.</p></div>
-        <div><i class="cp-hn">2</i><div class="cp-hv cp-v2"><div><u style="width:46%" class="lo"></u><b>1,799</b></div><div><u style="width:66%"></u><b>2,499</b></div><div><u style="width:78%"></u><b>2,899</b></div><div><u style="width:92%"></u><b>3,350</b></div></div><h3>Compare price and details</h3><p>Sizes, colours and the store's own offers, lined up side by side.</p></div>
-        <div><i class="cp-hn">3</i><div class="cp-hv cp-v3"><div class="cp-vc"><b>Orla 3-seater</b><small>Pan Home</small><span>View at Pan Home ↗</span></div></div><h3>Buy from the store</h3><p>We don't sell anything. We send you to the retailer to finish your order.</p></div>
+        <div><i class="cp-hn">1</i><h3>Search every store at once</h3><p>One search covers the UAE's home stores, so you skip the tab-hopping.</p></div>
+        <div><i class="cp-hn">2</i><h3>Compare the details</h3><p>Prices, sizes, colours and the store's own offers, side by side.</p></div>
+        <div><i class="cp-hn">3</i><h3>Buy from the store</h3><p>We don't sell anything. We send you to the retailer to order.</p></div>
       </section>
-
-      <section class="cp-stores" aria-label="Stores we compare"><small>Stores we compare</small><div class="cp-sw"><div class="cp-smq" id="storeMq"></div></div></section>
 
       <section class="cp-sec" id="rooms">
         <h2 class="cp-h2">Shop by room</h2>
@@ -94,6 +87,7 @@
         <p class="cp-more"><button type="button" class="cp-btn cp-btn-line" id="dealsAll" hidden>See all deals</button></p>
       </section>
 
+      <section class="cp-stores" aria-label="Stores we compare"><small>Stores we compare</small><div class="cp-slist" id="storeList"></div></section>
     </div>
   </main>
 
@@ -109,6 +103,6 @@
   <script src="js/home-tiles.js?v=20261012a1"></script>
   <script src="js/db-config.js?v=20261004t1"></script>
   <script src="js/common.js?v=20261021a1" data-v="20261006f"></script>
-  <script src="js/home.js?v=20261021b3"></script>
+  <script src="js/home.js?v=20261022a2"></script>
 </body>
 </html>
