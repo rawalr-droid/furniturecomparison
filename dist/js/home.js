@@ -14,7 +14,8 @@
   FF.loadMeta().then(m => {
     const live = m.stores.filter(s => s.c > 0);                       // only stores that have products on the site
     storeCount = live.length;
-    $('storeList').innerHTML = live.slice().sort((a, b) => b.c - a.c).map(s => `<span>${esc(s.n)}</span>`).join('');
+    const names = live.slice().sort((a, b) => b.c - a.c).map(s => `<span>${esc(s.n)}</span>`).join('');
+    $('storeList').innerHTML = names + names;                           // twice, so the strip loops without a gap
     moodCopy();
   }).catch(() => {});
 

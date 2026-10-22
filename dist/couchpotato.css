@@ -618,3 +618,11 @@ html body.cp .pn .pcs button[aria-pressed="true"] { background: #111; color: #ff
 }
 /* the open "All categories" menu sits above the sticky filter bar */
 html body.cp .nn-header { z-index: 80; }
+
+/* stores strip: one scrolling line */
+html body.cp .cp-sw { overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); }
+html body.cp .cp-slist { display: flex; flex-wrap: nowrap; justify-content: flex-start; gap: 12px; width: max-content; animation: cpStores 90s linear infinite; }
+html body.cp .cp-slist:hover { animation-play-state: paused; }
+html body.cp .cp-slist span { flex: none; white-space: nowrap; border-radius: 999px !important; }
+@keyframes cpStores { to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) { html body.cp .cp-sw { overflow-x: auto; -webkit-mask-image: none; mask-image: none; } html body.cp .cp-slist { animation: none; } }
