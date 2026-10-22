@@ -49,7 +49,8 @@
         const html = FF.pcCard({ id: it.id, name: c.name, store: c.store, img: c.img, price: c.price, orig: c.orig, size: it.size, colours: it.colours, room, out: c.out });
         const drop = it.price && c.price < it.price ? `<p class="wish-drop">↓ ${money(it.price - c.price)} since you saved it</p>` : '';
         const out = c.out ? '<p class="wish-drop wish-out">Out of Stock</p>' : '';
-        return html.replace('</div>\n    </li>', `${drop}${out}</div>\n    </li>`);
+        const del = `<button class="wish-del" type="button" data-remove="${esc(it.id)}" data-room="${esc(room)}" aria-label="Remove from ${esc(room)}" title="Remove"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`;
+        return html.replace('<button class="pc-wishlist"', `${del}<button class="pc-wishlist"`).replace('</div>\n    </li>', `${drop}${out}</div>\n    </li>`);
       }).join('');
       const save = was > sum ? ` · you'd save ${money(was - sum)}` : '';
       return `<section class="wish-room-sec"><div class="wish-room-head"><h2>${esc(room)}</h2>
