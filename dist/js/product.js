@@ -7,6 +7,15 @@
   function notFound() {
     root.innerHTML = '<section class="detail-copy"><h1>Product not found</h1><p>This product may no longer be in the catalogue.</p><a href="browse.html">Browse furniture</a></section>';
   }
+  // Material can arrive as JSON text ({"Primary Material": "Oak"}); show it as "Primary material: Oak". Empty ({}) shows nothing.
+  const materialText = m => {
+    if (!m || typeof m !== 'string' || !/^\s*[\[{]/.test(m)) return m;
+    try {
+      const o = JSON.parse(m), low = k => { k = String(k).trim(); return k.charAt(0).toUpperCase() + k.slice(1).toLowerCase(); };
+      if (Array.isArray(o)) return o.filter(Boolean).join(', ');
+      return Object.entries(o).filter(([, v]) => v).map(([k, v]) => `${low(k)}: ${v}`).join('; ');
+    } catch (e) { return m; }
+  };
   const fact = (label, value) => value ? `<div class="fact"><span>${label}</span>${esc(value)}</div>` : '';
 
   const SIM_SHARDS = 256;   // must match SHARDS in agents/similar/build_similar.py
@@ -125,7 +134,7 @@
           ${gone ? `<p class="cp-oos">${gone}</p>` : ''}
           ${actions}
           ${pickers}${variants.some(x => x.t) && (!pickers || otherOptions) ? `<p class="selected-variant"><span>Option</span>${esc(v.t)} <small>${current + 1} of ${variants.length}</small></p><div class="chip-row">${chips}</div>` : ''}
-          <div class="facts">${fact('Category', cat.l3)}${fact('Room', room)}${fact('Material', d.m)}${fact('Size', v && v.z)}${fact('Colour', (v && v.k) || d.k)}${fact('Dimensions', /\d{2}|\d\s*(cm|mm|in\b|inch|"|ft)|\d\s*[x×*]\s*\d|\d\s*[LWH]\b/i.test(d.z || '') ? d.z : '')}${fact('Brand', d.b)}${fact('Style', d.y)}</div>
+          <div class="facts">${fact('Category', cat.l3)}${fact('Room', room)}${fact('Material', materialText(d.m))}${fact('Size', v && v.z)}${fact('Colour', (v && v.k) || d.k)}${fact('Dimensions', /\d{2}|\d\s*(cm|mm|in\b|inch|"|ft)|\d\s*[x×*]\s*\d|\d\s*[LWH]\b/i.test(d.z || '') ? d.z : '')}${fact('Brand', d.b)}${fact('Style', d.y)}</div>
           <p class="description">${esc(d.d || 'See the retailer website for full product information.')}</p>
         </div>
         <div class="similar-wrap" id="similarWrap"><h3>Similar pieces across stores</h3><p>Finding alternatives…</p></div>

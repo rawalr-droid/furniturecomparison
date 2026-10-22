@@ -307,9 +307,10 @@
       let i = 0; util.textContent = msgs[0];
       if (!matchMedia('(prefers-reduced-motion: reduce)').matches) setInterval(() => { i = (i + 1) % msgs.length; util.textContent = msgs[i]; }, 6000);
     }).catch(() => {});
-    if (promo) FF.fetchJSON('data/home.json').then(h => {       // deals already skip discounts above 80% (inflated was-prices)
-      const max = Math.max(0, ...(h.deals || []).map(d => d.o > d.p ? Math.round((d.o - d.p) / d.o * 100) : 0));
-      promo.textContent = max ? `Biggest price drops, up to ${max}% off ›` : "Latest deals ›";
+    if (promo) FF.fetchJSON('data/home.json').then(h => {       // never claim more than 50% off (owner, 22 Oct); below that, round down to the nearest 5
+      const max = Math.max(0, ...(h.deals || []).map(d => d.o > d.p ? Math.floor((d.o - d.p) / d.o * 100) : 0));
+      const claim = max >= 50 ? 50 : Math.floor(max / 5) * 5;
+      promo.textContent = claim >= 10 ? `Biggest price drops, up to ${claim}% off ›` : "Latest deals ›";
     }).catch(() => {});
   };
 
