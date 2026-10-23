@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Compare furniture and home prices across UAE stores. Find a piece, then buy it from the store." />
-  <title>couchpotato.ae | Top UAE home stores, one search</title>
+  <meta name="description" content="Search furniture across UAE stores in one place. Compare prices, find similar pieces and spot the best deals, then buy directly from the retailer." />
+  <title>couchpotato.ae | UAE’s furniture stores in one search</title>
   <meta property="og:site_name" content="couchpotato.ae" />
   <link rel="canonical" href="https://www.couchpotato.ae/" />
   <meta property="og:url" content="https://www.couchpotato.ae/" />
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="couchpotato.ae | Top UAE home stores, one search" />
-  <meta property="og:description" content="Compare furniture and home prices across UAE stores. Find a piece, then buy it from the store." />
+  <meta property="og:title" content="couchpotato.ae | UAE’s furniture stores in one search" />
+  <meta property="og:description" content="Search furniture across UAE stores in one place. Compare prices, find similar pieces and spot the best deals." />
   <meta property="og:image" content="https://www.couchpotato.ae/scenes/living_japandi_photo.jpg" />
   <meta name="application-name" content="couchpotato.ae" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -27,7 +27,7 @@
   <link rel="stylesheet" href="banner.css?v=20260927" />
   <link rel="stylesheet" href="nordic.css?v=20261004f2" />
   <link rel="stylesheet" href="theme2.css?v=20261008n1" />
-  <link rel="stylesheet" href="couchpotato.css?v=20261022d1" />
+  <link rel="stylesheet" href="couchpotato.css?v=20261023e1" />
   <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","name":"couchpotato.ae","alternateName":"couchpotato","url":"https://www.couchpotato.ae/"},{"@type":"Organization","name":"couchpotato.ae","url":"https://www.couchpotato.ae/","logo":"https://www.couchpotato.ae/favicon-192.png","email":"hello@couchpotato.ae"}]}</script>
 </head>
 <body class="t2 t2-home cp">
@@ -47,17 +47,27 @@
   <a class="nn-promo" id="promoBar" href="browse.html?deals=1">Biggest price drops ›</a>
 
   <main>
-    <section class="rh" id="rh" aria-label="Shop the room">
-      <div class="rp" id="rp"></div><div class="rs"></div><div id="rd"></div>
-      <div class="rc"><small>Shop the room</small><h1>Furnish a room, compare every store</h1><p>Tap a dot to see the piece, then similar pieces at other UAE stores.</p><a class="cp-btn" href="browse.html">Search all products</a></div>
-      <div class="pn" id="pn" aria-live="polite"></div><div class="sw2" id="sw2" role="group" aria-label="Choose a room"></div>
+    <section class="rh" id="rh" aria-label="UAE furniture stores in one search">
+      <div class="rp"><img class="on" src="scenes/living_japandi_photo.jpg" alt="" width="1672" height="941" fetchpriority="high"></div><div class="rs"></div>
+      <div class="rc"><small>The UAE’s furniture catalogue</small><h1>UAE’s furniture stores in one search</h1><p>See every price, find similar pieces and spot the best deals.</p>
+        <div class="rkeys"><span>Compare prices</span><span>Find similar pieces</span><span>Spot the best deals</span></div>
+        <form class="rsearch" action="browse.html" role="search"><input name="q" type="search" placeholder="Search sofas, beds, dining tables…" aria-label="Search furniture"><button type="submit">Compare prices</button></form></div>
     </section>
 
     <div class="cp-w">
+      <div class="cp-what" id="what"><h2>What does <span class="cp-brand">couchpotato.ae</span> do?</h2></div>
       <section class="cp-how" id="how" aria-label="How it works">
-        <div><i class="cp-hn">1</i><h3>Search every store at once</h3><p>One search covers the UAE's home stores, so you skip the tab-hopping.</p></div>
-        <div><i class="cp-hn">2</i><h3>Compare the details</h3><p>Prices, sizes, colours and the store's own offers, side by side.</p></div>
-        <div><i class="cp-hn">3</i><h3>Buy from the store</h3><p>We don't sell anything. We send you to the retailer to order.</p></div>
+        <div><i class="cp-hn">1</i><h3><em>One search</em> across multiple UAE stores</h3></div>
+        <div><i class="cp-hn">2</i><h3>Compare <em>prices</em> and <em>similar pieces</em></h3></div>
+        <div><i class="cp-hn">3</i><h3>Buy <em>directly</em> from your trusted retailer</h3></div>
+      </section>
+
+      <section class="cp-sec" id="deals">
+        <h2 class="cp-h2">Top deals</h2>
+        <div class="t2-chips" id="dealChips" aria-label="Filter the deals" hidden></div>
+        <ul class="pc-grid cp-pinned" id="dealGrid"></ul>
+        <div class="empty" id="empty" hidden><p>Deals are being refreshed. Try the full catalogue while we update them.</p><a class="nn-btn" href="browse.html">Browse all products</a></div>
+        <p class="cp-more"><button type="button" class="cp-btn cp-btn-line" id="dealsAll" hidden>See all deals</button></p>
       </section>
 
       <section class="cp-sec" id="rooms">
@@ -79,13 +89,6 @@
         </a>
       </section>
 
-      <section class="cp-sec" id="deals">
-        <h2 class="cp-h2">Top deals</h2>
-        <div class="t2-chips" id="dealChips" aria-label="Filter the deals" hidden></div>
-        <ul class="pc-grid cp-pinned" id="dealGrid"></ul>
-        <div class="empty" id="empty" hidden><p>Deals are being refreshed. Try the full catalogue while we update them.</p><a class="nn-btn" href="browse.html">Browse all products</a></div>
-        <p class="cp-more"><button type="button" class="cp-btn cp-btn-line" id="dealsAll" hidden>See all deals</button></p>
-      </section>
 
       <section class="cp-stores" aria-label="Stores we compare"><small>Stores we compare</small><div class="cp-sw"><div class="cp-slist" id="storeList"></div></div></section>
     </div>
@@ -98,11 +101,11 @@
       <div><h4>Rooms</h4><a href="/room/living-room/">Living Room</a><a href="/room/bedroom/">Bedroom</a><a href="/room/dining-room/">Dining Room</a><a href="/room/home-office/">Home Office</a><a href="/room/kids-room/">Kids Room</a><a href="/room/entryway/">Entryway</a><a href="/room/bathroom/">Bathroom</a><a href="/room/kitchen/">Kitchen</a><a href="/room/outdoor/">Outdoor</a></div>
       <div><h4>About</h4><a href="index.html#how">How it works</a><a href="browse.html">All products</a><a href="moodboards.html">Mood boards</a><a href="wishlist.html">Wishlist</a></div>
     </div>
-    <p class="nn-footer-note">Product details, prices and photos shown here are gathered from each store's public website and can change. Confirm details with the retailer before buying. Questions or concerns? Email <a href="mailto:hello@couchpotato.ae">hello@couchpotato.ae</a>. <a href="privacy.html">Privacy</a>. © couchpotato.ae</p>
+    <p class="nn-footer-note">Product details, prices and photos shown here are gathered from each store's public website and can change. Confirm details with the retailer before buying. Questions or concerns? Email <a href="mailto:hello@couchpotato.ae">hello@couchpotato.ae</a>. <a href="privacy.html">Privacy</a>. © <span class="cp-brand">couchpotato.ae</span></p>
   </footer>
   <script src="js/home-tiles.js?v=20261012a1"></script>
   <script src="js/db-config.js?v=20261004t1"></script>
-  <script src="js/common.js?v=20261022b1" data-v="20261006f"></script>
-  <script src="js/home.js?v=20261022d1"></script>
+  <script src="js/common.js?v=20261023e1" data-v="20261006f"></script>
+  <script src="js/home.js?v=20261023e1"></script>
 </body>
 </html>
