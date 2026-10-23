@@ -58,7 +58,7 @@
     if (!moods.length) return;
     $('moodChips').innerHTML = moods.map((m, i) => `<button type="button" class="cp-mchip" data-i="${i}" aria-pressed="false"><i style="background:${esc(m.colour || (MOOD[m.key] || ['#fff'])[0])}"></i>${esc(m.name)}</button>`).join('');
     $('moodChips').addEventListener('click', e => { const c = e.target.closest('.cp-mchip'); if (c) setMood(Number(c.dataset.i)); });
-    $('moods').hidden = false;
+    $('moods').hidden = false; $('moodLabel').hidden = false;
     setMood(Math.max(0, moods.findIndex(m => m.key === 'boucle')));
     moodCopy();
   }).catch(() => {});

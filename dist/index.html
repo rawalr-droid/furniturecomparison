@@ -27,7 +27,7 @@
   <link rel="stylesheet" href="banner.css?v=20260927" />
   <link rel="stylesheet" href="nordic.css?v=20261004f2" />
   <link rel="stylesheet" href="theme2.css?v=20261008n1" />
-  <link rel="stylesheet" href="couchpotato.css?v=20261023f1" />
+  <link rel="stylesheet" href="couchpotato.css?v=20261023j2" />
   <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","name":"couchpotato.ae","alternateName":"couchpotato","url":"https://www.couchpotato.ae/"},{"@type":"Organization","name":"couchpotato.ae","url":"https://www.couchpotato.ae/","logo":"https://www.couchpotato.ae/favicon-192.png","email":"hello@couchpotato.ae"}]}</script>
 </head>
 <body class="t2 t2-home cp">
@@ -63,11 +63,10 @@
       </section>
 
       <section class="cp-sec" id="deals">
-        <h2 class="cp-h2">Top deals</h2>
+        <div class="cp-sech"><h2 class="cp-h2">Top deals</h2><button type="button" class="cp-alllink" id="dealsAll" hidden>All deals</button></div>
         <div class="t2-chips" id="dealChips" aria-label="Filter the deals" hidden></div>
         <ul class="pc-grid cp-pinned" id="dealGrid"></ul>
         <div class="empty" id="empty" hidden><p>Deals are being refreshed. Try the full catalogue while we update them.</p><a class="nn-btn" href="browse.html">Browse all products</a></div>
-        <p class="cp-more"><button type="button" class="cp-btn cp-btn-line" id="dealsAll" hidden>See all deals</button></p>
       </section>
 
       <section class="cp-sec" id="rooms">
@@ -75,9 +74,9 @@
         <div class="cp-rooms" id="roomRow"></div>
       </section>
 
+      <h2 class="cp-h2 cp-moodlabel" id="moodLabel" hidden>Shop by mood</h2>
       <section class="cp-mood" id="moods" hidden>
         <div class="cp-mood-t">
-          <span class="cp-ey">Shop by mood</span>
           <h2 class="cp-mood-h">Find your style, then make it yours.</h2>
           <p id="moodCopy">We've pulled together the most-loved home styles from UAE stores. Pick the one that feels like you. Every piece is real and priced.</p>
           <div class="cp-mchips" id="moodChips" role="group" aria-label="Moods"></div>
@@ -106,6 +105,6 @@
   <script src="js/home-tiles.js?v=20261012a1"></script>
   <script src="js/db-config.js?v=20261004t1"></script>
   <script src="js/common.js?v=20261023e1" data-v="20261006f"></script>
-  <script src="js/home.js?v=20261023g1"></script>
+  <script src="js/home.js?v=20261023i1"></script>
 </body>
 </html>
