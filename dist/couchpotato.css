@@ -703,3 +703,6 @@ html body.cp .cp-how h3 em { font-style: normal; font-weight: 700; }
   html body.cp .cp-what { margin-top: 56px; text-align: left; }
   html body.cp .cp-how h3 { font-size: 22px !important; }
 }
+
+/* section labels 30% larger (12.5px -> 16.25px): Top deals, Shop by room */
+html body.cp .cp-sec > .cp-h2, html body.cp .cp-how-t { font-size: 16.25px !important; margin-bottom: 36px; }

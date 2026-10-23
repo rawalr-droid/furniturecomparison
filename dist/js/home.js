@@ -68,8 +68,8 @@
     const deals = home.deals || [];
     const groups = [...new Set(deals.map(d => d.g).filter(Boolean))];
     // the 8 on the board: the best of each group in turn, so it is never eight sofas
-    // owner rule (23 Oct): the 8 on the front are living room / dining room / bedroom furniture (no rugs, office pieces or sets), AED 1,000-2,000, at least 50% off
-    const front = deals.filter(d => d.g !== 'Rugs' && d.p >= 1000 && d.p <= 2000 && d.o > d.p && (d.o - d.p) / d.o >= 0.5 && !/\b(sets?|office|desk|gaming|study)\b/i.test(d.name));
+    // owner rule (23 Oct): the 8 on the front are living room / dining room / bedroom furniture (no rugs, office pieces, sets, As Is / clearance / display items), AED 1,000-2,000, at least 50% off
+    const front = deals.filter(d => d.g !== 'Rugs' && d.p >= 1000 && d.p <= 2000 && d.o > d.p && (d.o - d.p) / d.o >= 0.5 && !/\b(sets?|office|desk|gaming|study)\b/i.test(d.name) && !/\b(as[ -]is|clearance|open[ -]box|display[ -]?(item|piece|model|unit))\b/i.test(d.name));
     const fg = [...new Set(front.map(d => d.g))], queue = fg.map(g => front.filter(d => d.g === g)), pinned = [];
     for (let k = 0; pinned.length < Math.min(8, front.length) && k < 80; k++) { const q = queue[k % queue.length]; if (q && q.length) pinned.push(q.shift()); }
     let all = false, cur = '';
@@ -82,7 +82,7 @@
         .map(([g, t]) => `<button type="button" class="t2-chip${g === cur ? ' on' : ''}" data-g="${esc(g)}" aria-pressed="${g === cur}">${esc(t)}</button>`).join('');
       grid.innerHTML = (all ? deals.filter(d => !cur || d.g === cur) : pinned).map(card).join('');
       btn.hidden = deals.length <= pinned.length;
-      btn.textContent = all ? 'Show fewer' : `See all ${deals.length} deals`;
+      btn.textContent = all ? 'Show fewer' : 'All deals';
     }
     $('dealChips').addEventListener('click', e => { const c = e.target.closest('.t2-chip'); if (c) { cur = c.dataset.g; draw(); } });
     $('dealsAll').addEventListener('click', () => { all = !all; cur = ''; draw(); if (!all) $('deals').scrollIntoView({ behavior: 'smooth', block: 'start' }); });
