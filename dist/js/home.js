@@ -68,10 +68,22 @@
     const deals = home.deals || [];
     const groups = [...new Set(deals.map(d => d.g).filter(Boolean))];
     // the 8 on the board: the best of each group in turn, so it is never eight sofas
-    // owner rule (23 Oct): the 8 on the front are living room / dining room / bedroom furniture (no rugs, office pieces, sets, As Is / clearance / display items), AED 1,000-2,000, at least 50% off
-    const front = deals.filter(d => d.g !== 'Rugs' && d.p >= 1000 && d.p <= 2000 && d.o > d.p && (d.o - d.p) / d.o >= 0.5 && !/\b(sets?|office|desk|gaming|study)\b/i.test(d.name) && !/\b(as[ -]is|clearance|open[ -]box|display[ -]?(item|piece|model|unit))\b/i.test(d.name));
-    const fg = [...new Set(front.map(d => d.g))], queue = fg.map(g => front.filter(d => d.g === g)), pinned = [];
-    for (let k = 0; pinned.length < Math.min(8, front.length) && k < 80; k++) { const q = queue[k % queue.length]; if (q && q.length) pinned.push(q.shift()); }
+    // The 8 on the front change every day: the nightly job keeps a pool of ~40 front-row-eligible deals (home.json "pool": living / dining / bedroom
+    // furniture, no sets, office pieces or As Is items, AED 1,000-2,000, 50-80% off) and the page picks 8 from it with the Dubai date as the seed,
+    // one per kind first, at most 2 per store. Without a pool (or under 8 in it) it falls back to the filtered deals list.
+    const dayKey = Number(new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Dubai' }).format(new Date()).replace(/-/g, ''));
+    const rng = seed => { let x = seed >>> 0; return () => { x = (Math.imul(x ^ x >>> 15, x | 1) + 0x6D2B79F5) >>> 0; return ((x ^ x >>> 7) >>> 0) / 4294967296; }; };
+    const pool = home.pool || [];
+    let pinned = [];
+    if (pool.length >= 8) {
+      const r = rng(dayKey), order = pool.map(c => ({ c, k: r() })).sort((a, b) => a.k - b.k).map(x => x.c), kinds = new Set(), perStore = {};
+      for (const c of order) if (pinned.length < 8 && !kinds.has(c.t) && (perStore[c.store] || 0) < 2) { pinned.push(c); kinds.add(c.t); perStore[c.store] = (perStore[c.store] || 0) + 1; }
+      for (const c of order) if (pinned.length < 8 && !pinned.includes(c) && (perStore[c.store] || 0) < 2) { pinned.push(c); perStore[c.store] = (perStore[c.store] || 0) + 1; }
+    } else {
+      const front = deals.filter(d => d.g !== 'Rugs' && d.p >= 1000 && d.p <= 2000 && d.o > d.p && (d.o - d.p) / d.o >= 0.5 && !/\b(sets?|office|desk|gaming|study)\b/i.test(d.name) && !/\b(as[ -]is|clearance|open[ -]box|display[ -]?(item|piece|model|unit))\b/i.test(d.name));
+      const fg = [...new Set(front.map(d => d.g))], queue = fg.map(g => front.filter(d => d.g === g));
+      for (let k = 0; pinned.length < Math.min(8, front.length) && k < 80; k++) { const q = queue[k % queue.length]; if (q && q.length) pinned.push(q.shift()); }
+    }
     let all = false, cur = '';
     const card = d => FF.pcCard({ id: d.id, name: d.name, store: d.store, img: FF.fixImg(d.i), price: d.p, orig: d.o, l3: d.cat });
     function draw() {
