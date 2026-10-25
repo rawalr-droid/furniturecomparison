@@ -377,7 +377,7 @@
     } else if (crumbs.length) {
       label = `${start} › ${trail}`; title = crumbs[crumbs.length - 1].n + (room ? ', ' + room : '');
     } else {
-      label = room ? `<a href="index.html#rooms">Shop by room</a> › <span>${esc(room)}</span>` : state.sale ? 'Everything on sale' : 'All products'; title = room || (state.sale ? 'Top deals' : 'Browse');
+      label = room ? `<a href="/#rooms">Shop by room</a> › <span>${esc(room)}</span>` : state.sale ? 'Everything on sale' : 'All products'; title = room || (state.sale ? 'Top deals' : 'Browse');
     }
     els.label.innerHTML = label;
     document.title = atHome() ? HOME_TITLE : `${title} | couchpotato.ae`;

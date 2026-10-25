@@ -61,4 +61,14 @@
 - Product pages are script-only (not readable by search engines); Search Console/Bing not set up.
 
 ## Lessons (updated at each weekly close; keep under 25 lines, replace stale ones)
-- (none yet)
+- Flow that worked (23-24 Oct): owner iterates on a MOCKUP first (design/mockup_*/, serve with `python3 -m http.server <port>` in that folder), says "build it", then: backup -> edit final-website/dist -> test -> hand to Master (files, tags, backup, rollback). Master publishes; the 22:00 nightly ships whatever is in dist, so finish before ~21:45 or say so.
+- Before every edit: copy the files to agents/state/site_backups/pre-<name>-<stamp>/ and name that folder in the hand-off.
+- Cache tags: a css/js change needs the tag bumped in ALL ~220 html (root pages + c/ + room/); python glob over **/*.html, skip data/. static_pages.py builds c/ and room/ from browse.html, so shell changes carry over (test it on a temp copy with a symlinked data/).
+- Check at 1440 and 390 with iframes in the pane (width, scrollWidth, getComputedStyle): the pane's screenshots go stale/tiny after resize or navigation. Take one more screenshot, or trust measured values. Pane width changes clear a set viewport.
+- If the preview server (ff-local-site, port 8766) goes down, preview_start it again. File:// does not work in the pane; mockups must load data as <script>, not fetch (and fetch of .gz fails when opened as a plain file).
+- When cutting code by slicing between markers, check you did not delete a neighbour (I once removed the piece-chip click handler). Re-test every control after a removal.
+- Section labels are DOM-dependent: `.cp-sec > .cp-h2` stops matching once the h2 moves into `.cp-sech`; re-measure font sizes after moving markup.
+- zsh: `grep --include=*.html` fails on glob; wrap in `bash -c '...'`.
+- Never claim what data does not show: no "last night/tonight/nightly", no "same sofa" unless matched, no savings claims; cap deal badges (pcCard hides >80%); exclude As Is / clearance / display / sets / office / pouf / shelving from the front-row deals.
+- Top deals front row: pool of ~40 in home.json "pool" (agents/ff_agents/site_patch.py refresh_pool, wrapped in try/except; kept 10 days, staggered, expired ids cannot return), page picks 8/day seeded by the Dubai date (js/home.js). Pipeline code changes must be reviewed by Master and dry-run on a copy before the nightly.
+- Brand name in text: couchpotato.ae in the logo typeface (<span class="cp-brand">). Orange #EE5A0B only for the hero label, chips' dots and the hero search button.

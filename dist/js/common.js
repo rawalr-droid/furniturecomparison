@@ -406,11 +406,19 @@
     },
     async signOut() { try { const c = await sb(); await c.auth.signOut({ scope: 'local' }); } catch (e) { console.warn(e); } }
   };
+  let loginReturn = false;                                      // true only on the page load that follows the Google sign-in redirect
   function acctSet(user, ev) {
     const was = FF.account.user;
     FF.account.user = user || null;
     acctDraw();
-    if (user && (!was || was.id !== user.id)) { FF.track('login', { method: 'Google' }); wlSync().catch(e => console.warn(e)); }
+    // GA "login" = a real sign-in only: the page we land on after the Google redirect, once per browser session. A plain page load of an
+    // already signed-in visitor used to count too (88 events from 2 people, 19-25 Oct).
+    if (user && loginReturn && ev === 'SIGNED_IN') {
+      let sent = false; try { sent = sessionStorage.getItem('cp-login-sent') === user.id; } catch (_) {}
+      loginReturn = false;
+      if (!sent) { FF.track('login', { method: 'Google' }); try { sessionStorage.setItem('cp-login-sent', user.id); } catch (_) {} }
+    }
+    if (user && (!was || was.id !== user.id)) wlSync().catch(e => console.warn(e));
     if (!user && ev === 'SIGNED_OUT') {                          // signed out: the list stays in the account, not on this device
       let owned = false; try { owned = !!localStorage.getItem(OKEY); localStorage.removeItem(OKEY); if (owned) localStorage.removeItem(WKEY); } catch (_) {}
       if (owned) { wlQuiet = true; document.dispatchEvent(new CustomEvent('ff-wish')); wlQuiet = false; }
@@ -427,6 +435,7 @@
     });
     let back = false, has = false;
     try { back = /[?&](code|error_description)=/.test(location.search); has = !!localStorage.getItem(`sb-${SB_REF}-auth-token`); } catch (_) {}
+    loginReturn = back || /[#&]access_token=/.test(location.hash);
     if (back || has) sb().then(c => c.auth.onAuthStateChange((ev, session) => setTimeout(() => acctSet(session && session.user, ev), 0))).catch(e => console.warn(e));
   }
 
@@ -473,7 +482,7 @@
     if (!document.getElementById('cpGa')) {
       const s = document.createElement('script'); s.id = 'cpGa'; s.async = true; s.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(GA_ID);
       document.head.appendChild(s);
-      const here = new URL(location.href); ['code', 'state', 'error', 'error_code', 'error_description'].forEach(k => here.searchParams.delete(k));   // never the sign-in return code
+      const here = new URL(location.href); here.pathname = here.pathname.replace(/\/index\.html$/, '/'); ['code', 'state', 'error', 'error_code', 'error_description'].forEach(k => here.searchParams.delete(k));   // never the sign-in return code
       gtag('js', new Date()); gtag('config', GA_ID, { page_location: here.href });
     }
   }
@@ -521,7 +530,7 @@
     if (nav) Promise.all([FF.loadMeta(), FF.loadRooms()]).then(() => {
       FF.renderNav(nav);
       // on a phone the header's own links are hidden, so the menu panel carries them
-      nav.insertAdjacentHTML('afterbegin', '<div class="cp-menu-links"><a href="index.html#rooms">Rooms</a><a href="moodboards.html">Moods</a><a href="browse.html?deals=1">Top deals</a><a href="wishlist.html">Wishlist</a></div>');
+      nav.insertAdjacentHTML('afterbegin', '<div class="cp-menu-links"><a href="/#rooms">Rooms</a><a href="moodboards.html">Moods</a><a href="browse.html?deals=1">Top deals</a><a href="wishlist.html">Wishlist</a></div>');
     });
     // "All categories" in the header: a panel with every department and what is inside it
     const catBtn = FF.$('cpCatBtn');
