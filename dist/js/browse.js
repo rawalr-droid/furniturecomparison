@@ -92,6 +92,7 @@
     const read = q => { const v = Math.floor(Number(box.querySelector(q).value)); return Number.isFinite(v) && v > 0 ? v : 0; };
     let lo = read('[data-pmin]'), hi = read('[data-pmax]');
     if (hi && lo > hi) [lo, hi] = [hi, lo];
+    if (lo || hi) trackFilter('price', `${lo}-${hi || ''}`);
     state.price = lo || hi ? [`${lo}-${hi || ''}`] : state.price.filter(isBand);           // an own range replaces the ticked ones; empty boxes remove it
     closeDrops(); go();
   }
@@ -446,7 +447,10 @@
   // ------------------------------------------------------------------ events
   const go = () => { state.shown = PAGE; syncControls(); syncChecks(); pills(); return refresh(); };
   function setCat(c) { state.cat = c; state.size = []; return go(); }
+  // GA4 filter_apply {filter, filter_value} (owner approved 26 Oct): only when a choice is applied, lowercase strings
+  const trackFilter = (f, v) => FF.track && FF.track('filter_apply', { filter: String(f), filter_value: String(v).toLowerCase() });
   function tick(k, v, on) {
+    if (on) trackFilter(k === 'cat' ? 'category' : k === 'disc' ? 'discount' : k, v);
     if (k === 'cat') return setCat(v);
     if (k === 'disc') state.disc = on ? Number(v) : 0;                 // "25% off or more" already includes 50%: one choice at a time
     else state[k] = state[k].filter(x => x !== v).concat(on ? [v] : []);
@@ -463,7 +467,7 @@
     document.body.style.overflow = open ? 'hidden' : '';
     if (open) closeDrops();
   }
-  els.sort.addEventListener('change', () => { state.sort = els.sort.value; go(); });
+  els.sort.addEventListener('change', () => { state.sort = els.sort.value; trackFilter('sort', state.sort); go(); });
   document.addEventListener('change', e => { const i = e.target; if (i.dataset && i.dataset.fk) tick(i.dataset.fk, i.value, i.checked); });
   document.addEventListener('input', e => {
     if (!e.target.matches || !e.target.matches('[data-fs]')) return;
@@ -475,6 +479,7 @@
     if (e.key === 'Enter' && e.target.matches && e.target.matches('[data-pmin], [data-pmax]')) { e.preventDefault(); setOwnPrice(e.target.closest('.ff-own')); }
   });
 
+  window.FF_FREE_SEARCH = q => goSearch(q);                       // used by the category-mapped search dropdown (its "Search all products" row)
   function goSearch(q) { state.q = q.trim(); if (state.q) { state.cat = ''; state.size = []; } /* the header search looks across everything */ go().then(() => $('browse').scrollIntoView({ behavior: 'smooth', block: 'start' })); }
   $('searchForm').addEventListener('submit', e => { e.preventDefault(); goSearch(els.search.value); });
   document.querySelectorAll('[data-query]').forEach(b => b.addEventListener('click', () => goSearch(b.dataset.query)));

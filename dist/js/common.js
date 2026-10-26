@@ -519,6 +519,33 @@
     const c = cookieChoice();
     if (c !== 'no') gaStart();                                  // owner 16 Oct: no notice; counting is on unless the visitor opts out via "Cookie settings"
   }
+  // GA4 click events (owner approved 26 Oct). One delegated listener so every page type works, the 212 static /c/ and /room/ pages included.
+  // FF.track only sends after the cookie choice allows it (and never on localhost). Names and params: signin_click {location},
+  // select_item {item_id, list}, moodboard_open {name}, room_open {name}; filter_apply {filter, filter_value} is sent from browse.js.
+  // All values are strings, lowercase except item_id, which keeps the product id exactly as store_click sends it (6,092 ids contain capitals; lowercasing would break the join). Search needs nothing: GA's own site-search measurement already records view_search_results with search_term from ?q=.
+  const evPath = location.pathname, evPage = evPath.split('/').pop() || 'index.html';
+  const evList = el => {
+    if (el.closest('#simGrid, .similar-cards')) return 'similar';
+    if (evPage === 'wishlist.html') return 'wishlist';
+    if (evPath === '/' || evPage === 'index.html' && !/^\/(c|room)\//.test(evPath)) return el.closest('#dealGrid') ? 'home_top_deals' : 'home_other';
+    if (evPage === 'board.html' || evPage === 'moodboards.html') return 'moodboard';
+    if (/^\/(c|room)\//.test(evPath)) return 'category';
+    if (evPage === 'browse.html') { const p = new URLSearchParams(location.search); return p.get('q') ? 'search' : (p.get('c') || p.get('room')) ? 'category' : 'browse'; }
+    return 'browse';
+  };
+  document.addEventListener('click', e => {
+    const t = e.target;
+    const si = t.closest('[data-signin]');
+    if (si) FF.track('signin_click', { location: si.closest('.nn-header') ? 'header' : (evPage === 'wishlist.html' ? 'wishlist' : 'other') });
+    const nm = t.closest('a.pc-name'), card = nm && nm.closest('.pc-card[data-product-id]');
+    if (card) { FF.track('select_item', { item_id: String(card.dataset.productId), list: evList(card) }); return; }
+    const mb = t.closest('.mb-links a[href*="product.html?id="]');                 // a mood board's "Details" link
+    if (mb) { try { FF.track('select_item', { item_id: new URL(mb.href).searchParams.get('id'), list: 'moodboard' }); } catch (_) {} return; }
+    const bd = t.closest('a[href*="board.html?b="]');
+    if (bd) { try { FF.track('moodboard_open', { name: new URL(bd.href).searchParams.get('b').toLowerCase() }); } catch (_) {} return; }
+    const rm = t.closest('a.cp-room');
+    if (rm) FF.track('room_open', { name: FF.slug((rm.querySelector('.cp-rl b') || rm).textContent.trim()) });
+  });
   document.addEventListener('click', e => {
     const a = e.target.closest('a[data-store]'); if (!a || !gaOn) return;
     let host = ''; try { host = new URL(a.href).hostname; } catch (_) {}
@@ -544,4 +571,329 @@
     cookieInit();
     acctInit();
   });
+})();
+
+/* ==========================================================================================================================================
+   Category-mapped search (owner, 26 Oct 2026). As the visitor types, a dropdown suggests CATEGORY pages (taxonomy v2: L1/L2/L3, plus
+   "Shop by room" pages); Enter without picking goes to the best-mapped category page; only terms that do not map (brand names, "grey 3 seater")
+   fall back to the old free-text product search. Uses only the category tree that already loads (FF.meta.tree); no product data, no AI.
+   GA: a mapped jump loses ?q=, so it sends view_search_results {search_term} itself; picking a suggestion also sends
+   search_suggestion_click {search_term, category} (category = the page's slug path). Rollback: restore js/common.js and couchpotato.css.
+   ========================================================================================================================================== */
+(function () {
+  'use strict';
+  const FF = window.FF; if (!FF) return;
+  const STOP = new Set(['a', 'an', 'the', 'for', 'of', 'in', 'and', 'with', 'to', 'my', 'i', 'want', 'need', 'buy', 'some', 'cheap', 'best']);
+  const IRREG = { shelves: 'shelf', knives: 'knife', tvs: 'tv', glasses: 'glass', couches: 'couch', mattresses: 'mattress', wardrobes: 'wardrobe', lenses: 'lens' };
+  const sing = w => IRREG[w] || (w.length > 3 && /ies$/.test(w) ? w.slice(0, -3) + 'y' : /(ss|us|is)$/.test(w) ? w : /(ches|shes|xes|sses|zes)$/.test(w) ? w.slice(0, -2) : w.length > 3 && /s$/.test(w) ? w.slice(0, -1) : w);
+  const words = q => String(q || '').toLowerCase().replace(/&/g, ' ').replace(/[^a-z0-9 ]+/g, ' ').split(/\s+/).filter(w => w && !STOP.has(w)).map(sing);
+  // alias spec: "alias | alias = target, target" ; targets are category slug tails (deepest match wins) or "room:Name"; the FIRST target is where Enter goes.
+  const SPEC = `
+chair|seat|seating = armchairs-accent-chairs, dining-chairs, office-chairs, outdoor-chairs-benches
+armchair|accent chair|lounge chair|wingback|arm chair|tub chair = armchairs-accent-chairs
+recliner|massage chair|reclining chair|recliner sofa = recliners-massage-chairs
+dining chair|kitchen chair = dining-chairs
+office chair|desk chair|computer chair|ergonomic chair|executive chair|task chair = office-chairs
+gaming chair|gamer chair = gaming-chairs
+stool|footstool|foot stool = stools, ottomans-poufs-footstools, bar-stools
+bar stool|counter stool|barstool = bar-stools
+sofa|couch|settee|loveseat|love seat|lounge|three seater|3 seater|2 seater|two seater|sofaa = sofas, corner-l-shape-sofas, modular-sofas, sofa-sets, sofa-beds
+corner sofa|l shape sofa|l shaped sofa|l shape|sectional|corner couch|u shape sofa = corner-l-shape-sofas
+modular sofa|modular|sectional modular = modular-sofas
+sofa set|couch set|living room set|sofa set 3 2 1 = sofa-sets
+sofa bed|sofabed|futon|sleeper sofa|couch bed|convertible sofa = sofa-beds
+chaise|chaise lounge|chaise longue|daybed|day bed = chaise-longues-daybeds
+ottoman|pouf|pouffe|footrest|foot rest|puff = ottomans-poufs-footstools
+bean bag|beanbag = bean-bags
+bench|entryway bench|bed bench = benches, outdoor-chairs-benches
+table|tabel = dining-tables, coffee-tables, side-end-tables, console-tables, desks, outdoor-tables
+coffee table|center table|centre table|tea table|cocktail table|middle table = coffee-tables
+side table|end table|accent table|sofa side table|lamp table|corner table = side-end-tables
+console table|console|entryway table|hall table|hallway table|sofa table = console-tables
+nesting table|nest of tables|nested table = nesting-tables
+other table|small table = other-tables
+tv unit|tv stand|tv cabinet|tv table|tv console|media unit|media console|entertainment unit|television stand|tv|tv bench = tv-media-units
+cabinet|cupboard|display cabinet|display unit|showcase|curio|cabnet|crockery unit = cabinets-display-units
+bookcase|bookshelf|book shelf|bookshelves|shelf|shelving|shelving unit|wall shelf|rack shelf|etagere = bookcases-shelves
+shoe rack|shoe cabinet|shoe storage|shoe organizer|shoe organiser|shoe stand|shoe shelf = shoe-racks-storage
+divider|room divider|screen|partition|folding screen = room-dividers-screens
+coat stand|coat rack|hall tree|hat stand|coat hanger stand|umbrella stand = coat-stands-hall-trees
+bed|king bed|queen bed|single bed|double bed|beds|bedd|bunk bed|twin bed = beds, bed-frames-headboards, kids-beds
+bed frame|bedframe|headboard|head board|bedstead|divan|platform bed|storage bed = bed-frames-headboards
+bedroom set|bedroom furniture set|bedroom suite|bed set furniture = bedroom-sets
+wardrobe|wardrope|almirah|almira|armoire|closet|walk in closet|sliding wardrobe = wardrobes, kids-storage-wardrobes, clothes-wardrobe-organisers
+bedside table|nightstand|night stand|bedside|bedside cabinet|night table|bedside drawer = bedside-tables
+dresser|dressing table|vanity table|makeup table|make up table|vanity = dressers-dressing-tables, vanity-units
+chest of drawer|drawer|tallboy|chest|drawers|chest drawer = chests-of-drawers, trunks-chests
+mattress|mattres|matress|memory foam|orthopedic mattress|spring mattress = mattresses/mattresses
+mattress topper|mattress protector|topper|mattress pad = mattress-toppers-protectors
+bar table|bistro table|pub table|high table|bar counter|breakfast bar = bar-bistro-tables
+dining table|dinner table|kitchen table|dinning table|dining tabel = dining-tables
+dining set|dining table set|dining room set|6 seater dining|4 seater dining|dinette = dining-sets
+sideboard|buffet|credenza|server|dining cabinet = sideboards-buffets
+bar unit|bar cabinet|serving trolley|bar cart|drinks trolley|wine cabinet|wine rack = bar-units-serving-trolleys
+desk|study table|computer table|writing desk|work desk|office desk|workstation|laptop table|pc table = desks
+office storage|filing cabinet|file cabinet|office cabinet|office shelf = office-storage
+outdoor chair|patio chair|garden chair|balcony chair|outdoor bench|garden bench = outdoor-chairs-benches
+lounger|sunbed|sun lounger|sun bed|swing|hammock|gazebo|pergola|parasol|umbrella|canopy|shade|cabana = loungers-swings-shade
+outdoor sofa|rattan sofa|patio sofa|garden sofa|outdoor lounge|outdoor sofa set|outdoor couch|rattan set = outdoor-sofas-lounge-sets
+outdoor table|patio table|garden table|outdoor coffee table = outdoor-tables
+outdoor dining|balcony set|patio set|garden set|bistro set|outdoor dining set|balcony furniture|garden furniture|patio furniture|outdoor furniture = outdoor-dining-balcony-sets, outdoor-sofas-lounge-sets, outdoor-chairs-benches, outdoor-tables
+kids bed|children bed|toddler bed|child bed|loft bed|kids bunk bed|kid bed|boys bed|girls bed = kids-beds
+kids desk|kids table|kids study table|kids chair|play table|children desk|kid desk = kids-desks-chairs-tables
+kids wardrobe|kids storage|toy storage|toy box|toy chest|kids cabinet|children wardrobe = kids-storage-wardrobes
+cot|crib|nursery|baby bed|baby cot|changing table|bassinet|moses basket|baby furniture|nursery furniture = cots-nursery-furniture
+kids|kid|child|children|baby|toddler|boys|girls|kids room|childrens room|kids furniture = room:Kids Room, kids-beds, kids-desks-chairs-tables, kids-storage-wardrobes
+vase|flower vase|vases|decor vase = vases
+sculpture|figurine|statue|ornament|decor piece|showpiece|show piece = figurines-sculptures
+decorative tray|tray|decor tray|ottoman tray|bowl|decorative bowl = decorative-trays-bowls
+decorative box|decor box|trinket box|jewelry box|jewellery box = decorative-boxes
+bookend|book end|decor book|coffee table book = decorative-books-bookends
+candle holder|lantern|candlestick|candle stand|tealight holder|votive = candle-holders-lanterns
+painting|canvas|wall art|artwork|art|picture|canvas art|oil painting|wall painting = paintings-canvas-art
+wall hanging|macrame|wall sculpture|wall decor|wall decoration|wall ornament = wall-hangings-sculptures
+wallpaper|wall panel|wall paper|3d panel|pvc panel = wall-panels-wallpaper
+poster|print|map|framed print|art print|wall print = prints-posters-maps
+mirror|wall mirror|round mirror|decorative mirror|mirors = wall-mirrors, floor-mirrors, table-mirrors, led-bathroom-mirrors
+floor mirror|full length mirror|standing mirror|leaning mirror|dressing mirror = floor-mirrors
+table mirror|vanity mirror|makeup mirror|desk mirror|tabletop mirror = table-mirrors
+led mirror|bathroom mirror|smart mirror|backlit mirror|illuminated mirror = led-bathroom-mirrors
+clock|wall clock|large clock|decorative clock = wall-clocks, table-clocks
+table clock|desk clock|mantel clock|alarm clock = table-clocks
+photo frame|picture frame|frame|photo album|collage frame = photo-frames
+artificial plant|fake plant|artificial tree|faux plant|plant|tree|indoor tree|faux tree|palm|artifical plant|fake tree = artificial-plants-trees, live-plants, planters-pots
+artificial flower|fake flower|flower|flowers|faux flower|bouquet|artifical flower = artificial-flowers, dried-flowers
+live plant|real plant|indoor plant|houseplant|succulent|cactus|real flower = live-plants
+dried flower|pampas|pampas grass|dried grass|preserved flower = dried-flowers
+planter|plant pot|flower pot|plant stand|plant holder|pot cover|plantr = planters-pots
+candle|scented candle|pillar candle|tealight|candels = candles
+room spray|air freshener|fragrance|perfume|room fragrance|reed diffuser spray = room-sprays-fragrance
+diffuser|oud burner|burner|aroma diffuser|incense burner|mabkhara|bakhoor burner|aroma = diffusers-burners
+incense|bakhoor|bukhoor|oud|agarbatti|dhoop = incense-bakhoor
+christmas|xmas|christmas tree|seasonal|festive|halloween|easter|new year = christmas-seasonal
+ramadan|eid|ramadhan|iftar|ramadan decor|eid decor|fanous|ramadan lantern = ramadan-eid
+lamp|lamps|lighting lamp = lighting/lamps, table-lamps, floor-lamps
+table lamp|desk lamp|bedside lamp|study lamp|reading lamp|night lamp|accent lamp = table-lamps
+floor lamp|standing lamp|arc lamp|tripod lamp|torchiere|floor light|standing light = floor-lamps
+light|lighting|lights|lite|light fixture = lighting
+ceiling light|ceiling lamp|flush mount|ceiling fixture|ceiling fan light|led ceiling light = ceiling-lights/ceiling-lights, pendant-lights, chandeliers
+pendant|pendant light|hanging light|hanging lamp|pendant lamp|drop light = pendant-lights
+chandelier|chandlier|crystal chandelier|candelabra|chandeliers = chandeliers
+spotlight|downlight|spot light|recessed light|track light|down light = spotlights-downlights
+wall light|wall lamp|sconce|wall sconce|wall mounted light|bracket light = wall-lights/wall-lights
+bulb|light bulb|led bulb|lightbulb|lamp bulb|bulbs = bulbs-light-accessories
+led strip|string light|fairy light|strip light|rope light|neon light|led light strip|string lights = led-strips-string-lights
+outdoor light|garden light|solar light|outdoor lamp|landscape light|patio light|flood light = outdoor-lights
+rug|carpet|rugs|carpets|ruge|area carpet|floor rug|floor carpet = rugs-carpets/rugs, area-rugs, kids-rugs, outdoor-rugs, runners
+area rug|living room rug|large rug|shag rug|wool rug|persian rug|rug 5x8 = area-rugs
+kids rug|children rug|nursery rug|play mat rug|kids carpet = kids-rugs
+outdoor rug|patio rug|garden rug|balcony rug|waterproof rug|outdoor carpet = outdoor-rugs
+runner|hallway rug|hallway runner|rug runner|corridor rug|stair runner|kitchen runner = runners
+door mat|doormat|welcome mat|entrance mat|floor mat|entry mat = door-mats
+prayer mat|prayer rug|sajada|musalla|janamaz|prayer carpet = prayer-mats
+cushion|throw pillow|scatter cushion|sofa cushion|pillow cushion|cushons|decorative pillow|accent pillow = filled-cushions
+cushion cover|pillow cover|pillow slip|throw pillow cover|cushion case = cushion-covers
+seat pad|chair pad|furniture cover|sofa cover|chair cover|slipcover|seat cushion|chair cushion = seat-pads-furniture-covers
+throw|blanket|throws|blankets|sofa throw|fleece|cozy blanket|plaid = throws-blankets
+curtain|drape|curtians|drapes|window curtain|blackout curtain|sheer curtain|sheer|curtin = curtains
+blind|shade|roller blind|window blind|venetian blind|roman blind|window shade|zebra blind|blinds = blinds-shades
+curtain rod|curtain pole|curtain rail|curtain ring|curtain hook|curtain accessory|curtain tieback|rod = curtain-rods-accessories
+sheet|bed sheet|bedsheet|pillowcase|pillow case|fitted sheet|flat sheet|bed linen|linen|sheets = sheets-pillowcases, duvet-covers, bedding-sets
+duvet cover|quilt cover|comforter cover|doona cover|duvet set = duvet-covers
+bedding set|bed set|comforter set|bedding|bed in a bag|bedding sets|bed linen set = bedding-sets
+bedspread|quilt|bed cover|coverlet|bed throw|bedcover|bed spread|quilted bedspread = bedspreads-quilts
+duvet|comforter|doona|down duvet|winter duvet|feather duvet|quilted comforter = duvets-comforters
+pillow|sleeping pillow|bed pillow|memory foam pillow|neck pillow|pilow|pillows = pillows
+towel|bath towel|hand towel|face towel|beach towel|towels|towl|towell = towels
+bath mat|bathmat|bathroom mat|bath rug|shower mat|bathroom rug|toilet mat = bath-mats
+bathrobe|robe|dressing gown|bath robe|bathroom robe|spa robe = bathrobes
+soap dispenser|bath set|toothbrush holder|bathroom set|soap dish|bathroom accessories|tumbler holder|bathroom accessory = soap-dispensers-bath-sets
+shower curtain|shower accessory|shower caddy|bath curtain|shower rail = shower-curtains-accessories
+towel holder|towel rack|towel rail|towel ring|towel bar|towel hook|toilet roll holder = towel-holders-racks
+vanity unit|bathroom vanity|sink cabinet|basin cabinet|wash basin cabinet|vanity cabinet = vanity-units
+bathroom cabinet|bathroom storage|bathroom shelf|bathroom unit|medicine cabinet|bathroom organiser|bathroom rack = bathroom-cabinets-storage
+laundry basket|hamper|laundry bag|laundry bin|clothes hamper|dirty clothes basket|laundry = laundry-baskets-hampers, ironing-drying
+ironing board|iron board|drying rack|clothes airer|clothes dryer|clothes horse|ironing|washing line|clothes drying = ironing-drying
+glass|glassware|tumbler|wine glass|water glass|drinking glass|juice glass|glasses|whisky glass|champagne glass = glassware
+tea|coffee|tea set|coffee set|teapot|coffee cup|tea cup|dallah|arabic coffee|kettle|turkish coffee|tea pot|cafetiere = tea-coffee
+mug|cup|mugs|coffee mug|tea mug|travel mug|espresso cup = mugs-cups
+flask|bottle|water bottle|thermos|vacuum flask|insulated bottle|sports bottle|hot flask = flasks-bottles
+plate|bowl|dish|dinnerware|tableware|plates|dinner plate|soup bowl|salad bowl|side plate|crockery = plates-bowls, dinner-sets
+dinner set|dinnerware set|dish set|dinner service|crockery set|tableware set|porcelain set|plate set = dinner-sets
+serving dish|platter|serving tray|serving bowl|serving platter|cake stand|serving board|snack tray|serveware = serving-dishes-platters
+placemat|coaster|table mat|place mat|table coaster|table placemat|dining mat|heat mat = placemats-coasters
+napkin|napkin ring|serviette|napkin holder|table napkin|cloth napkin|paper napkin = napkins-napkin-rings
+tablecloth|table cloth|table runner|table linen|table cover|dining cloth|oilcloth|table skirt = tablecloths-runners
+cutlery|flatware|spoon|fork|knife set|silverware|cutlery set|spoon set|serving spoon|knife fork = cutlery-sets-flatware
+kitchen mat|utility mat|anti fatigue mat|kitchen rug|floor mat kitchen|sink mat = kitchen-utility-mats
+utensil|gadget|spatula|ladle|kitchen tool|peeler|whisk|tongs|kitchen utensil|can opener|grater|kitchen gadget = utensils-gadgets
+knife|chopping board|cutting board|chopper|kitchen knife|chef knife|knife block|knife set kitchen|butcher block = knives-cutting-boards
+food storage|container|lunch box|tupperware|jar|food container|storage container|airtight|lunchbox|spice jar|canister = food-storage-containers
+dish rack|drainer|kitchen rack|dish drainer|plate rack|kitchen holder|sink organiser|spice rack|kitchen organiser|dish drying = racks-drainers-holders
+pot|pan|frying pan|saucepan|cooking pot|wok|cookware|pots|pans|casserole|stock pot|non stick|frypan|pressure cooker = pots-pans, cookware-sets
+bakeware|baking tray|cake tin|baking|baking pan|muffin tray|cake mould|baking sheet|bake|cake pan|baking dish = bakeware
+cookware set|pot set|pan set|pots and pans set|cooking set|non stick set|cookware sets = cookware-sets
+kitchen towel|oven glove|apron|tea towel|pot holder|oven mitt|dish cloth|kitchen cloth|kitchen linen|dishcloth = kitchen-textiles
+storage box|basket|storage basket|organizer|organiser|bin box|storage bin|woven basket|wicker basket|box|storage|baskets|boxes|home organizer = boxes-baskets
+trunk|storage chest|blanket box|toy chest storage|storage trunk|chest box|ottoman storage|storage ottoman|wooden trunk|treasure chest = trunks-chests
+hanger|coat hanger|clothes hanger|hangers|wooden hanger|velvet hanger|suit hanger|trouser hanger = hangers
+wardrobe organiser|closet organizer|closet organiser|clothes organiser|wardrobe storage|drawer organiser|shelf organiser|hanging organiser|clothes storage = clothes-wardrobe-organisers
+bin|trash can|dustbin|waste bin|garbage|rubbish bin|trash bin|dust bin|pedal bin|bins|kitchen bin|sensor bin|garbage can = waste-bins/waste-bins
+hook|wall hook|rack|wall rack|hooks|coat hook|key holder|hat rack|wall hanger|towel hooks = wall-hooks-racks
+trolley|cart|utility cart|kitchen trolley|serving cart|rolling cart|storage cart|hand trolley|tea trolley|cart trolley = trolleys-carts
+garden|garden ornament|fountain|garden statue|water feature|garden decor|garden decoration|outdoor ornament|gnome|garden sculpture = garden-ornaments-fountains
+artificial grass|turf|lawn|fake grass|synthetic grass|grass mat|artificial turf|grass carpet|green carpet|artificial lawn = artificial-grass
+fence|fencing|hedge|privacy screen|garden fence|artificial hedge|bamboo fence|balcony screen|privacy fence|boxwood = artificial-fencing-hedges
+bbq|barbecue|grill|fire pit|outdoor kitchen|charcoal grill|gas grill|fire bowl|smoker|bar b q|firepit = bbq-fire-pits-outdoor-cooking
+living room|lounge room|livingroom|sitting room|majlis|lounge area|drawing room|hall = room:Living Room
+bedroom|bed room|master bedroom|guest room|sleeping room|bedrom = room:Bedroom
+dining room|diningroom|dining area|dinning room|dining hall|eating area = room:Dining Room
+home office|study|office|study room|work from home|office room|workspace|home study = room:Home Office
+entryway|hallway|entrance|foyer|entry|hall way|corridor|lobby|porch|mudroom = room:Entryway
+bathroom|bath room|washroom|restroom|toilet|powder room|shower room|wc|bathrom = room:Bathroom
+kitchen|kitchenware|kitchen area|kitchenette|kitchan|cooking|pantry|kitchen room|galley = room:Kitchen
+outdoor|patio|balcony|terrace|outside|veranda|rooftop|backyard|courtyard|yard|alfresco = room:Outdoor
+`;
+  let ready = null, nodes = [], aliasList = [];            // aliasList: [{k: 'sofa bed', w: ['sofa','bed'], t: [node...]}]
+  const roomSlug = r => r.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  function build() {
+    if (ready) return ready;
+    return ready = FF.loadMeta().then(m => {
+      const tree = (m && m.tree) || [];
+      const add = (n, level, parents) => {
+        const node = { type: 'cat', n: n.n, s: n.s, c: n.c || 0, level, path: parents.map(p => p.n), w: words(n.n), url: '/c/' + n.s + '/' };
+        nodes.push(node);
+        (n.ch || []).forEach(ch => add(ch, level + 1, parents.concat([n])));
+      };
+      tree.forEach(l1 => add(l1, 0, []));
+      (m.rooms || []).forEach(r => nodes.push({ type: 'room', n: r, s: 'room:' + r, c: ((FF.rooms && FF.rooms.rooms && FF.rooms.rooms[r] && FF.rooms.rooms[r].n) || 0), level: 1, path: ['Shop by room'], w: words(r), url: '/room/' + roomSlug(r) + '/' }));
+      const find = tail => {
+        if (tail.indexOf('room:') === 0) return nodes.find(x => x.type === 'room' && x.s === tail);
+        const hit = nodes.filter(x => x.type === 'cat' && (x.s === tail || x.s.endsWith('/' + tail)));
+        return hit.sort((a, b) => b.level - a.level)[0] || null;      // the deepest page wins when a name repeats (L2 and its L3)
+      };
+      SPEC.split('\n').forEach(line => {
+        const i = line.indexOf('='); if (i < 0) return;
+        const targets = line.slice(i + 1).split(',').map(s => find(s.trim())).filter(Boolean); if (!targets.length) return;
+        line.slice(0, i).split('|').forEach(a => { const w = words(a); if (w.length) aliasList.push({ k: w.join(' '), w, t: targets }); });
+      });
+      return true;
+    }).catch(() => (ready = null));
+  }
+  const lev = (a, b, max) => {                                // small edit distance, early exit
+    if (Math.abs(a.length - b.length) > max) return max + 1;
+    let prev = Array.from({ length: b.length + 1 }, (_, j) => j);
+    for (let i = 1; i <= a.length; i++) {
+      const cur = [i]; let best = i;
+      for (let j = 1; j <= b.length; j++) { cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); if (cur[j] < best) best = cur[j]; }
+      if (best > max) return max + 1; prev = cur;
+    }
+    return prev[b.length];
+  };
+  // -> { items: [{node, score, full}], full: bool }  "full" = the typed words are all accounted for by the top match (safe to jump on Enter)
+  function match(q) {
+    const qw = words(q); if (!qw.length) return { items: [], full: false };
+    const key = qw.join(' '), out = new Map();
+    const put = (node, score, full, order) => { const o = out.get(node); if (!o || score > o.score) out.set(node, { node, score, full, order: order || 0 }); };
+    let exact = false;
+    aliasList.forEach(a => {
+      if (a.k === key) { exact = true; a.t.forEach((t, i) => put(t, 1000 - i, true, i)); }
+      else if (a.k.indexOf(key) === 0 && key.length >= 2) a.t.forEach((t, i) => put(t, 700 - i, false, i));                  // typing: "sof" -> sofa
+      else if (qw.length > 1 && (' ' + key + ' ').indexOf(' ' + a.k + ' ') >= 0) a.t.forEach((t, i) => put(t, 400 - i, false, i));       // "grey sofa": part of the phrase maps, not all of it
+    });
+    nodes.forEach(n => {                                       // the category names themselves: every typed word is the start of a name word
+      const nw = n.w.concat(n.path.length ? words(n.path[n.path.length - 1]) : []);
+      if (qw.every(w => nw.some(x => x.indexOf(w) === 0))) {
+        const nameHit = qw.every(w => n.w.some(x => x.indexOf(w) === 0));
+        const same = n.w.join(' ') === key;
+        put(n, (same ? 950 : nameHit ? 600 : 300) + (3 - Math.min(3, n.level)) * 5, same, 99);
+      }
+    });
+    if (!exact && !out.size) {                                  // misspellings: 1 edit for short words, 2 for long
+      const max = key.length >= 7 ? 2 : 1;
+      aliasList.forEach(a => { if (lev(a.k, key, max) <= max) a.t.forEach((t, i) => put(t, 500 - i, true, i)); });
+    }
+    const items = [...out.values()].sort((a, b) => b.score - a.score || a.order - b.order || b.node.c - a.node.c).slice(0, 6);
+    const top = items[0];
+    return { items, full: !!(top && top.full && top.score >= 500) };
+  }
+  // ---- UI
+  const rowsFor = q => { const r = match(q); return { items: r.items, full: r.full }; };
+  const fmt = n => Number(n || 0).toLocaleString('en-AE');
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  let box = null, cur = null, active = -1, rows = [], lastQ = '';
+  function ensureBox() {
+    if (box) return box;
+    box = document.createElement('div'); box.className = 'cp-sug'; box.id = 'cpSug'; box.setAttribute('role', 'listbox'); box.hidden = true;
+    box.addEventListener('mousedown', e => e.preventDefault());                            // keep the focus in the input while tapping a row
+    box.addEventListener('click', e => { const r = e.target.closest('[data-i]'); if (r) choose(Number(r.dataset.i)); });
+    document.body.appendChild(box); return box;
+  }
+  function place() {
+    if (!box || box.hidden || !cur) return;
+    const r = cur.input.closest('form, .rsearch, .nn-search') ? cur.input.closest('form, .rsearch, .nn-search').getBoundingClientRect() : cur.input.getBoundingClientRect();
+    box.style.left = Math.max(8, r.left + window.scrollX) + 'px'; box.style.top = (r.bottom + window.scrollY + 4) + 'px'; box.style.width = Math.min(Math.max(r.width, 300), window.innerWidth - 16) + 'px';
+  }
+  function close() { if (box) box.hidden = true; active = -1; if (cur) cur.input.setAttribute('aria-expanded', 'false'); }
+  function render(q) {
+    const b = ensureBox(); lastQ = q;
+    const m = rowsFor(q); rows = m.items.map(i => ({ kind: 'cat', node: i.node })); 
+    if (q.trim()) rows.push({ kind: 'free', q: q.trim() });
+    if (!q.trim() || !rows.length || (rows.length === 1 && rows[0].kind === 'free' && !m.items.length && q.trim().length < 2)) { close(); return; }
+    b.innerHTML = rows.map((r, i) => r.kind === 'cat'
+      ? `<div class="cp-sug-r" role="option" data-i="${i}" id="cpSug${i}"><span class="cp-sug-t"><b>${esc(r.node.n)}</b><small>${esc(r.node.path.join(' › ') || 'All categories')}</small></span><span class="cp-sug-c">${r.node.c ? fmt(r.node.c) : ''}</span></div>`
+      : `<div class="cp-sug-r cp-sug-free" role="option" data-i="${i}" id="cpSug${i}"><span class="cp-sug-t"><b>Search all products for “${esc(r.q)}”</b><small>Not what you meant? Look through every product name</small></span></div>`).join('');
+    b.hidden = false; active = -1; cur.input.setAttribute('aria-expanded', 'true'); place();
+  }
+  function hl(i) {
+    active = i; [...box.children].forEach((c, k) => { c.classList.toggle('on', k === i); c.setAttribute('aria-selected', String(k === i)); });
+    if (cur) { if (i >= 0) cur.input.setAttribute('aria-activedescendant', 'cpSug' + i); else cur.input.removeAttribute('aria-activedescendant'); }
+  }
+  const lc = s => String(s || '').trim().toLowerCase();
+  function go(url) { window.location.assign(url); }
+  function choose(i) {
+    const r = rows[i]; if (!r || !cur) return;
+    const typed = cur.input.value;
+    if (r.kind === 'free') { close(); freeSearch(typed); return; }
+    FF.track && FF.track('view_search_results', { search_term: lc(typed), transport_type: 'beacon' });
+    FF.track && FF.track('search_suggestion_click', { search_term: lc(typed), category: lc(r.node.s), transport_type: 'beacon' });
+    close(); go(r.node.url);
+  }
+  function freeSearch(q) {                                    // the old behaviour: browse.html?q=… (GA counts it from the address)
+    const f = cur.input.closest('form');
+    if (/browse\.html$/.test(location.pathname) && window.FF_FREE_SEARCH) return window.FF_FREE_SEARCH(q);
+    go('browse.html?q=' + encodeURIComponent(q.trim()));
+  }
+  function onSubmit(e, input) {
+    const q = input.value; if (!q.trim()) return;
+    cur = cur && cur.input === input ? cur : { input };
+    if (active >= 0 && rows[active]) { e.preventDefault(); e.stopImmediatePropagation(); choose(active); return; }
+    if (!ready || !aliasList.length) return;                  // data not ready: let the normal free-text search run
+    const m = match(q);
+    if (m.full && m.items[0]) {                               // every typed word maps: jump to the best category page
+      e.preventDefault(); e.stopImmediatePropagation();
+      const node = m.items[0].node;
+      FF.track && FF.track('view_search_results', { search_term: lc(q), transport_type: 'beacon' });
+      close(); go(node.url);
+    }                                                          // else: nothing maps cleanly -> the normal free-text search continues
+  }
+  function attach(input) {
+    if (!input || input.dataset.cpSug) return; input.dataset.cpSug = '1';
+    input.setAttribute('autocomplete', 'off'); input.setAttribute('role', 'combobox'); input.setAttribute('aria-autocomplete', 'list'); input.setAttribute('aria-expanded', 'false'); input.setAttribute('aria-controls', 'cpSug');
+    const f = input.closest('form');
+    if (f) f.addEventListener('submit', e => onSubmit(e, input), true);
+    input.addEventListener('focus', () => { cur = { input }; build(); });
+    input.addEventListener('input', () => { cur = { input }; build().then(() => { if (cur && cur.input === input) render(input.value); }); });
+    input.addEventListener('keydown', e => {
+      if (!box || box.hidden) return;
+      if (e.key === 'ArrowDown') { e.preventDefault(); hl((active + 1) % rows.length); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); hl(active <= 0 ? rows.length - 1 : active - 1); }
+      else if (e.key === 'Escape') { close(); }
+    });
+    input.addEventListener('blur', () => setTimeout(close, 120));
+  }
+  document.addEventListener('click', e => { if (box && !box.hidden && !e.target.closest('#cpSug') && !e.target.closest('.nn-search, .rsearch')) close(); });
+  window.addEventListener('resize', place); window.addEventListener('scroll', place, { passive: true });
+  document.addEventListener('DOMContentLoaded', () => { document.querySelectorAll('.nn-search input[name="q"], .rsearch input[name="q"]').forEach(attach); });
+  FF.searchMap = { match: q => build().then(() => match(q)), build, stats: () => ({ aliases: aliasList.length, nodes: nodes.length, mapped: new Set(aliasList.flatMap(a => a.t.map(t => t.s))).size, mappedPaths: [...new Set(aliasList.flatMap(a => a.t.map(t => t.s)))] }) };                    // for tests
 })();

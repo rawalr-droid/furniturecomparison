@@ -727,3 +727,17 @@ html body.cp .cp-sech .cp-h2 { text-align: center; }
 html body.cp .cp-alllink { position: absolute; right: 0; top: 50%; transform: translateY(-50%); }
 html body.cp .cp-stores small { font-size: 16.25px; font-weight: 600; letter-spacing: .14em; text-align: center; margin-bottom: 32px; }
 html body.cp .cp-sech .cp-h2 { font: 600 16.25px/1.2 var(--cp-sans) !important; letter-spacing: .14em; text-transform: uppercase; }
+
+/* category-mapped search dropdown (26 Oct 2026) */
+.cp-sug { position: absolute; z-index: 400; background: #fff; border: 1px solid #111; box-shadow: 0 18px 36px -14px rgba(0,0,0,.35); max-height: min(62vh, 420px); overflow-y: auto; font-family: "Inter Tight", system-ui, sans-serif; }
+.cp-sug[hidden] { display: none; }
+.cp-sug-r { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 11px 16px; cursor: pointer; border-top: 1px solid #eee; }
+.cp-sug-r:first-child { border-top: 0; }
+.cp-sug-r:hover, .cp-sug-r.on { background: #f4f4f2; }
+.cp-sug-t { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.cp-sug-t b { font-size: 15px; font-weight: 600; color: #111; }
+.cp-sug-t small { font-size: 12.5px; color: #6b6b6b; font-weight: 400; }
+.cp-sug-c { font-size: 12.5px; color: #6b6b6b; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.cp-sug-free { background: #fafafa; }
+.cp-sug-free b { font-weight: 500; }
+@media (max-width: 600px) { .cp-sug-r { padding: 14px 16px; } .cp-sug-t b { font-size: 16px; } }
