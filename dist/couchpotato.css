@@ -741,3 +741,9 @@ html body.cp .cp-sech .cp-h2 { font: 600 16.25px/1.2 var(--cp-sans) !important; 
 .cp-sug-free { background: #fafafa; }
 .cp-sug-free b { font-weight: 500; }
 @media (max-width: 600px) { .cp-sug-r { padding: 14px 16px; } .cp-sug-t b { font-size: 16px; } }
+
+/* mobile: the three steps stack flush left (the later desktop padding rules had pushed steps 2 and 3 in) */
+@media (max-width: 900px) {
+  html body.cp .cp-how > div, html body.cp .cp-how > div + div { padding: 24px 0 26px; margin: 0; border-left: 0; }
+  html body.cp .cp-how > div + div { border-top: 1px solid var(--cp-bd); }
+}
