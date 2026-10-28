@@ -6,7 +6,7 @@
   const params = new URLSearchParams(location.search);
   const many = k => (params.get(k) || '').split(',').map(s => s.trim()).filter(Boolean);        // "store=a,b"; an old single value still works
   const state = {
-    q: params.get('q') || '', cat: (window.FF_CAT_REDIRECTS || {})[params.get('c')] || params.get('c') || '',
+    q: (params.get('q') || '').trim(), cat: (window.FF_CAT_REDIRECTS || {})[params.get('c')] || params.get('c') || '',
     room: many('room'), store: many('store'), size: many('size'), price: many('price').filter(t => /^\d+-\d*$/.test(t)),
     disc: Math.max(0, Math.min(80, parseInt(params.get('disc'), 10) || 0)), sale: params.get('deals') === '1',
     sort: SORTS.includes(params.get('sort')) ? params.get('sort') : 'featured', shown: PAGE, compare: [],
@@ -352,12 +352,45 @@
       .catch(e => { if (key === facetKey) facetKey = ''; console.warn('filter counts could not be loaded', e); });
   }
 
+  // Phone grid rhythm (owner approved mockup, 28 Oct): every 7th product opens as a full-width feature tile (is-feature; is-wide when its photo is
+  // landscape, so it is not cropped) and one promo tile follows the 7th product. couchpotato.css shows both on phones only; nothing changes on desktop.
+  function decorate() {
+    const cards = [...els.grid.querySelectorAll(':scope > .pc-card')];
+    const showPromo = !state.sale && !state.q.trim();
+    let cells = 0, since = 99;                                   // grid cells used so far (a feature tile takes 2) and products since the last feature
+    cards.forEach((c, i) => {
+      if (i >= 4 && cells % 2 === 0 && since >= 6) {             // a feature tile only starts a new row, so no row is left half empty
+        c.classList.add('is-feature'); cells += 2; since = 0;
+        const im = c.querySelector('.pc-media img');
+        if (im) {
+          const wide = () => { if (im.naturalWidth && im.naturalWidth / im.naturalHeight > 1.2) c.classList.add('is-wide'); };
+          if (im.complete) wide(); else im.addEventListener('load', wide, { once: true });
+        }
+      } else { cells += 1; since += 1; }
+      if (i === 6 && showPromo) {
+        c.insertAdjacentHTML('afterend', '<li class="pc-promo"><small>Top deals</small><b>New deals every day</b><a href="browse.html?deals=1">See all deals</a></li>');
+        cells += 1;
+      }
+    });
+  }
+  let lastTotal = 0, sentSearch = '', sentList = '';
+  // GA4 (owner approved 27 Oct): view_search_results {search_term, results_count} + search_no_results for a free-text search, once per new
+  // search; view_item_list {list, item_count} when a category / room / browse view is opened (item_count = all pieces in it). Not per card.
+  function gaView() {
+    const q = state.q.trim().toLowerCase();
+    if (q) { if (q !== sentSearch) { sentSearch = q; sentList = ''; if (FF.trackSearch) FF.trackSearch(q, lastTotal); } return; }
+    sentSearch = '';
+    const list = FF.listName ? FF.listName() : 'browse', key = [list, state.cat, state.room.join(',')].join('|');
+    if (key !== sentList) { sentList = key; if (FF.track) FF.track('view_item_list', { list, item_count: String(lastTotal) }); }
+  }
   function render() {
     const rows = dbv ? dbv.items : currentRows();
     if (!dbv) facets = cache.facets;
     const visible = dbv ? rows : rows.slice(0, state.shown);
     const total = dbv ? dbv.total : rows.length;
+    lastTotal = total;
     els.grid.innerHTML = visible.map(card).join('');
+    decorate();
     const crumbs = [FF.node(state.cat).l1, FF.node(state.cat).l2, FF.node(state.cat).l3].filter(Boolean);
     const trail = crumbs.map((x, i) => (i === crumbs.length - 1 && !state.q ? `<span>${esc(x.n)}</span>` : `<a href="browse.html?c=${enc(x.s)}" data-cat="${esc(x.s)}">${esc(x.n)}</a>`)).join(' › ');
     const room = oneRoom() || cameFrom();          // inside a room the trail starts at the room, not at "All products"
@@ -394,6 +427,11 @@
     els.show.textContent = `Show ${total.toLocaleString()} ${total === 1 ? 'result' : 'results'}`;
     els.load.hidden = visible.length >= total || !rows.length;
     els.empty.hidden = !!rows.length; els.grid.hidden = !rows.length;
+    const eh = els.empty.querySelector('h3'), ep = els.empty.querySelector('p');
+    if (eh && ep) {
+      if (!rows.length && state.q) { eh.textContent = `No results for “${state.q}”`; ep.textContent = 'Check the spelling, try a shorter word like “sofa” or “table”, or remove a filter.'; }
+      else { eh.textContent = 'No matching products'; ep.textContent = 'Try removing a filter or searching for a broader term.'; }
+    }
     pills();
   }
 
@@ -413,7 +451,7 @@
         await dbLoad(false);
         if (my !== token) return;
         els.status.textContent = '';
-        return render();
+        render(); gaView(); return;
       } catch (e) { FF.db.fail(e); dbv = null; facets = null; facetKey = ''; cache = { key: '', rows: [], facets: null }; if (my !== token) return; loadRest(); }
     }
     const keys = neededKeys();
@@ -428,7 +466,7 @@
     }
     if (my !== token) return;
     els.status.textContent = '';
-    render();
+    render(); gaView();
   }
 
   // once the first view is on screen, quietly load everything else so search and filters cover the whole catalogue

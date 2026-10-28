@@ -5,6 +5,7 @@
   const id = new URLSearchParams(location.search).get('id');
 
   function notFound() {
+    if (FF.pageReady) FF.pageReady();
     root.innerHTML = '<section class="detail-copy"><h1>Product not found</h1><p>This product may no longer be in the catalogue.</p><a href="browse.html">Browse furniture</a></section>';
   }
   // Material can arrive as JSON text ({"Primary Material": "Oak"}); show it as "Primary material: Oak". Empty ({}) shows nothing.
@@ -103,6 +104,7 @@
 
     function paint() {
       const { v, price, orig } = view();
+      if (FF.gaItem) FF.gaItem.band = FF.priceBand(price);
       const shownOff = price > 0 && orig > price && (orig - price) / orig <= 0.805;      // QC 2026-10-17: hide a was-price implying more than 80% off
       FF._snap.set(id, { name: d.n, store, img: FF.fixImg((v && v.i) || d.i), price, orig, size: (v && v.z) || '', colours: 0, from: false, room });
       const main = v && v.i && imgIndex === -1 ? v.i : images[imgIndex] || '';
@@ -146,7 +148,10 @@
     document.title = FF.cleanName(d.n) + ' | couchpotato.ae';
     const md = document.querySelector('meta[name="description"]');
     if (md) md.content = `${FF.cleanName(d.n)} from ${store}, ${money(d.p)}. Compare it with similar pieces from UAE home stores.`;
+    FF.gaItem = { id, store, category: String(l3.s || '').toLowerCase(), band: FF.priceBand(view().price) };     // read by the store_click listener in common.js
     paint();
+    if (FF.pageReady) FF.pageReady();                              // the title is set: now the one page_view (GA4, owner approved 27 Oct)
+    if (FF.track) FF.track('view_item', Object.assign({ item_id: id, store, category: FF.gaItem.category }, FF.gaItem.band ? { price_band: FF.gaItem.band } : {}));
 
     // similar items: precomputed nightly from photo + description + price + category + size + colour (data/s/, built by
     // agents/similar/build_similar.py). A size/colour card can have its own list; otherwise the product's list is used.

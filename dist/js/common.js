@@ -476,15 +476,41 @@
   let gaOn = false;
   function gtag() { window.dataLayer.push(arguments); }
   FF.track = (name, params) => { if (gaOn) gtag('event', name, params || {}); };
+  // GA4 tracking upgrade (owner approved 27 Oct). A product page's title is only set once the name has loaded, so the automatic page_view
+  // (sent right after the config call) could record "Product | couchpotato.ae". On product.html alone the config sends no page_view; one is sent
+  // by hand after product.js has set the title (FF.pageReady), or after 6 s if the product never loads. Exactly one per load (pvSent).
+  // On browse.html?q= the search term is kept out of page_location so Google's own site-search event does not count the same search a
+  // second time; FF.trackSearch (below) sends view_search_results with the number of results instead.
+  const gaIsProduct = /(^|\/)product\.html$/.test(location.pathname);
+  const gaIsSearch = /(^|\/)browse\.html$/.test(location.pathname);
+  function gaHere() {
+    const h = new URL(location.href); h.pathname = h.pathname.replace(/\/index\.html$/, '/');
+    ['code', 'state', 'error', 'error_code', 'error_description'].forEach(k => h.searchParams.delete(k));   // never the sign-in return code
+    if (gaIsSearch) h.searchParams.delete('q');
+    return h;
+  }
+  let pvReady = false, pvSent = false;
+  function gaPV() {
+    if (!gaIsProduct || pvSent || !pvReady || !gaOn) return;
+    pvSent = true; gtag('event', 'page_view', { page_title: document.title, page_location: gaHere().href });
+  }
+  FF.pageReady = () => { pvReady = true; gaPV(); };
+  FF.priceBand = p => { p = Number(p); return !(p > 0) ? '' : p < 500 ? 'under_500' : p < 1000 ? '500_1000' : p < 2500 ? '1000_2500' : p < 5000 ? '2500_5000' : 'over_5000'; };
+  FF.trackSearch = (term, n) => {                                // one search: view_search_results {search_term, results_count}, plus search_no_results when empty
+    term = String(term || '').trim().toLowerCase(); if (!term || !FF.track) return; n = Number(n) || 0;
+    FF.track('view_search_results', { search_term: term, results_count: String(n), transport_type: 'beacon' });
+    if (!n) FF.track('search_no_results', { search_term: term, transport_type: 'beacon' });
+  };
   function gaStart() {
     if (gaOn || !GA_ID || /^(localhost|127\.|\[::1\])/.test(location.hostname)) return;     // never count our own test pages
     gaOn = true; window['ga-disable-' + GA_ID] = false; window.dataLayer = window.dataLayer || [];
     if (!document.getElementById('cpGa')) {
       const s = document.createElement('script'); s.id = 'cpGa'; s.async = true; s.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(GA_ID);
       document.head.appendChild(s);
-      const here = new URL(location.href); here.pathname = here.pathname.replace(/\/index\.html$/, '/'); ['code', 'state', 'error', 'error_code', 'error_description'].forEach(k => here.searchParams.delete(k));   // never the sign-in return code
-      gtag('js', new Date()); gtag('config', GA_ID, { page_location: here.href });
+      gtag('js', new Date()); gtag('config', GA_ID, gaIsProduct ? { page_location: gaHere().href, send_page_view: false } : { page_location: gaHere().href });
+      if (gaIsProduct) setTimeout(FF.pageReady, 6000);
     }
+    gaPV();
   }
   function gaStop() {                                           // changed their mind: stop sending and drop Google's cookies
     gaOn = false; if (!GA_ID) return;
@@ -533,6 +559,15 @@
     if (evPage === 'browse.html') { const p = new URLSearchParams(location.search); return p.get('q') ? 'search' : (p.get('c') || p.get('room')) ? 'category' : 'browse'; }
     return 'browse';
   };
+  const FROM = 'cp-from';                                        // the last card opened (list + position), read by the product page; 30 minutes, no personal data
+  const stashFrom = (id, list, pos) => { try { localStorage.setItem(FROM, JSON.stringify({ id: String(id), list, pos, t: Date.now() })); } catch (_) {} };
+  FF.cameFrom = id => { try { const o = JSON.parse(localStorage.getItem(FROM)); return o && o.id === String(id) && Date.now() - o.t < 1800000 ? o : null; } catch (_) { return null; } };
+  FF.listName = () => evList(document.body);
+  const stashCard = e => {
+    const c = e.target.closest('.pc-card[data-product-id]'); if (!c || e.target.closest('[data-wish]')) return;
+    stashFrom(c.dataset.productId, evList(c), [...c.parentElement.children].filter(x => x.classList.contains('pc-card')).indexOf(c) + 1);
+  };
+  document.addEventListener('click', stashCard); document.addEventListener('auxclick', stashCard);
   document.addEventListener('click', e => {
     const t = e.target;
     const si = t.closest('[data-signin]');
@@ -540,7 +575,7 @@
     const nm = t.closest('a.pc-name'), card = nm && nm.closest('.pc-card[data-product-id]');
     if (card) { FF.track('select_item', { item_id: String(card.dataset.productId), list: evList(card) }); return; }
     const mb = t.closest('.mb-links a[href*="product.html?id="]');                 // a mood board's "Details" link
-    if (mb) { try { FF.track('select_item', { item_id: new URL(mb.href).searchParams.get('id'), list: 'moodboard' }); } catch (_) {} return; }
+    if (mb) { try { const mid = new URL(mb.href).searchParams.get('id'); FF.track('select_item', { item_id: mid, list: 'moodboard' }); stashFrom(mid, 'moodboard', 0); } catch (_) {} return; }
     const bd = t.closest('a[href*="board.html?b="]');
     if (bd) { try { FF.track('moodboard_open', { name: new URL(bd.href).searchParams.get('b').toLowerCase() }); } catch (_) {} return; }
     const rm = t.closest('a.cp-room');
@@ -549,7 +584,14 @@
   document.addEventListener('click', e => {
     const a = e.target.closest('a[data-store]'); if (!a || !gaOn) return;
     let host = ''; try { host = new URL(a.href).hostname; } catch (_) {}
-    FF.track('store_click', { store: a.dataset.store, item_id: a.dataset.pid || '', link_domain: host });
+    const pid = a.dataset.pid || '', p = { store: a.dataset.store, item_id: pid, link_domain: host };
+    const it = FF.gaItem && FF.gaItem.id === pid ? FF.gaItem : null;                       // set by product.js for the product on screen
+    const band = it ? it.band : FF.priceBand(a.dataset.price);
+    if (it && it.category) p.category = it.category;
+    if (band) p.price_band = band;
+    if (evPage === 'product.html') { const f = FF.cameFrom(pid); if (f) { p.list = f.list; if (f.pos) p.position = String(f.pos); } }
+    else if (evPage === 'board.html' || evPage === 'moodboards.html') p.list = 'moodboard';
+    FF.track('store_click', p);
   });
 
   document.addEventListener('DOMContentLoaded', () => {
@@ -855,7 +897,7 @@ outdoor|patio|balcony|terrace|outside|veranda|rooftop|backyard|courtyard|yard|al
     const r = rows[i]; if (!r || !cur) return;
     const typed = cur.input.value;
     if (r.kind === 'free') { close(); freeSearch(typed); return; }
-    FF.track && FF.track('view_search_results', { search_term: lc(typed), transport_type: 'beacon' });
+    FF.trackSearch(typed, r.node.c);
     FF.track && FF.track('search_suggestion_click', { search_term: lc(typed), category: lc(r.node.s), transport_type: 'beacon' });
     close(); go(r.node.url);
   }
@@ -865,7 +907,7 @@ outdoor|patio|balcony|terrace|outside|veranda|rooftop|backyard|courtyard|yard|al
     go('browse.html?q=' + encodeURIComponent(q.trim()));
   }
   function onSubmit(e, input) {
-    const q = input.value; if (!q.trim()) return;
+    input.value = input.value.trim(); const q = input.value; if (!q) return;                    // "Chair " is searched (and counted) as "chair"
     cur = cur && cur.input === input ? cur : { input };
     if (active >= 0 && rows[active]) { e.preventDefault(); e.stopImmediatePropagation(); choose(active); return; }
     if (!ready || !aliasList.length) return;                  // data not ready: let the normal free-text search run
@@ -873,7 +915,7 @@ outdoor|patio|balcony|terrace|outside|veranda|rooftop|backyard|courtyard|yard|al
     if (m.full && m.items[0]) {                               // every typed word maps: jump to the best category page
       e.preventDefault(); e.stopImmediatePropagation();
       const node = m.items[0].node;
-      FF.track && FF.track('view_search_results', { search_term: lc(q), transport_type: 'beacon' });
+      FF.trackSearch(q, node.c);
       close(); go(node.url);
     }                                                          // else: nothing maps cleanly -> the normal free-text search continues
   }
