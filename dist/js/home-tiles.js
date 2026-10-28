@@ -47,3 +47,13 @@ window.FF_HOME_ROOMS = [
   "i": "https://media.homecentre.com/i/homecentre/161324875-161324875-HC050119_04-2100.jpg?v=1&w=900"
  }
 ];
+
+// Homepage "Collections" (owner approved the layout, 28 Oct): three fixed collections; each opens a filtered category page.
+// n = title, c = link, i = photo (a store photo, like the room photos above; the tile still works if it fails to load).
+window.FF_HOME_COLLECTIONS = [
+ { "n": "Beds under AED 1,500", "c": "browse.html?c=furniture%2Fbedroom%2Fbeds&price=0-1500", "i": "https://cdn.shopify.com/s/files/1/0255/1857/1617/files/2_2e18908b-320b-4c6d-bf25-ab4ead30ed04.jpg?v=1771941620" },
+ { "n": "Dining tables under AED 2,000", "c": "browse.html?c=furniture%2Fdining-room%2Fdining-tables&price=0-2000", "i": "https://media.homecentre.com/i/homecentre/168405741-168405741-HC24092025_01-2100.jpg?w=900" },
+ { "n": "Sofas, 50% off or more", "c": "browse.html?c=furniture%2Fsofas-seating%2Fsofas&disc=50", "i": "https://assets.danubehome.com/media/dh-seller/p/sellers/BESPOKE-FURNITURE/product-image/179900159990/1783676282108/1.webp" }
+];
+// Homepage "Popular searches": the most searched terms on the site (Google Analytics, 28 days to 27 Oct). Update by hand now and then.
+window.FF_HOME_TERMS = ['Dining table', 'Sofa', 'Coffee table', 'Bunk bed', 'Queen bed', 'Sofa bed', 'Outdoor dining', 'Rug', 'Armchair', 'Sideboard'];
