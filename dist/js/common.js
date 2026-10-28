@@ -91,11 +91,6 @@
   // colours than the cards shown (m), whether other options change the price ("from", f) and which option to open (q).
   FF.baseId = id => String(id).split('~')[0];
   FF.slug = v => String(v || '').toLowerCase().replace(/[^a-z0-9+]+/g, '-').replace(/^-+|-+$/g, '') || 'x';
-  // Mood-board scenes ship as WebP next to the JPEG (about half the bytes; Render bandwidth, 28 Oct). The board JSON still names the .jpg, so
-  // board_*.jpg is mapped to board_*.webp, and if that file is missing (a scene added later) the .jpg is used. The Japandi picture stays a JPEG:
-  // the nightly can redraw it in place (design_hook.py), which would leave a WebP copy out of date.
-  FF.sceneSrc = u => (/^scenes\/board_[^?]+\.jpg$/.test(u) ? u.replace(/\.jpg$/, '.webp') : u);
-  FF.sceneErr = (img, jpg, drop) => { if (/\.webp/.test(img.src) && jpg) img.src = jpg; else if (drop) img.remove(); };
 
   FF.rowFrom = a => {
     const [id, name, s, c, price, orig, img0, room, opts, at] = a;

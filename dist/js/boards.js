@@ -6,7 +6,7 @@
   const PAGE = 24;
   const params = new URLSearchParams(location.search);
   const tile = b => `<a class="t2-tile mb-tile" href="board.html?b=${enc(b.key)}">
-    <img src="${esc(FF.sceneSrc(b.image))}" alt="${esc(b.name)} room" loading="lazy" onerror="FF.sceneErr(this,'${esc(b.image)}',1)">
+    <img src="${esc(b.image)}" alt="${esc(b.name)} room" loading="lazy" onerror="this.remove()">
     <span class="t2-tl"><b>${esc(b.name)}<small>${esc(b.line)}</small></b><span>Explore →</span></span></a>`;
   FF.moodTile = tile;
   FF.loadMeta().catch(() => {});
@@ -43,7 +43,7 @@
     const shown = board.anchors.filter(a => a.inStock);
     const stores = new Set(shown.map(a => a.store)).size;
     els.hero.innerHTML = `<div class="mb-scene" style="aspect-ratio:${board.w}/${board.h}">
-        <img class="mb-photo" src="${esc(FF.sceneSrc(board.image))}" alt="${esc(board.name)} living room with ${shown.length} real products" onerror="FF.sceneErr(this,'${esc(board.image)}')">${shown.map(dot).join('')}</div>
+        <img class="mb-photo" src="${esc(board.image)}" alt="${esc(board.name)} living room with ${shown.length} real products">${shown.map(dot).join('')}</div>
       <div class="mb-copy"><p class="mb-eyebrow">Mood board</p><h1>${esc(board.name)}</h1><p class="mb-line">${esc(board.line)}</p>
         ${board.about ? `<p class="mb-about">${esc(board.about)}</p>` : ''}
         <p class="mb-total">The whole look: <strong>${money(board.total)}</strong> · ${shown.length} pieces</p>
