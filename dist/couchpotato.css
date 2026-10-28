@@ -822,7 +822,8 @@ html body.cp #dealGrid.cp-pinned .pc-card.is-feature .pc-price-now { font-size: 
   html body.cp #dealGrid.cp-pinned { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 30px 16px; grid-auto-flow: dense; }
   html body.cp #dealGrid.cp-pinned .pc-card.is-feature { grid-column: 1 / span 2; grid-row: span 2; display: flex; flex-direction: column; }
   html body.cp #dealGrid.cp-pinned .pc-card.is-feature.r { grid-column: 3 / span 2; }
-  html body.cp #dealGrid.cp-pinned .pc-card.is-feature .pc-media { aspect-ratio: auto; flex: 1; min-height: 0; }
+  html body.cp #dealGrid.cp-pinned .pc-card.is-feature .pc-media { aspect-ratio: auto; flex: 1 1 auto; min-height: 0; }
+  html body.cp #dealGrid.cp-pinned .pc-card.is-feature .pc-body, html body.cp #dealGrid.cp-pinned .pc-card.is-feature .pc-ribbon { flex: 0 0 auto; }
   html body.cp #dealGrid.cp-pinned .pc-card.is-feature .pc-media img { position: absolute; inset: 0; }
 }
 /* phone hero: a darker foot so the line and the search stay readable on a light room photo (mockup) */

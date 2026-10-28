@@ -53,7 +53,7 @@
     sec.style.background = colour; sec.classList.toggle('light', tone === 'light'); sec.classList.toggle('dark', tone !== 'light');
     document.querySelectorAll('#moodChips .cp-mchip').forEach((c, k) => { c.classList.toggle('on', k === i); c.setAttribute('aria-pressed', k === i); });
     img.style.opacity = 0;
-    setTimeout(() => { img.src = m.image; img.alt = m.name + ' living room'; img.style.opacity = 1; }, 160);
+    setTimeout(() => { img.onerror = () => { img.onerror = null; img.src = m.image; }; img.src = FF.sceneSrc(m.image); img.alt = m.name + ' living room'; img.style.opacity = 1; }, 160);
     $('moodName').textContent = m.name; $('moodLine').textContent = m.line;
     $('moodPrice').textContent = `${money(m.total)} · ${m.pieces} pieces`;
     $('moodLink').href = 'board.html?b=' + enc(m.key);
